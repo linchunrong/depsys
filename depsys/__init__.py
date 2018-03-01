@@ -7,3 +7,5 @@ app.config.from_object('depsys.setting')
 app.config.from_envvar('FLASKR_SETTINGS')
 
 db = SQLAlchemy(app)
+
+from depsys.model import User

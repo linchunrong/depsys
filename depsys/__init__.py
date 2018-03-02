@@ -4,8 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config.from_object('depsys.setting')
-app.config.from_envvar('FLASKR_SETTINGS')
+#app.config.from_envvar('FLASKR_SETTINGS')
 
 db = SQLAlchemy(app)
 
-from depsys.model import User
+from depsys.model import User,Project

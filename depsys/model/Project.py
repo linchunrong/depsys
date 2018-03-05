@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from depsys import db
 
 class Project(db.Model):
@@ -37,3 +39,5 @@ class Record(db.Model):
     def __init__(self,project_id,status):
         self.project_id = project_id
         self.status = status
+    def __repr__(self):
+        return '<Record %r>' % self.project_id

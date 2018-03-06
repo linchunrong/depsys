@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from wtforms import Form,BooleanField,StringField,SubmitField,TextField,PasswordField,validators
+from flask_wtf import FlaskForm
+from wtforms import BooleanField,StringField,SubmitField,PasswordField,validators
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     """Login Form"""
-    username = StringField('Username', validators=[validators.InputRequired()])
-    password = PasswordField('Password', validators=[validators.InputRequired()])
+    username = StringField('Username', validators=[validators.DataRequired()])
+    password = PasswordField('Password', validators=[validators.DataRequired()])
     remember_me = BooleanField('Remember me')
     submit = SubmitField('Login')

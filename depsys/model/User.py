@@ -4,7 +4,7 @@
 from depsys import db
 
 class User(db.Model):
-    __tablename__ = 'user'
+    __tablename__ = 'users'
     user_id = db.Column(db.Integer,primary_key=True)
     username = db.Column(db.String(16),unique=True,nullable=False)
     password = db.Column(db.String(24),nullable=False)

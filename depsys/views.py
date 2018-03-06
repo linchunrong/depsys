@@ -5,6 +5,15 @@ from depsys import app,db
 from depsys.model.User import User,Certif,System
 from flask import render_template, redirect, url_for, flash, request,session
 
+# Index
+@app.route('/')
+@app.route('/index')
+def index():
+    if 'username' in session:
+        return render_template('index.html')
+    flash('Please login first!')
+    return redirect(url_for('login'))
+
 # Login
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -21,16 +30,14 @@ def login():
             error = 'Invalid password'
         else:
             session['logged_in'] = True
+            session['username'] = request.form['username']
             flash('You were logged in')
             return redirect(url_for('index'))
     return render_template('login.html', error=error)
 
-# index
-@app.route('/index')
-def index():
-    return render_template('index.html')
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
+    session.pop('username', None)
     flash('You were logged out')
     return redirect(url_for('login'))

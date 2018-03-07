@@ -3,6 +3,7 @@
 
 from depsys import app,db
 from depsys.model.User import User,Certif,System
+from depsys.model.Project import Project,Record
 from flask import render_template, redirect, url_for, flash, request,session
 
 # Index
@@ -10,8 +11,9 @@ from flask import render_template, redirect, url_for, flash, request,session
 @app.route('/index')
 def index():
     if 'username' in session:
-        return render_template('index.html')
-    flash('Please login first!')
+        projects = Project.query.all()
+        return render_template('index.html', projects=projects)
+    #flash('Please login first!')
     return redirect(url_for('login'))
 
 # Login
@@ -31,7 +33,7 @@ def login():
         else:
             session['logged_in'] = True
             session['username'] = request.form['username']
-            flash('You were logged in')
+            #flash('You were logged in')
             return redirect(url_for('index'))
     return render_template('login.html', error=error)
 
@@ -39,5 +41,5 @@ def login():
 def logout():
     session.pop('logged_in', None)
     session.pop('username', None)
-    flash('You were logged out')
+    #flash('You were logged out')
     return redirect(url_for('login'))

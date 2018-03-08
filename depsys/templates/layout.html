@@ -6,11 +6,16 @@
     <link href="../static/css/style.css" rel='stylesheet' type='text/css' />
 </head>
 <div>
-    <ul>
-        <li><a href="#home">系统看板</a></li>
-        <li><a href="#news">工程发布</a></li>
-        <li><a href="#contact">系统配置</a></li>
-        <li style="float: right"><a href="{{ url_for('logout') }}">登出</a></lii>
+    <ul class="left">
+        <li class="left"><a href="#home">系统看板</a></lii>
+        <li class="left"><a href="#news">工程发布</a></li>
+        <li class="left"><a href="#contact">系统配置</a></li>
+        <li class="left"><a href="#contact">人个信息</a></li>
+    </ul>
+</div>
+<div>
+    <ul class="right">
+        <li class="right"><a href="#logout">登出</a> </li>
     </ul>
 </div>
 {% block body %}{% endblock %}

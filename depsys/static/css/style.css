@@ -1,29 +1,51 @@
+
 body {
     margin: 0;
 }
-
-ul {
+ul.right {
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: cadetblue;
+    background-color: darkslategrey;
     position: fixed;
     top: 0;
     width: 100%;
 }
 
-li {
-    float: left;
+li.right {
+    float: right;
 }
 
-li a {
+li.right a {
     display: block;
     color: white;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
 }
-li a:hover {
+li.right a:hover {
+    background-color: darkcyan;
+}
+
+ul.left {
+    left: 0;
+    width: 200px;
+    height: 100%;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: cadetblue;
+    position: fixed;
+}
+li.left a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+li.left a:hover {
     background-color: darkcyan;
 }

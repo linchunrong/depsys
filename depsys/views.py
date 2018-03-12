@@ -12,7 +12,8 @@ from flask import render_template, redirect, url_for, flash, request,session
 def index():
     if 'username' in session:
         projects = Project.query.all()
-        return render_template('index.html', projects=projects)
+        records = Record.query
+        return render_template('index.html', projects=projects, records=records)
     #flash('Please login first!')
     return redirect(url_for('login'))
 

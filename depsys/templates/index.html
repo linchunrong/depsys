@@ -7,14 +7,23 @@ h2 {
     margin-top: 50px;
     padding: 20px;
 }
+h3 {
+    text-align: left;
+    margin-left: 210px;
+}
 h4 {
-    text-align: center;
-    margin-left: 200px;
+    text-align: left;
+    margin-left: 230px;
 }
 </style>
 <body>
     <div>
     <h2>System Dashboard~~</h2>
+    <h3>Deploy Record:</h3>
+        <h4>Success: {{ records.filter_by(status='1').all() | length }}</h4>
+        <h4>Failed:  {{ records.filter_by(status='0').all() | length }}</h4>
+        <h4>Abort:   {{ records.filter_by(status='-1').all() | length }}</h4>
+    <h3>Project list:</h3>
     {% for project in projects %}
         <h4>{{ project.project_name }}</h4>
     {% else %}

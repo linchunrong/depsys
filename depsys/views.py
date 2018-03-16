@@ -44,3 +44,22 @@ def logout():
     session.pop('username', None)
     #flash('You were logged out')
     return redirect(url_for('login'))
+
+@app.route('/deploy')
+def deploy():
+    pass
+@app.route('/deploy/<project>')
+def project_deploy():
+    pass
+@app.route('/config')
+def config():
+    pass
+@app.route('/config/<project>')
+def project_config():
+    pass
+@app.route('/dashboard')
+def dashboard():
+    pass
+@app.route('/dashboard/<project>')
+def project_dashboard():
+    pass

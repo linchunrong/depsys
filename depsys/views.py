@@ -1,21 +1,30 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from functools import wraps
 from depsys import app,db
 from depsys.model.User import User,Certif,System
 from depsys.model.Project import Project,Record
 from flask import render_template, redirect, url_for, flash, request,session
 
+def login_need(func):
+    @wraps(func)
+    def login_check(*args, **kwargs):
+        if 'username' in session:
+            return func(*args,**kwargs)
+        else:
+            #flash('Please login first!')
+            return redirect(url_for('login'))
+    return login_check
+
 # Index
 @app.route('/')
 @app.route('/index')
+@login_need
 def index():
-    if 'username' in session:
-        projects = Project.query.all()
-        records = Record.query
-        return render_template('index.html', projects=projects, records=records)
-    #flash('Please login first!')
-    return redirect(url_for('login'))
+    projects = Project.query.all()
+    records = Record.query
+    return render_template('index.html', projects=projects, records=records)
 
 # Login
 @app.route('/login', methods=['GET','POST'])
@@ -46,20 +55,31 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/deploy')
+@login_need
 def deploy():
-    pass
+    return ("Still working on it...")
+
 @app.route('/deploy/<project>')
-def project_deploy():
-    pass
+@login_need
+def project_deploy(project):
+    return ("Still working on it...")
+
 @app.route('/config')
+@login_need
 def config():
-    pass
+    return ("Still working on it...")
+
 @app.route('/config/<project>')
-def project_config():
-    pass
+@login_need
+def project_config(project):
+    return ("Still working on it...")
+
 @app.route('/dashboard')
+@login_need
 def dashboard():
-    pass
+    return ("Still working on it...")
+
 @app.route('/dashboard/<project>')
-def project_dashboard():
-    pass
+@login_need
+def project_dashboard(project):
+    return ("Still working on it...")

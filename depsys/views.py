@@ -83,3 +83,8 @@ def dashboard():
 @login_need
 def project_dashboard(project):
     return ("Still working on it...")
+
+@app.route('/chart')
+def chart_test():
+    from depsys.dashboard import dash_index
+    return dash_index()

@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block body %}
+    <body>
+    <div style="margin-left: 210px; margin-top: 50px">
+        <h3>Deployment status</h3>
+        {{ div | safe }}
+        {{ script | safe }}
+        <h3>Project list:</h3>
+    {% for project in projects %}
+        <h4>{{ project.project_name }}</h4>
+    {% else %}
+        <h4>Unbelievable.  No project here so far</h4>
+    {% endfor %}
+    </div>
+    </body>
+{% endblock %}

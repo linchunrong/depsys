@@ -17,7 +17,7 @@ def dash_index():
         'status': ['Success',  'Failed', 'Abort']
     }
 
-    bar = Bar(data, values='amount', label='status', title="Total deployment status", plot_width=500)
+    bar = Bar(data, values='amount', label='status', title="Total deployment status", agg="mean", plot_width=400)
     #output_file("./depsys/templates/dash_index.html")
     #show(bar)
     script,div = components(bar)

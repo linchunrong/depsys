@@ -4,8 +4,8 @@
 from functools import wraps
 from depsys import app,db
 from depsys.model.User import User,Certif,System
-from depsys.model.Project import Project,Record
-from flask import render_template, redirect, url_for, flash, request,session
+from depsys.dashboard import dashboard_index
+from flask import render_template, redirect, url_for, flash, request,session,jsonify
 
 def login_need(func):
     @wraps(func)
@@ -22,9 +22,6 @@ def login_need(func):
 @app.route('/index')
 @login_need
 def index():
-#    projects = Project.query.all()
-#    records = Record.query
-#    return render_template('index.html', projects=projects, records=records)
     return render_template('index.html')
 
 # Login
@@ -85,19 +82,8 @@ def dashboard():
 def project_dashboard(project):
     return ("Still working on it...")
 
-#@app.route('/chart')
-#def chart_test():
-#    from depsys.dashboard import dash_index
-#    return dash_index()
-
-#@app.route('/test')
-#def echarts_test():
-#    return render_template('test.html')
-
 @app.route('/deploy_num')
 @login_need
 def deploy_num():
-    from depsys.dashboard import dashboard_index
-    d = dashboard_index()
-    from flask import jsonify
-    return jsonify(d)
+    data = dashboard_index()
+    return jsonify(data)

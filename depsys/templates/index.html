@@ -1,34 +1,44 @@
 {% extends "layout.html" %}
 {% block body %}
-<style>
-h2 {
-    text-align: center;
-    margin-left: 200px;
-    margin-top: 50px;
-    padding: 20px;
-}
-h3 {
-    text-align: left;
-    margin-left: 210px;
-}
-h4 {
-    text-align: left;
-    margin-left: 230px;
-}
-</style>
-<body>
-    <div>
-    <h2>System Dashboard~~</h2>
-    <h3>Deploy Record:</h3>
-        <h4>Success: {{ records.filter_by(status='1').all() | length }}</h4>
-        <h4>Failed:  {{ records.filter_by(status='0').all() | length }}</h4>
-        <h4>Abort:   {{ records.filter_by(status='-1').all() | length }}</h4>
-    <h3>Project list:</h3>
-    {% for project in projects %}
-        <h4>{{ project.project_name }}</h4>
-    {% else %}
-        <h4>Unbelievable.  No project here so far</h4>
-    {% endfor %}
-    </div>
-</body>
+    <body>
+    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+    <div id="main" style="width: 600px;height:400px;margin-top: 50px;margin-left: 210px; z-index: -1"></div>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('main'));
+        // 显示标题，图例和空的坐标轴
+        myChart.setOption({
+            title: {
+                text: '发版成功率概况'
+            },
+            tooltip: {},
+            legend: {
+                data:['次数']
+            },
+            xAxis: {
+                data: []
+            },
+            yAxis: {},
+            series: [{
+                name: '次数',
+                type: 'bar',
+                data: []
+            }]
+        });
+        // 异步加载数据
+$.get('deploy_num').done(function (data) {
+        // 填入数据
+        myChart.setOption({
+            xAxis: {
+                data: data.status
+            },
+            series: [{
+                // 根据名字对应到相应的系列
+                name: '次数',
+                data: data.amount
+            }]
+        });
+    });
+    </script>
+    </body>
 {% endblock %}
+

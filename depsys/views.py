@@ -32,11 +32,12 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=request.form['username']).first()
-        passwd = User.query.filter_by(password=request.form['password']).first()
+        #passwd = User.query.filter_by(password=request.form['password']).first()
+        passwd = user.password
 
         if user is None:
             error = 'Invalid username'
-        elif passwd is None:
+        elif passwd != password:
             error = 'Invalid password'
         else:
             session['logged_in'] = True

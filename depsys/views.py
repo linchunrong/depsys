@@ -82,6 +82,7 @@ def dashboard():
 def project_dashboard(project):
     return ("Still working on it...")
 
+# json data pages
 @app.route('/deploy_num')
 @login_need
 def deploy_num():

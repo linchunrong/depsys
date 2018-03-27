@@ -5,6 +5,7 @@ from functools import wraps
 from depsys import app,db
 from depsys.model.User import User,Certif,System
 from depsys.dashboard import dashboard_index
+from depsys.deploy import deploy_index
 from flask import render_template, redirect, url_for, flash, request,session,jsonify
 
 def login_need(func):
@@ -56,7 +57,8 @@ def logout():
 @app.route('/deploy')
 @login_need
 def deploy():
-    return ("Still working on it...")
+    project_list = deploy_index()
+    return render_template('deploy.html', project_list=project_list)
 
 @app.route('/deploy/<project>')
 @login_need

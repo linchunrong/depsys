@@ -4,7 +4,7 @@
 table
 {
 	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
-	width:80%;
+	width:85%;
 	border-collapse:collapse;
 }
 td,th
@@ -24,8 +24,7 @@ th
 }
 </style>
     <body>
-    <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1">
-    <h4>&nbsp;&nbsp;子业务清单</h4>
+    <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
     <table>
         <tr>
             <th>工程名</th>
@@ -34,7 +33,8 @@ th
         {% for project in project_list %}
         <tr>
             <td>{{ project }}</td>
-            <td><button type="button" onclick="alert('Still working on it...')">生产发布</button></td>
+            <!--<td><button type="button" onclick="alert('Still working on it...')">生产发布</button></td>-->
+            <td><a style="text-decoration: none" href="./deploy/{{ project }}">生产发布</a></td>
         </tr>
         {% endfor %}
     </table>

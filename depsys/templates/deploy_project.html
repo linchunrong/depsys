@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block body %}
+    <body>
+    <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
+        <h3>工程：{{ project }}</h3>
+        <form action="{{ url_for('login') }}" method=post>
+            <div>
+			    <span>请输入需发布分支：<input type="text" name=username class="textbox" ></span>
+                <!--<input type="submit" value="发布" class="submit" />-->
+                <button type="button" onclick="alert('Still working on it...')">发布!</button>
+            </div>
+		</form>
+    </div>
+    </body>
+{% endblock %}
+

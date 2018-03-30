@@ -25,19 +25,21 @@
             }]
         });
         // 异步加载数据
-        $.get('deploy_num').done(function (data) {
-        // 填入数据
-        myChart.setOption({
-            xAxis: {
-                data: data.status
-            },
-            series: [{
-                // 根据名字对应到相应的系列
-                name: '次数',
-                data: data.amount
-            }]
+        $(function(){
+            $.get('deploy_num').done(function (data) {
+            // 填入数据
+                myChart.setOption({
+                    xAxis: {
+                        data: data.status
+                    },
+                    series: [{
+                        // 根据名字对应到相应的系列
+                        name: '次数',
+                        data: data.amount
+                    }]
+                });
+            });
         });
-    });
     </script>
     </body>
 {% endblock %}

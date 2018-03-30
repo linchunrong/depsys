@@ -68,7 +68,7 @@ def project_deploy(project):
 @app.route('/config')
 @login_need
 def config():
-    return ("Still working on it...")
+    return render_template('sysconfig.html')
 
 @app.route('/config/<project>')
 @login_need

@@ -73,7 +73,7 @@ def config():
 @app.route('/config/<project>')
 @login_need
 def project_config(project):
-    return ("Still working on it...")
+    return render_template('config_project.html',project=project)
 
 @app.route('/dashboard')
 @login_need

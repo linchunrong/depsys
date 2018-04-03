@@ -11,27 +11,26 @@
             </div><br>
             <div>
                 <span>发布配置：</span><hr>
-                <ol style="list-style-type: none">
-                    <li><span>发布脚本路径：<input style="width: 60%" type="text" name=deploy_path class="textbox"></span></li>
-                    <li><span>启动脚本路径：<input style="width: 60%" type="text" name=start_path class="textbox"></span></li>
-                    <li><span>停止脚本路径：<input style="width: 60%" type="text" name=stop_path class="textbox"></span></li>
-                </ol>
+                <ul style="list-style-type: none">
+                    <li><span>发布脚本路径：<input style="width: 60%" type="text" name="deploy_path" class="textbox"></span></li>
+                    <li><span>启动脚本路径：<input style="width: 60%" type="text" name="start_path" class="textbox"></span></li>
+                    <li><span>停止脚本路径：<input style="width: 60%" type="text" name="stop_path" class="textbox"></span></li>
+                </ul>
             </div><br>
             <div>
-                <span>源码库连接配置：</span><hr>
-                <span>Repository URL：<input style="width: 60%" type="text" name=repo_url class="textbox"></span>
-                <ol style="list-style-type: none">
-                    <li><span>Username：<input style="width: 200px" type="text" name=repo_user class="textbox"></span></li>
-                    <li><span>Password：<input style="width: 200px" type="password" name=repo_pass class="textbox"></span></li>
+                <span>邮件发送设置：</span><hr>
+                <ul style="list-style-type: none">
+                    <li><span>SMTP Server：<input style="width: 60%" type="text" name="smtp_server" class="textbox"></span></li>
+                    <li><span>Username：<input style="width: 200px" type="text" name="smtpp_user" class="textbox"></span></li>
+                    <li><span>Password：<input style="width: 200px" type="password" name="smtp_pass" class="textbox"></span></li>
                     <button type="button" onclick="alert('Still working on it...')">验证</button>
-                </ol>
+                </ul>
             </div><br>
             <div>
-                <input type="submit" value="保存" class="submit" />
-                <input name="" type="button" onClick="window.close();" value="取消"/>
+                <input name="submit" type="submit" value="保存"/>
+                <input name="reset" type="reset" value="取消"/>
             </div>
 		</form>
     </div>
     </body>
 {% endblock %}
-

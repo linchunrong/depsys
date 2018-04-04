@@ -34,7 +34,15 @@ class Certif(db.Model):
 class System(db.Model):
     __tablename__ = 'system'
     id = db.Column(db.Integer,primary_key=True)
+    # auth: local, ldap etc.
     auth = db.Column(db.String(16),default='local',nullable=False)
+    ansible_path = db.Column(db.String(200))
+    deploy_script = db.Column(db.String(200))
+    start_script = db.Column(db.String(200))
+    stop_script = db.Column(db.String(200))
+    smtp_server = db.Column(db.String(50))
+    smtp_user = db.Column(db.String(24))
+    smtp_pwd = db.Column(db.String(24))
 
     def __init__(self,auth):
         self.auth = auth

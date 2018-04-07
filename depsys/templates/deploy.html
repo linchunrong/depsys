@@ -25,17 +25,20 @@ th
 </style>
     <body>
     <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
+        <div style="width: 85%">
+            <a href="#" style="text-decoration: none">添加工程</a><hr></div>
     <table>
         <tr>
             <th>工程名</th>
-            <th style="width: 120px; text-align: center">操作</th>
+            <th style="width: 150px; text-align: center">操作</th>
         </tr>
         {% for project in project_list %}
         <tr>
             <td>{{ project }}</td>
             <!--<td><button type="button" onclick="alert('Still working on it...')">生产发布</button></td>-->
             <td><a style="text-decoration: none" href="./deploy/{{ project }}">生产发布</a>&nbsp;&nbsp;
-                <a style="text-decoration: none" href="./config/{{ project }}">配置</a></td>
+                <a style="text-decoration: none" href="./config/{{ project }}">配置</a>
+                <a style="text-decoration: none" href="#">删除</a></td>
         </tr>
         {% endfor %}
     </table>

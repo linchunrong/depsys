@@ -1,16 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from depsys import db
+from depsys import db, login_manager
+from flask_login import UserMixin
 
-class User(db.Model):
+
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
-    user_id = db.Column(db.Integer,primary_key=True)
+    id = db.Column(db.Integer,primary_key=True)
     username = db.Column(db.String(16),unique=True,nullable=False)
     password = db.Column(db.String(24),nullable=False)
     group = db.Column(db.String(36))
     enable = db.Column(db.Boolean,default=True,nullable=False)
     permission = db.Column(db.Integer)
+
+    @login_manager.user_loader
+    def load_user(id):
+        return User.query.get(int(id))
 
     def __init__(self,username,password):
         self.username  = username

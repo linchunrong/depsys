@@ -14,6 +14,12 @@ class Project(db.Model):
     source_address = db.Column(db.String(100))
     describe = db.Column(db.String(200))
     type = db.Column(db.String(10))
+    deploy_script = db.Column(db.String(200))
+    start_script = db.Column(db.String(200))
+    stop_script = db.Column(db.String(200))
+    # type: shell, python etc.
+    post_script_type = db.Column(db.String(10))
+    post_script = db.Column(db.String(200))
     records = db.relationship('Record',backref='prjt')
 
     def __init__(self,project_name,servers,type):

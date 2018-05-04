@@ -6,7 +6,7 @@ from depsys.model.User import User,Certif,System
 from depsys.dashboard import dashboard_index
 from depsys.deploy import deploy_index
 from flask import render_template, redirect, url_for, flash, request,session,jsonify
-from depsys.forms import LoginForm
+from depsys.forms import LoginForm, ConfigForm
 from flask_login import login_user, login_required, logout_user
 
 # Index
@@ -55,7 +55,8 @@ def config():
 @app.route('/config/<project>')
 @login_required
 def project_config(project):
-    return render_template('config_project.html',project=project)
+    form = ConfigForm()
+    return render_template('config_project.html',project=project, form=form)
 
 @app.route('/dashboard')
 @login_required

@@ -22,3 +22,17 @@ class ConfigForm(FlaskForm):
     post_script_type = SelectField('Post_script_type', choices=[('shell','shell script'),('python','python script')])
     post_script = TextAreaField('Post_script', render_kw={"placeholder": "请在此框输入完整脚本！", "style": "width: 80%; height: 50px" })
     #submit = SubmitField('Save')
+
+class SystemForm(FlaskForm):
+    """System Form"""
+    ansible_path = StringField('Ansible_path', validators=[validators.InputRequired()], default="/usr/bin/ansible")
+    deploy_script = StringField('Deploy_script', validators=[validators.InputRequired()], render_kw={"style": "width: 60%"})
+    start_script = StringField('Start_script', validators=[validators.InputRequired()], render_kw={"style": "width: 60%"})
+    stop_script = StringField('Stop_script', validators=[validators.InputRequired()], render_kw={"style": "width: 60%"})
+    repository_server = StringField('Repository_server', validators=[validators.InputRequired], render_kw={"style": "width: 60%"})
+    repository_user = StringField('Rep_user', validators=[validators.InputRequired], render_kw={"placeholder": "请输入用户名"})
+    repository_password = PasswordField('Rep_pwd', validators=[validators.InputRequired], render_kw={"placeholder": "请输入密码"})
+    smtp_server = StringField('Smtp_server', validators=[validators.InputRequired], render_kw={"placeholder": "服务器地址"})
+    smtp_user = StringField('Smtp_user', validators=[validators.InputRequired], render_kw={"placeholder": "请输入用户名"})
+    smtp_password = PasswordField('Smtp_pwd', validators=[validators.InputRequired], render_kw={"placeholder": "请输入密码"})
+    #submit = SubmitField('Save')

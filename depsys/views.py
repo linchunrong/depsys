@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from depsys import app,db
-from depsys.model.User import User,Certif,System
+from depsys.model.User import User, Certif, System
 from depsys.dashboard import dashboard_index
 from depsys.deploy import deploy_index
 from flask import render_template, redirect, url_for, flash, request,session,jsonify
-from depsys.forms import LoginForm, ConfigForm
+from depsys.forms import LoginForm, ConfigForm, SystemForm
 from flask_login import login_user, login_required, logout_user
 
 # Index
@@ -50,7 +50,8 @@ def project_deploy(project):
 @app.route('/config')
 @login_required
 def config():
-    return render_template('sysconfig.html')
+    form = SystemForm()
+    return render_template('sysconfig.html',form=form)
 
 @app.route('/config/<project>')
 @login_required

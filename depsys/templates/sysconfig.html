@@ -4,25 +4,35 @@
     <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
         <h3>全局设置：</h3><hr>
         <form action="{{ url_for('config') }}" method=post>
+            {{ form.hidden_tag() }}
             <div>
-			    <span>Ansible Path：<input type="text" name=username class="textbox" ></span>
-                <!--<input type="submit" value="发布" class="submit" />-->
+			    <span>Ansible Path：{{ form.ansible_path }}</span>
                 <button type="button" onclick="alert('Still working on it...')">验证</button>
             </div><br>
             <div>
                 <span>发布配置：</span><hr>
                 <ul style="list-style-type: none">
-                    <li><span>发布脚本路径：<input style="width: 60%" type="text" name="deploy_path" class="textbox"></span></li>
-                    <li><span>启动脚本路径：<input style="width: 60%" type="text" name="start_path" class="textbox"></span></li>
-                    <li><span>停止脚本路径：<input style="width: 60%" type="text" name="stop_path" class="textbox"></span></li>
+                    <li><span>发布脚本路径：{{ form.deploy_script }}</span></li>
+                    <li><span>启动脚本路径：{{ form.start_script }}</span></li>
+                    <li><span>停止脚本路径：{{ form.stop_script }}</span></li>
                 </ul>
             </div><br>
             <div>
-                <span>邮件发送设置：</span><hr>
+                <span>源码库连接配置：</span><hr>
+                <span>Repository Server：{{ form.repository_server }}</span>
                 <ul style="list-style-type: none">
-                    <li><span>SMTP Server：<input style="width: 60%" type="text" name="smtp_server" class="textbox"></span></li>
-                    <li><span>Username：<input style="width: 200px" type="text" name="smtpp_user" class="textbox"></span></li>
-                    <li><span>Password：<input style="width: 200px" type="password" name="smtp_pass" class="textbox"></span></li>
+                    <li><span>{{ form.repository_user }}</span></li>
+                    <li><span>{{ form.repository_password }}</span></li>
+                    <button type="button" onclick="alert('Still working on it...')">验证</button>
+                </ul>
+            </div><br>
+            <div>
+            <div>
+                <span>邮件发送设置：</span><hr>
+                <span>SMTP Server：{{ form.smtp_server }}</span>
+                <ul style="list-style-type: none">
+                    <li><span>{{ form.smtp_user }}</span></li>
+                    <li><span>{{ form.smtp_password }}</span></li>
                     <button type="button" onclick="alert('Still working on it...')">验证</button>
                 </ul>
             </div><br>

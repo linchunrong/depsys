@@ -3,10 +3,11 @@
     <body>
     <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
         <form action="{{ url_for('config') }}" method=post>
+        {{ form.hidden_tag() }}
         {% if project == "add_new_project" %}
         <h3>添加新工程：</h3><hr>
             <div>
-                <span>工程名：<input type="text" name="new_project" class="textbox" placeholder="请输入新工程名...">
+                <span>工程名：{{ form.project_name }}
                 <button type="button" onclick="alert('Still working on it...')">是否可用</button></span>
             </div><br>
         {% else %}
@@ -17,45 +18,34 @@
             </div><br>
         {% endif %}
             <div>
-                <span>服务器列表(以";"分隔)：</span><hr>
+                <span>服务器列表：</span><hr>
                 <ul style="list-style-type: none">
-                    <li><span>IPs：<input style="width: 60%" type="text" name="servers"></span></li>
+                    <li><span>IPs：{{ form.servers }}</span></li>
                 </ul>
             </div><br>
             <div>
-                <span>Ansile 配置：</span><hr>
-                <ul style="list-style-type: none">
-                    <li><span>Ansible Path：<input type="text" name=username class="textbox" ></span>
-                        <button type="button" onclick="alert('Still working on it...')">验证</button></li>
-                </ul>
-            </div><br>
-            <div>
-                <span>源码库连接配置：</span><hr>
-                <span>Repository URL：<input style="width: 60%" type="text" name="repo_url" class="textbox"></span>
-                <ul style="list-style-type: none">
-                    <li><span>Username：<input style="width: 200px" type="text" name="repo_user" class="textbox"></span></li>
-                    <li><span>Password：<input style="width: 200px" type="password" name="repo_pass" class="textbox"></span></li>
-                    <button type="button" onclick="alert('Still working on it...')">验证</button>
-                </ul>
+                <span>工程源码库地址：</span><hr>
+                <span>Repository Address：{{ form.source_address }}</span>
             </div><br>
             <div>
                 <span>发布配置：</span><hr>
                 <ul style="list-style-type: none">
-                    <li><span>发布脚本路径：<input style="width: 60%" type="text" name="deploy_path" class="textbox"></span></li>
-                    <li><span>启动脚本路径：<input style="width: 60%" type="text" name="start_path" class="textbox"></span></li>
-                    <li><span>停止脚本路径：<input style="width: 60%" type="text" name="stop_path" class="textbox"></span></li>
+                    <li><span>发布脚本路径：{{ form.deploy_script }}</span></li>
+                    <li><span>启动脚本路径：{{ form.start_script }}</span></li>
+                    <li><span>停止脚本路径：{{ form.stop_script }}</span></li>
                 </ul>
             </div><br>
             <div>
                 <span>发布后动作：</span><hr>
                 <ul style="list-style-type: none">
                     <li><span>请在下框输入脚本：</span><br>
-                        <select>
+                        {{ form.post_script_type }}
+                        <!--<select>
                             <option value="shell">shell script</option>
                             <option value="python">python script</option>
-                        </select>
+                        </select>-->
                     </li><br>
-                    <li><textarea style="width: 80%; height: 50px" name="post_script"></textarea></li>
+                    <li>{{ form.post_script }}</li>
                 </ul>
             </div><br>
             <div>

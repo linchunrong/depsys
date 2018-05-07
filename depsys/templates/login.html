@@ -13,15 +13,13 @@
 			<div class="inset">
 				<!--start-main-->
 				<form action="{{ url_for('login') }}" method=post>
+                    {{ form.hidden_tag() }}
 			         <div>
-						<span><label>用户名</label></span>
-						<!--<span><input type="text" name=username class="textbox" ></span>-->
-                          {{ form.hidden_tag() }}
+						<!--<span><label>用户名</label></span>-->
                          <span>{{ form.username }}</span>
 					 </div>
 					 <div>
-						<span><label>密码</label></span>
-					    <!--<span><input type="password" name=password class="password"></span>-->
+						<!--<span><label>密码</label></span>-->
                          <span>{{ form.password }}</span>
 					 </div>
 					<div class="sign">

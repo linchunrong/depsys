@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from depsys.model.Project import Record,Project
+from depsys.models import Record
+
 
 def dashboard_index():
     amount = []

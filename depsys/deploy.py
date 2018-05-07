@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from depsys.model.Project import Project
+from depsys.models import Project
 
 def deploy_index():
     project_list = []

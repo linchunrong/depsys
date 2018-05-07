@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from depsys import app,db
-from depsys.model.User import User, Certif, System
+from flask import render_template, redirect, url_for, request, jsonify
+from flask_login import login_user, login_required, logout_user
+
+from depsys import app
 from depsys.dashboard import dashboard_index
 from depsys.deploy import deploy_index
-from flask import render_template, redirect, url_for, flash, request,session,jsonify
 from depsys.forms import LoginForm, ConfigForm, SystemForm
-from flask_login import login_user, login_required, logout_user
+from depsys.models import User
+
 
 # Index
 @app.route('/')

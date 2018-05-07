@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from depsys.models import System
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, SubmitField, PasswordField, validators, SelectField, TextAreaField
 
@@ -25,7 +26,8 @@ class ConfigForm(FlaskForm):
 
 class SystemForm(FlaskForm):
     """System Form"""
-    ansible_path = StringField('Ansible_path', validators=[validators.InputRequired()], default="/usr/bin/ansible")
+    system = System.query.first()
+    ansible_path = StringField('Ansible_path', validators=[validators.InputRequired()], default=system.ansible_path)
     deploy_script = StringField('Deploy_script', validators=[validators.InputRequired()], render_kw={"style": "width: 60%"})
     start_script = StringField('Start_script', validators=[validators.InputRequired()], render_kw={"style": "width: 60%"})
     stop_script = StringField('Stop_script', validators=[validators.InputRequired()], render_kw={"style": "width: 60%"})

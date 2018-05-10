@@ -21,16 +21,6 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return '<User %r>' % self.username
 
-class Certif(db.Model):
-    __tablename__ = 'certif'
-    cert_id = db.Column(db.Integer,primary_key=True)
-    cert_name = db.Column(db.String(16),nullable=False)
-    password = db.Column(db.String(24),nullable=False)
-    interface = db.Column(db.String(16))
-
-    def __repr__(self):
-        return  '<Cert %r>' % self.cert_name
-
 class System(db.Model):
     __tablename__ = 'system'
     id = db.Column(db.Integer,primary_key=True)
@@ -40,6 +30,9 @@ class System(db.Model):
     deploy_script = db.Column(db.String(200))
     start_script = db.Column(db.String(200))
     stop_script = db.Column(db.String(200))
+    repository_server = db.Column(db.String(200))
+    repository_user = db.Column(db.String(24))
+    repository_pwd = db.Column(db.String(24))
     smtp_server = db.Column(db.String(50))
     smtp_user = db.Column(db.String(24))
     smtp_pwd = db.Column(db.String(24))
@@ -58,9 +51,6 @@ class Project(db.Model):
     source_address = db.Column(db.String(100))
     describe = db.Column(db.String(200))
     type = db.Column(db.String(10))
-    deploy_script = db.Column(db.String(200))
-    start_script = db.Column(db.String(200))
-    stop_script = db.Column(db.String(200))
     # type: shell, python etc.
     post_script_type = db.Column(db.String(10))
     post_script = db.Column(db.String(200))

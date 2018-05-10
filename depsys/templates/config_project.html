@@ -2,7 +2,7 @@
 {% block body %}
     <body>
     <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
-        <form action="{{ url_for('config') }}" method=post>
+        <form action="{{ url_for('config') }}" method=POST>
         {{ form.hidden_tag() }}
         {% if project == "add_new_project" %}
         <h3>添加新工程：</h3><hr>
@@ -28,15 +28,7 @@
                 <span>Repository Address：{{ form.source_address }}</span>
             </div><br>
             <div>
-                <span>发布配置：</span><hr>
-                <ul style="list-style-type: none">
-                    <li><span>发布脚本路径：{{ form.deploy_script }}</span></li>
-                    <li><span>启动脚本路径：{{ form.start_script }}</span></li>
-                    <li><span>停止脚本路径：{{ form.stop_script }}</span></li>
-                </ul>
-            </div><br>
-            <div>
-                <span>发布后动作：</span><hr>
+                <span>发布后动作(如果有)：</span><hr>
                 <ul style="list-style-type: none">
                     <li><span>请在下框输入脚本：</span><br>
                         {{ form.post_script_type }}

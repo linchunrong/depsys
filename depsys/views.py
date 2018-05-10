@@ -7,6 +7,7 @@ from flask_login import login_user, login_required, logout_user
 from depsys import app
 from depsys.dashboard import dashboard_index
 from depsys.deploy import deploy_index
+from depsys.sysconfig import project_config
 from depsys.forms import LoginForm, ConfigForm, SystemForm
 from depsys.models import User
 
@@ -59,6 +60,12 @@ def config():
 @login_required
 def project_config(project):
     form = ConfigForm()
+    if form.validate_on_submit() and request.method=="POST":
+        if project == "add_new_project":
+            project_config(project_name_old=None,project_name=form.project_name.data,servers=form.servers.data,source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
+        else:
+            project_config(project_name_old=project,project_name=request.form['new_project'],servers=form.servers.data,source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
+        return redirect(url_for('deploy'))
     return render_template('config_project.html',project=project, form=form)
 
 @app.route('/dashboard')

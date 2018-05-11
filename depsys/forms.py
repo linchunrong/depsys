@@ -24,7 +24,7 @@ class ConfigForm(FlaskForm):
 class SystemForm(FlaskForm):
     """System Form"""
     system = System.query.first()
-    ansible_path = StringField('Ansible_path', validators=[validators.InputRequired()], default=system.ansible_path)
+    ansible_path = StringField('Ansible_path', validators=[validators.InputRequired()], default=system.ansible_path if system.ansible_path else "/bin/bash/ansible")
     deploy_script = StringField('Deploy_script', validators=[validators.InputRequired()], render_kw={"style": "width: 60%"})
     start_script = StringField('Start_script', validators=[validators.InputRequired()], render_kw={"style": "width: 60%"})
     stop_script = StringField('Stop_script', validators=[validators.InputRequired()], render_kw={"style": "width: 60%"})

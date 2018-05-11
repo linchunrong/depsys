@@ -2,7 +2,7 @@
 {% block body %}
     <body>
     <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
-        <form action="{{ url_for('config') }}" method=POST>
+        <form action="" method=post>
         {{ form.hidden_tag() }}
         {% if project == "add_new_project" %}
         <h3>添加新工程：</h3><hr>
@@ -13,7 +13,7 @@
         {% else %}
         <h3>{{ project }} 设置：</h3><hr>
             <div>
-                <span>工程重命名：<input type="text" name="new_project" class="textbox" placeholder="{{ project }}">
+                <span>工程重命名：<input type="text" name="new_project" class="textbox" value={{ project }}>
                 <button type="button" onclick="alert('Still working on it...')">是否可用</button></span>
             </div><br>
         {% endif %}
@@ -32,10 +32,6 @@
                 <ul style="list-style-type: none">
                     <li><span>请在下框输入脚本：</span><br>
                         {{ form.post_script_type }}
-                        <!--<select>
-                            <option value="shell">shell script</option>
-                            <option value="python">python script</option>
-                        </select>-->
                     </li><br>
                     <li>{{ form.post_script }}</li>
                 </ul>

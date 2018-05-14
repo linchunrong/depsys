@@ -6,10 +6,10 @@
         <h3>确定删除工程？</h3>
             <div>
                 <span>工程名：{{ project }}</span>
-            </div>
+            </div><br>
             <div>
                 <input name="submit" type="submit" value="确定" />
-                <button type="button" onclick="{{ url_for('deploy') }}">取消</button>
+                <a href="./deploy"><button>取消</button></a>
             </div>
 		</form>
     </div>

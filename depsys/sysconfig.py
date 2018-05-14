@@ -22,3 +22,10 @@ def project_config(project_name_old, project_name, servers, source_address, post
                               post_script_type=post_script_type,post_script=post_script if post_script else None)
         db.session.add(add_project)
         db.session.commit()
+
+def project_delete(project_name):
+    """Delete project"""
+    if project_name:
+        del_project = Project.query.filter_by(project_name=project_name).first()
+        db.session.delete(del_project)
+        db.session.commit()

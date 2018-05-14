@@ -70,6 +70,14 @@ def project_config(project):
         return redirect(url_for('deploy'))
     return render_template('config_project.html',project=project, form=form)
 
+@app.route('/delete/<project>', methods=['GET', 'POST'])
+@login_required
+def delete_project(project):
+    if request.method=="POST":
+        sysconfig.project_delete(project_name=project)
+        return redirect(url_for('deploy'))
+    return render_template('del_project.html',project=project)
+
 @app.route('/dashboard')
 @login_required
 def dashboard():

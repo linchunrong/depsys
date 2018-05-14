@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block body %}
+    <body>
+    <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
+        <form action="" method=post>
+        <h3>确定删除工程？</h3>
+            <div>
+                <span>工程名：{{ project }}</span>
+            </div>
+            <div>
+                <input name="submit" type="submit" value="确定" />
+                <button type="button" onclick="{{ url_for('deploy') }}">取消</button>
+            </div>
+		</form>
+    </div>
+    </body>
+{% endblock %}

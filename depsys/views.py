@@ -7,7 +7,6 @@ from flask_login import login_user, login_required, logout_user
 from depsys import app
 from depsys.dashboard import dashboard_index
 from depsys.deploy import deploy_index
-from depsys import sysconfig
 from depsys.sysconfig import Project_config
 from depsys.forms import LoginForm, ConfigForm, SystemForm
 from depsys.models import User
@@ -64,13 +63,9 @@ def project_config(project):
     p = Project_config()
     if request.method=="POST":
         if project == "add_new_project":
-            #sysconfig.project_config(project_name_old="",project_name=form.project_name.data,servers=form.servers.data,
-            #               source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
             p.add(project_name=form.project_name.data,servers=form.servers.data,
                            source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
         else:
-            #sysconfig.project_config(project_name_old=project,project_name=request.form['new_project'],servers=form.servers.data,
-            #               source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
             p.update(project_name_old=project,project_name=request.form['new_project'],servers=form.servers.data,
                            source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
         return redirect(url_for('deploy'))
@@ -81,7 +76,6 @@ def project_config(project):
 def delete_project(project):
     p = Project_config()
     if request.method=="POST":
-        #sysconfig.project_delete(project_name=project)
         p.delete(project_name=project)
         return redirect(url_for('deploy'))
     return render_template('del_project.html',project=project)

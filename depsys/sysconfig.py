@@ -6,10 +6,19 @@ from depsys.models import Project, System
 
 class System_config:
     """System config, only have update method"""
-    def update(self,ansible_path):
+    def update(self, ansible_path, deploy_script, start_script, stop_script, repository_server, repository_user, repository_password, smtp_server, smtp_user, smtp_password):
         # Should be only one record in DB
         item = System.query.first()
         item.ansible_path = ansible_path
+        item.deploy_script = deploy_script
+        item.start_script = start_script
+        item.stop_script = stop_script
+        item.repository_server = repository_server
+        item.repository_user = repository_user
+        item.repository_password = repository_password
+        item.smtp_server = smtp_server
+        item.smtp_user = smtp_user
+        item.smtp_password = smtp_password
         db.session.commit()
 
 class Project_config:

@@ -7,7 +7,7 @@ from flask_login import login_user, login_required, logout_user
 from depsys import app
 from depsys.dashboard import dashboard_index
 from depsys.deploy import deploy_index
-from depsys.sysconfig import Project_config
+from depsys.sysconfig import Project_config, System_config
 from depsys.forms import LoginForm, ConfigForm, SystemForm
 from depsys.models import User
 
@@ -50,10 +50,16 @@ def deploy():
 def project_deploy(project):
     return render_template('deploy_project.html',project=project)
 
-@app.route('/config')
+@app.route('/config', methods=['GET', 'POST'])
 @login_required
 def config():
     form = SystemForm()
+    s = System_config()
+    if request.method=="POST":
+        s.update(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
+                 repository_server=form.repository_server.data, repository_user=form.repository_user.data, repository_password=form.repository_password.data,
+                 smtp_server=form.smtp_server.data, smtp_user=form.smtp_user.data, smtp_password=form.smtp_password.data)
+        return redirect(url_for('config'))
     return render_template('sysconfig.html',form=form)
 
 @app.route('/config/<project>', methods=['GET', 'POST'])

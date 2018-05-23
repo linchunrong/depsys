@@ -7,7 +7,7 @@ from flask_login import login_user, login_required, logout_user
 from depsys import app
 from depsys.dashboard import dashboard_index
 from depsys.deploy import deploy_index
-from depsys import sysconfig
+from depsys.sysconfig import Project_config, System_config
 from depsys.forms import LoginForm, ConfigForm, SystemForm
 from depsys.models import User
 
@@ -50,22 +50,29 @@ def deploy():
 def project_deploy(project):
     return render_template('deploy_project.html',project=project)
 
-@app.route('/config')
+@app.route('/config', methods=['GET', 'POST'])
 @login_required
 def config():
     form = SystemForm()
+    s = System_config()
+    if request.method=="POST":
+        s.update(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
+                 repository_server=form.repository_server.data, repository_user=form.repository_user.data, repository_password=form.repository_password.data,
+                 smtp_server=form.smtp_server.data, smtp_user=form.smtp_user.data, smtp_password=form.smtp_password.data)
+        return redirect(url_for('config'))
     return render_template('sysconfig.html',form=form)
 
 @app.route('/config/<project>', methods=['GET', 'POST'])
 @login_required
 def project_config(project):
     form = ConfigForm()
+    p = Project_config()
     if request.method=="POST":
         if project == "add_new_project":
-            sysconfig.project_config(project_name_old="",project_name=form.project_name.data,servers=form.servers.data,
+            p.add(project_name=form.project_name.data,servers=form.servers.data,
                            source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
         else:
-            sysconfig.project_config(project_name_old=project,project_name=request.form['new_project'],servers=form.servers.data,
+            p.update(project_name_old=project,project_name=request.form['new_project'],servers=form.servers.data,
                            source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
         return redirect(url_for('deploy'))
     return render_template('config_project.html',project=project, form=form)
@@ -73,8 +80,9 @@ def project_config(project):
 @app.route('/delete/<project>', methods=['GET', 'POST'])
 @login_required
 def delete_project(project):
+    p = Project_config()
     if request.method=="POST":
-        sysconfig.project_delete(project_name=project)
+        p.delete(project_name=project)
         return redirect(url_for('deploy'))
     return render_template('del_project.html',project=project)
 

@@ -7,7 +7,7 @@
         {% if project == "add_new_project" %}
         <h3>添加新工程：</h3><hr>
             <div>
-                <span>工程名：{{ form.project_name }}
+                <span>工程名：{{ form.project_name(placeholder="请输入新工程名(必填)") }}
                 <button type="button" onclick="alert('Still working on it...')">是否可用</button></span>
             </div><br>
         {% else %}
@@ -20,12 +20,12 @@
             <div>
                 <span>服务器列表：</span><hr>
                 <ul style="list-style-type: none">
-                    <li><span>IPs：{{ form.servers }}</span></li>
+                    <li><span>IPs：{{ form.servers(style="width:60%",placeholder="多个IP请以 \",\" 号分隔！(必填)",value=conf.servers) }}</span></li>
                 </ul>
             </div><br>
             <div>
                 <span>工程源码库地址：</span><hr>
-                <span>Repository Address：{{ form.source_address }}</span>
+                <span>Repository Address：{{ form.source_address(style="width:60%") }}</span>
             </div><br>
             <div>
                 <span>发布后动作(如果有)：</span><hr>
@@ -33,7 +33,7 @@
                     <li><span>请在下框输入脚本：</span><br>
                         {{ form.post_script_type }}
                     </li><br>
-                    <li>{{ form.post_script }}</li>
+                    <li>{{ form.post_script(style="width: 80%; height: 50px",placeholder="请在此框输入完整脚本！",value=conf.post_script ) }}</li>
                 </ul>
             </div><br>
             <div>

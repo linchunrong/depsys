@@ -9,7 +9,7 @@ from depsys.dashboard import dashboard_index
 from depsys.deploy import deploy_index
 from depsys.sysconfig import Project_config, System_config
 from depsys.forms import LoginForm, ConfigForm, SystemForm
-from depsys.models import User, System
+from depsys.models import User, System, Project
 
 # Index
 @app.route('/')
@@ -23,7 +23,7 @@ def login():
     error = None
     form = LoginForm()
     if form.validate_on_submit() and request.method=='POST':
-        user=User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(username=form.username.data).first()
         if user is None:
             error = 'Invalid username'
         elif user.password != form.password.data:
@@ -67,6 +67,7 @@ def config():
 def project_config(project):
     form = ConfigForm()
     p = Project_config()
+    conf = Project.query.filter_by(project_name=project).first()
     if request.method=="POST":
         if project == "add_new_project":
             p.add(project_name=form.project_name.data,servers=form.servers.data,
@@ -75,7 +76,7 @@ def project_config(project):
             p.update(project_name_old=project,project_name=request.form['new_project'],servers=form.servers.data,
                            source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
         return redirect(url_for('deploy'))
-    return render_template('config_project.html',project=project, form=form)
+    return render_template('config_project.html',project=project, form=form, conf=conf)
 
 @app.route('/delete/<project>', methods=['GET', 'POST'])
 @login_required

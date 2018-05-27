@@ -6,38 +6,37 @@
         <form action="" method=post>
             {{ form.hidden_tag() }}
             <div>
-			    <span>Ansible Path：{{ form.ansible_path }}</span>
+			    <span>Ansible Path：{{ form.ansible_path(placeholder="Ansible执行路径...",value=conf.ansible_path) }}</span>
                 <button type="button" onclick="alert('Still working on it...')">验证</button>
             </div><br>
             <div>
                 <span>发布配置：</span><hr>
                 <ul style="list-style-type: none">
-                    <li><span>发布脚本路径：{{ form.deploy_script }}</span></li>
-                    <li><span>启动脚本路径：{{ form.start_script }}</span></li>
-                    <li><span>停止脚本路径：{{ form.stop_script }}</span></li>
+                    <li><span>发布脚本路径：{{ form.deploy_script(value=conf.deploy_script,style="width:60%") }}</span></li>
+                    <li><span>启动脚本路径：{{ form.start_script(value=conf.start_script,style="width:60%")  }}</span></li>
+                    <li><span>停止脚本路径：{{ form.stop_script(value=conf.stop_script,style="width:60%")  }}</span></li>
                 </ul>
             </div><br>
             <div>
                 <span>源码库连接配置：</span><hr>
-                <span>Repository Server：{{ form.repository_server }}</span>
+                <span>Repository Server：{{ form.repository_server(style="width:60%",placeholder="请输入源码库地址...",value=conf.repository_server) }}</span>
                 <ul style="list-style-type: none">
-                    <li><span>{{ form.repository_user }}</span></li>
-                    <li><span>{{ form.repository_password }}</span></li>
+                    <li><span>{{ form.repository_user(placeholder="请输入用户名...",value=conf.repository_user) }}</span></li>
+                    <li><span>{{ form.repository_password(placeholder="请输入密码...",value=conf.repository_password) }}</span></li>
                     <button type="button" onclick="alert('Still working on it...')">验证</button>
                 </ul>
             </div><br>
-            <div>
             <div>
                 <span>邮件发送设置：</span><hr>
-                <span>SMTP Server：{{ form.smtp_server }}</span>
+                <span>SMTP Server：{{ form.smtp_server(placeholder="请输入SMTP服务器地址...",value=conf.smtp_server) }}</span>
                 <ul style="list-style-type: none">
-                    <li><span>{{ form.smtp_user }}</span></li>
-                    <li><span>{{ form.smtp_password }}</span></li>
+                    <li><span>{{ form.smtp_user(placeholder="SMTP用户名...",value=conf.smtp_user) }}</span></li>
+                    <li><span>{{ form.smtp_password(placeholder="SMTP密码...",value=conf.smtp_password) }}</span></li>
                     <button type="button" onclick="alert('Still working on it...')">验证</button>
                 </ul>
             </div><br>
             <div>
-                <input name="submit" type="submit" value="保存"/>
+                <input name="submit" type="submit" value="保存" onclick="alert('已保存！')"/>
                 <input name="reset" type="reset" value="取消"/>
             </div>
 		</form>

@@ -20,6 +20,7 @@ class System_config:
         item.smtp_user = smtp_user
         item.smtp_password = smtp_password
         db.session.commit()
+        db.session.close()
 
 class Project_config:
     """ Action for project"""
@@ -33,16 +34,20 @@ class Project_config:
             item.post_script_type = post_script_type
             item.post_script = post_script if post_script else None
             db.session.commit()
+            db.session.close()
 
     def add(self, project_name, servers, source_address, post_script_type, post_script):
-        add_project = Project(project_name=project_name, servers=servers, source_address=source_address,
+        """Add project"""
+        item = Project(project_name=project_name, servers=servers, source_address=source_address,
                               post_script_type=post_script_type, post_script=post_script if post_script else None)
-        db.session.add(add_project)
+        db.session.add(item)
         db.session.commit()
+        db.session.close()
 
     def delete(self, project_name):
         """Delete project"""
         if project_name:
-            del_project = Project.query.filter_by(project_name=project_name).first()
-            db.session.delete(del_project)
+            item = Project.query.filter_by(project_name=project_name).first()
+            db.session.delete(item)
             db.session.commit()
+            db.session.close()

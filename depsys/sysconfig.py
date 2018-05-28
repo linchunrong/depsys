@@ -15,7 +15,7 @@ class System_config:
         item.stop_script = stop_script
         item.repository_server = repository_server
         item.repository_user = repository_user
-        item.repository_password = repository_password
+        item.repository_pwd = repository_password
         item.smtp_server = smtp_server
         item.smtp_user = smtp_user
         item.smtp_password = smtp_password

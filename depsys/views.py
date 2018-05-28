@@ -52,15 +52,21 @@ def project_deploy(project):
 @app.route('/config', methods=['GET', 'POST'])
 @login_required
 def config():
+    error = None
     form = SystemForm()
     s = System_config()
     conf = System.query.first()
     if request.method=="POST":
-        s.update(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
-                 repository_server=form.repository_server.data, repository_user=form.repository_user.data, repository_password=form.repository_password.data,
-                 smtp_server=form.smtp_server.data, smtp_user=form.smtp_user.data, smtp_password=form.smtp_password.data)
-        return redirect(url_for('config'))
-    return render_template('sysconfig.html',form=form, conf=conf)
+        if form.validate_on_submit():
+            s.update(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
+                    repository_server=form.repository_server.data, repository_user=form.repository_user.data,
+                     repository_password=form.repository_password.data if form.repository_password.data else conf.repository_pwd,
+                    smtp_server=form.smtp_server.data, smtp_user=form.smtp_user.data, smtp_password=form.smtp_password.data)
+            return redirect(url_for('config'))
+        else:
+            for key in form.errors:
+                error = form.errors[key]
+    return render_template('sysconfig.html',form=form, conf=conf, error=error)
 
 @app.route('/config/<project>', methods=['GET', 'POST'])
 @login_required

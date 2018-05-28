@@ -23,7 +23,7 @@
                          <span>{{ form.password(placeholder="密码") }}</span>
 					 </div>
 					<div class="sign">
-                        <input type="submit" value="登录" class="submit" />
+                        {{ form.submit(class="submit") }}
 					</div>
 					</form>
                     {% if error %}<p class="error" style="text-align: center; color: red;font-style: oblique;font-weight: 450"><strong>Error:</strong> {{ error }}{% endif %}

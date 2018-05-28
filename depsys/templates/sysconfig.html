@@ -36,7 +36,7 @@
                 </ul>
             </div><br>
             <div>
-                <input name="submit" type="submit" value="保存" onclick="alert('已保存！')"/>
+                {{ form.submit(onclick="alert('已保存！')") }}
                 <input name="reset" type="reset" value="取消"/>
             </div>
 		</form>

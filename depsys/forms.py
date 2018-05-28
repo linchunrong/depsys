@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from depsys.models import System
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, SubmitField, PasswordField, validators, SelectField, TextAreaField
+from wtforms import StringField, SubmitField, PasswordField, validators, SelectField, TextAreaField
 
 class LoginForm(FlaskForm):
     """Login Form"""
     username = StringField('Username', validators=[validators.InputRequired()])
     password = PasswordField('Password', validators=[validators.InputRequired()])
     #remember_me = BooleanField('Remember me')
-    #submit = SubmitField('Login')
+    submit = SubmitField('登录')
 
 class ConfigForm(FlaskForm):
     """Config Form"""
@@ -19,7 +18,7 @@ class ConfigForm(FlaskForm):
     source_address = StringField('Repository_address', validators=[validators.InputRequired()])
     post_script_type = SelectField('Post_script_type', choices=[('shell','shell script'),('python','python script')])
     post_script = TextAreaField('Post_script')
-    #submit = SubmitField('Save')
+    submit = SubmitField('保存')
 
 class SystemForm(FlaskForm):
     """System Form"""
@@ -33,4 +32,4 @@ class SystemForm(FlaskForm):
     smtp_server = StringField('Smtp_server', validators=[validators.InputRequired])
     smtp_user = StringField('Smtp_user', validators=[validators.InputRequired])
     smtp_password = PasswordField('Smtp_pwd', validators=[validators.InputRequired])
-    #submit = SubmitField('Save')
+    submit = SubmitField('保存')

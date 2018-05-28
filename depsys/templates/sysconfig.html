@@ -22,7 +22,7 @@
                 <span>Repository Server：{{ form.repository_server(style="width:60%",placeholder="请输入源码库地址...",value=conf.repository_server) }}</span>
                 <ul style="list-style-type: none">
                     <li><span>{{ form.repository_user(placeholder="请输入用户名...",value=conf.repository_user) }}</span></li>
-                    <li><span>{{ form.repository_password(placeholder="请输入密码...",value=conf.repository_password) }}</span></li>
+                    <li><span>{{ form.repository_password(placeholder="请输入密码...") }}</span></li>
                     <button type="button" onclick="alert('Still working on it...')">验证</button>
                 </ul>
             </div><br>
@@ -36,10 +36,11 @@
                 </ul>
             </div><br>
             <div>
-                {{ form.submit(onclick="alert('已保存！')") }}
+                {{ form.submit }}
                 <input name="reset" type="reset" value="取消"/>
             </div>
 		</form>
+        {% if error %}<p class="error" style="text-align: left; color: red;font-style: oblique;font-weight: 450"><strong>Error:</strong> {{ error }} {% endif %}
     </div>
     </body>
 {% endblock %}

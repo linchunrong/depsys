@@ -13,9 +13,9 @@ class LoginForm(FlaskForm):
 
 class ConfigForm(FlaskForm):
     """Config Form"""
-    project_name = StringField('Project_name', validators=[validators.InputRequired()])
-    servers = StringField('IPs', validators=[validators.InputRequired()])
-    source_address = StringField('Repository_address', validators=[validators.InputRequired()])
+    project_name = StringField('Project_name', validators=[validators.InputRequired(message="工程名必填!")])
+    servers = StringField('IPs', validators=[validators.InputRequired(message="服务器地址必填!")])
+    source_address = StringField('Repository_address', validators=[validators.InputRequired(message="源码地址必填！")])
     post_script_type = SelectField('Post_script_type', choices=[('shell','shell script'),('python','python script')])
     post_script = TextAreaField('Post_script')
     submit = SubmitField('保存')

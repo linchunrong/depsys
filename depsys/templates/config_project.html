@@ -13,7 +13,7 @@
         {% else %}
         <h3>{{ project }} 设置：</h3><hr>
             <div>
-                <span>工程重命名：<input type="text" name="new_project" class="textbox" value={{ project }}>
+                <span>工程重命名：{{ form.project_name(value=conf.project_name) }}
                 <button type="button" onclick="alert('Still working on it...')">是否可用</button></span>
             </div><br>
         {% endif %}
@@ -25,7 +25,7 @@
             </div><br>
             <div>
                 <span>工程源码库地址：</span><hr>
-                <span>Repository Address：{{ form.source_address(style="width:60%") }}</span>
+                <span>Repository Address：{{ form.source_address(style="width:60%",placeholder="请输入项目源码地址...(必填)",value=conf.source_address) }}</span>
             </div><br>
             <div>
                 <span>发布后动作(如果有)：</span><hr>
@@ -33,15 +33,15 @@
                     <li><span>请在下框输入脚本：</span><br>
                         {{ form.post_script_type }}
                     </li><br>
-                    <li>{{ form.post_script(style="width: 80%; height: 50px",placeholder="请在此框输入完整脚本！",value=conf.post_script ) }}</li>
+                    <li>{{ form.post_script(style="width:40%; height:50px",placeholder="请在此框输入完整脚本！") }}</li>
                 </ul>
             </div><br>
             <div>
-                <!--<input name="submit" type="submit" value="保存" />-->
                 {{ form.submit }}
-                <input name="reset" type="reset" value="取消"/>
+                <input name="reset" type="reset" value="重置"/>
             </div>
 		</form>
+        {% if error %}<p class="error" style="text-align: left; color: red;font-style: oblique;font-weight: 450"><strong>Error:</strong> {{ error }}{% endif %}
     </div>
     </body>
 {% endblock %}

@@ -65,18 +65,23 @@ def config():
 @app.route('/config/<project>', methods=['GET', 'POST'])
 @login_required
 def project_config(project):
+    error = None
     form = ConfigForm()
     p = Project_config()
     conf = Project.query.filter_by(project_name=project).first()
     if request.method=="POST":
-        if project == "add_new_project":
-            p.add(project_name=form.project_name.data,servers=form.servers.data,
-                           source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
+        if form.validate_on_submit():
+            if project == "add_new_project":
+                p.add(project_name=form.project_name.data,servers=form.servers.data,
+                               source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
+            else:
+                p.update(project_name_old=project,project_name=form.project_name.data,servers=form.servers.data,
+                               source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
+            return redirect(url_for('deploy'))
         else:
-            p.update(project_name_old=project,project_name=request.form['new_project'],servers=form.servers.data,
-                           source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)
-        return redirect(url_for('deploy'))
-    return render_template('config_project.html',project=project, form=form, conf=conf)
+            for key in form.errors:
+                error = form.errors[key]
+    return render_template('config_project.html',project=project, form=form, conf=conf, error=error)
 
 @app.route('/delete/<project>', methods=['GET', 'POST'])
 @login_required

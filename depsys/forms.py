@@ -11,7 +11,7 @@ class LoginForm(FlaskForm):
     #remember_me = BooleanField('Remember me')
     submit = SubmitField('登录')
 
-class ChangePwd(FlaskForm):
+class UserForm(FlaskForm):
     """User change password"""
     password = PasswordField('New Password', validators=[validators.EqualTo('confirm',message="密码不一致！")])
     confirm = PasswordField('Repeat Password')

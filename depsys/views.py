@@ -7,7 +7,7 @@ from depsys import app
 from depsys.dashboard import dashboard_index
 from depsys.deploy import deploy_index
 from depsys.sysconfig import Project_config, System_config, User_config
-from depsys.forms import LoginForm, ConfigForm, SystemForm, ChangePwd
+from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm
 from depsys.models import User, System, Project
 
 # Index
@@ -41,13 +41,13 @@ def logout():
 @login_required
 def profile():
     error = None
-    form = ChangePwd()
+    form = UserForm()
     user_id = session['user_id']
     user = User.query.filter_by(id=user_id).first()
     if request.method=="POST":
         if form.validate_on_submit():
             u = User_config()
-            u.update(user_id=user_id, password=form.password.data)
+            u.update(user_id=user_id, password=form.password.data if form.password.data else user.password)
             return redirect(url_for('profile'))
         else:
             for key in form.errors:

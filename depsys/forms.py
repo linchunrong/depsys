@@ -11,6 +11,12 @@ class LoginForm(FlaskForm):
     #remember_me = BooleanField('Remember me')
     submit = SubmitField('登录')
 
+class ChangePwd(FlaskForm):
+    """User change password"""
+    password = PasswordField('New Password', validators=[validators.EqualTo('confirm',message="密码不一致！")])
+    confirm = PasswordField('Repeat Password')
+    submit = SubmitField('更新')
+
 class ConfigForm(FlaskForm):
     """Config Form"""
     project_name = StringField('Project_name', validators=[validators.InputRequired(message="工程名必填!")])

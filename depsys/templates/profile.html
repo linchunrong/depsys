@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block body %}
+    <body>
+    <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
+        <h3>个人信息：</h3><hr style="width: 400px; float: left"><br>
+        <form action="" method=post>
+            {{ form.hidden_tag() }}
+            <div>
+                <div style="display: inline">用户名：</div>
+                <div style="display: inline">{{ user.username }}</div>
+            </div>
+            <div>
+                <div style="display: inline">所属组：</div>
+                <div style="display: inline">{{ user.group }}</div>
+            </div><br>
+            <div>更改密码：{{ form.password }}</div>
+            <div>确认密码：{{ form.confirm }}</div><br>
+            <div>
+                {{ form.submit }}
+                <input name="reset" type="reset" value="重置"/>
+            </div>
+		</form>
+        {% if error %}<p class="error" style="text-align: left; color: red;font-style: oblique;font-weight: 450"><strong>Error:</strong> {{ error }}{% endif %}
+    </div>
+    </body>
+{% endblock %}

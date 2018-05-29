@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import render_template, redirect, url_for, request, jsonify
+from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
-
 from depsys import app
 from depsys.dashboard import dashboard_index
 from depsys.deploy import deploy_index
-from depsys.sysconfig import Project_config, System_config
-from depsys.forms import LoginForm, ConfigForm, SystemForm
+from depsys.sysconfig import Project_config, System_config, User_config
+from depsys.forms import LoginForm, ConfigForm, SystemForm, ChangePwd
 from depsys.models import User, System, Project
 
 # Index
@@ -37,6 +36,23 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    error = None
+    form = ChangePwd()
+    user_id = session['user_id']
+    user = User.query.filter_by(id=user_id).first()
+    if request.method=="POST":
+        if form.validate_on_submit():
+            u = User_config()
+            u.update(user_id=user_id, password=form.password.data)
+            return redirect(url_for('profile'))
+        else:
+            for key in form.errors:
+                error = form.errors[key]
+    return render_template('profile.html', form=form, user=user, error=error)
 
 @app.route('/deploy')
 @login_required

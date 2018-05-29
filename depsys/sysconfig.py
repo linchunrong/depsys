@@ -45,11 +45,10 @@ class Project_config:
 
     def delete(self, project_name):
         """Delete project"""
-        if project_name:
-            item = Project.query.filter_by(project_name=project_name).first()
-            db.session.delete(item)
-            db.session.commit()
-            db.session.close()
+        item = Project.query.filter_by(project_name=project_name).first()
+        db.session.delete(item)
+        db.session.commit()
+        db.session.close()
 
 class User_config:
     """Config for user"""

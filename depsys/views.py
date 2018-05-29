@@ -70,10 +70,10 @@ def project_deploy(project):
 def config():
     error = None
     form = SystemForm()
-    s = System_config()
     conf = System.query.first()
     if request.method=="POST":
         if form.validate_on_submit():
+            s = System_config()
             s.update(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
                     repository_server=form.repository_server.data, repository_user=form.repository_user.data,
                      repository_password=form.repository_password.data if form.repository_password.data else conf.repository_pwd,
@@ -89,10 +89,10 @@ def config():
 def project_config(project):
     error = None
     form = ConfigForm()
-    p = Project_config()
     conf = Project.query.filter_by(project_name=project).first()
     if request.method=="POST":
         if form.validate_on_submit():
+            p = Project_config()
             if project == "add_new_project":
                 p.add(project_name=form.project_name.data,servers=form.servers.data,
                                source_address=form.source_address.data,post_script_type=form.post_script_type.data,post_script=form.post_script.data)

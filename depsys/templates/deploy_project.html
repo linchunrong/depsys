@@ -44,7 +44,13 @@ th
                     <td><input type="radio" name="selected"/></td>
                     <td>{{ record.version }}</td>
                     <td>{{ record.time_end }}</td>
-                    <td>{{ record.status }}</td>
+                    {% if record.status == 1 %}
+                    <td>成功</td>
+                    {% elif record.status == 0 %}
+                    <td>失败</td>
+                    {% elif record.status == -1 %}
+                    <td>中断</td>
+                    {% endif %}
                     <td>{{ record.logs }}</td>
                 </tr>
                 {% endfor %}

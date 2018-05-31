@@ -5,7 +5,7 @@ from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
 from depsys import app
 from depsys.dashboard import dashboard_index
-from depsys.deploy import deploy_index
+from depsys.deploy import deploy_index, deploy_record
 from depsys.sysconfig import Project_config, System_config, User_config
 from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm
 from depsys.models import User, System, Project
@@ -63,7 +63,8 @@ def deploy():
 @app.route('/deploy/<project>')
 @login_required
 def project_deploy(project):
-    return render_template('deploy_project.html',project=project)
+    records = deploy_record(project)
+    return render_template('deploy_project.html',project=project, records=records)
 
 @app.route('/config', methods=['GET', 'POST'])
 @login_required

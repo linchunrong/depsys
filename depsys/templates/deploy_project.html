@@ -22,6 +22,20 @@ th
 	color:#ffffff;
 }
 </style>
+<script src="../static/layer/layer.js"></script>
+<script>
+function func1() {
+        layer.open({
+            type: 1,
+            skin: 'layui-layer-demo', //样式类名
+            closeBtn: 1, //不显示关闭按钮
+            shift: 2,
+            area: ['420px', '240px'], //宽高
+            shadeClose: true, //开启遮罩关闭
+            content: '内容'
+        });
+}
+</script>
     <body>
     <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
         <h3 style="color: #0091e6">工程：{{ project }}</h3>
@@ -37,21 +51,25 @@ th
                     <th>版本</th>
                     <th>日期</th>
                     <th>构建</th>
+                    <th>发版说明</th>
+                    <th>发起人</th>
                     <th>日志</th>
                 </tr>
                 {% for record in records %}
                 <tr>
-                    <td><input type="radio" name="selected"/></td>
+                    <td width="40px"><input type="radio" name="selected"/></td>
                     <td>{{ record.version }}</td>
                     <td>{{ record.time_end }}</td>
                     {% if record.status == 1 %}
-                    <td>成功</td>
+                    <td width="80px">成功</td>
                     {% elif record.status == 0 %}
                     <td>失败</td>
                     {% elif record.status == -1 %}
                     <td>中断</td>
                     {% endif %}
-                    <td>{{ record.logs }}</td>
+                    <td>{{ record.deploy_reason }}</td>
+                    <td width="100px">{{ record.requester }}</td>
+                    <td width="100px"><a href="#" id="func1" onclick="func1()" style="text-decoration: none">点击查看</a></td>
                 </tr>
                 {% endfor %}
             </table>

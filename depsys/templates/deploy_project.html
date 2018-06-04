@@ -24,12 +24,13 @@ th
 </style>
 <script src="../static/layer/layer.js"></script>
 <script>
-function func1() {
+function show_logs(message) {
     layer.open({
         type: 1,
-        area: ['600px', '360px'],
+        title: '日志',
+        area: ['800px', '500px'],
         shadeClose: true, //点击遮罩关闭
-        content: '\<\div style="padding:20px;">自定义内容\<\/div>'
+        content: '\<\div style="padding:20px;">' + message + '\<\/div>'
     });
 }
 </script>
@@ -66,7 +67,7 @@ function func1() {
                     {% endif %}
                     <td>{{ record.deploy_reason }}</td>
                     <td width="100px">{{ record.requester }}</td>
-                    <td width="100px"><a href="#" id="func1" onclick="func1()" style="text-decoration: none">点击查看</a></td>
+                    <td width="100px"><a href="#" id="func1" onclick="show_logs('{{ record.logs }}')" style="text-decoration: none">点击查看</a></td>
                 </tr>
                 {% endfor %}
             </table>

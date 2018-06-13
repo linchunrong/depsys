@@ -1,52 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from threading import Lock
 from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
-from depsys import app, socketio
+from depsys import app, execute
 from depsys.dashboard import dashboard_index
 from depsys.deploy import deploy_index, deploy_record
 from depsys.sysconfig import Project_config, System_config, User_config
 from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm
 from depsys.models import User, System, Project
-from flask_socketio import emit, disconnect
-
-thread = None
-thread_lock = Lock()
-
-
-def background_thread():
-    """Example of how to send server generated events to clients."""
-    count = 0
-    while True:
-        socketio.sleep(3)
-        count += 1
-        socketio.emit('my_response',
-                      {'data': 'Server generated event', 'count': count},
-                      namespace='/execute')
-
-
-@app.route('/execute')
-def execute():
-    return render_template('execute.html', async_mode=socketio.async_mode)
-
-
-@socketio.on('disconnect_request', namespace='/execute')
-def disconnect_request():
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': 'Disconnected!', 'count': session['receive_count']})
-    disconnect()
-
-
-@socketio.on('connect', namespace='/execute')
-def test_connect():
-    global thread
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(target=background_thread)
-    emit('my_response', {'data': 'Connected', 'count': 0})
 
 
 # Index
@@ -109,6 +71,12 @@ def deploy():
 def project_deploy(project):
     records = deploy_record(project)
     return render_template('deploy_project.html', project=project, records=records)
+
+
+@app.route('/execute')
+@login_required
+def deploy_exec():
+    return render_template('execute.html', async_mode=execute.socketio.async_mode)
 
 
 @app.route('/config', methods=['GET', 'POST'])

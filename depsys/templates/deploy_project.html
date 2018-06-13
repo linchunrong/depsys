@@ -40,7 +40,7 @@ function show_logs(message) {
         <form action="" method=post>
             <div>
 			    <span>请输入需发布分支：<input type="text"></span>
-                <button type="button" onclick="alert('Still working on it...')">发布!</button>
+                <button formmethod="get" formaction="{{ url_for('execute') }}">发布!</button>
             </div><br>
             <hr style="width: 70%;float: left"><br>
             <table>

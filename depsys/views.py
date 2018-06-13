@@ -24,15 +24,15 @@ def background_thread():
         count += 1
         socketio.emit('my_response',
                       {'data': 'Server generated event', 'count': count},
-                      namespace='/test')
+                      namespace='/execute')
 
 
-@app.route('/test')
-def test():
-    return render_template('test.html', async_mode=socketio.async_mode)
+@app.route('/execute')
+def execute():
+    return render_template('execute.html', async_mode=socketio.async_mode)
 
 
-@socketio.on('disconnect_request', namespace='/test')
+@socketio.on('disconnect_request', namespace='/execute')
 def disconnect_request():
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my_response',
@@ -40,7 +40,7 @@ def disconnect_request():
     disconnect()
 
 
-@socketio.on('connect', namespace='/test')
+@socketio.on('connect', namespace='/execute')
 def test_connect():
     global thread
     with thread_lock:

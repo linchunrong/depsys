@@ -32,7 +32,7 @@
                 <ul style="list-style-type: none">
                     <li><span>请在下框输入脚本：</span><br>
                         {{ form.post_script_type }}
-                    </li><br>
+                    </li>
                     <li>{{ form.post_script(style="width:40%; height:50px",placeholder="请在此框输入完整脚本！") }}</li>
                 </ul>
             </div><br>
@@ -41,7 +41,7 @@
                 <input name="reset" type="reset" value="重置"/>
             </div>
 		</form>
-        {% if error %}<p class="error" style="text-align: left; color: red;font-style: oblique;font-weight: 450"><strong>Error:</strong> {{ error }}{% endif %}
+        {% if error %}<p class="error" style="text-align: left; color: red;font-style: oblique;font-weight: 500"><strong>Error:</strong> {{ error }}{% endif %}
     </div>
     </body>
 {% endblock %}

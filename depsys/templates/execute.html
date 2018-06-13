@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block body %}
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            namespace = '/execute';
+            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+            socket.on('my_response', function(msg) {
+                $('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ': ' + msg.data + '\n').html());
+            });
+
+            $('form#disconnect').submit(function() {
+                socket.emit('disconnect_request');
+                return false;
+            });
+        });
+    </script>
+    <body>
+    <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
+        <h2>Executing - Project</h2>
+        <form id="disconnect" method="POST" action="#">
+            <input type="submit" value="Disconnect">
+        </form>
+        <h2>Output:</h2>
+        <textarea id="log" style="width: 65%; height: 500px; background-color: ghostwhite" placeholder="Logs output here..."></textarea>
+    </div>
+    </body>
+{% endblock %}

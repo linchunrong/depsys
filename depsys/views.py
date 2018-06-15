@@ -3,7 +3,7 @@
 
 from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
-from depsys import app, execute
+from depsys import app,deploy
 from depsys.dashboard import dashboard_index
 from depsys.deploy import DeployInfo
 from depsys.sysconfig import Project_config, System_config, User_config
@@ -77,7 +77,7 @@ def project_deploy(project):
 @login_required
 def deploy_exec(project):
     branch = request.form['branch']
-    return render_template('execute.html', project=project, branch=branch, async_mode=execute.socketio.async_mode)
+    return render_template('execute.html', project=project, branch=branch, async_mode=deploy.socketio.async_mode)
 
 
 @app.route('/config', methods=['GET', 'POST'])

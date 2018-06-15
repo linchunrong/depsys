@@ -5,7 +5,7 @@ from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
 from depsys import app, execute
 from depsys.dashboard import dashboard_index
-from depsys.deploy import deploy_index, deploy_record
+from depsys.deploy import DeployInfo
 from depsys.sysconfig import Project_config, System_config, User_config
 from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm
 from depsys.models import User, System, Project
@@ -61,15 +61,15 @@ def profile():
 
 @app.route('/deploy')
 @login_required
-def deploy():
-    project_list = deploy_index()
+def deploy_index():
+    project_list = DeployInfo().projects()
     return render_template('deploy.html', project_list=project_list)
 
 
 @app.route('/deploy/<project>')
 @login_required
 def project_deploy(project):
-    records = deploy_record(project)
+    records = DeployInfo().records(project)
     return render_template('deploy_project.html', project=project, records=records)
 
 
@@ -124,7 +124,7 @@ def project_config(project):
 
 @app.route('/delete/<project>', methods=['GET', 'POST'])
 @login_required
-def delete_project(project):
+def project_delete(project):
     p = Project_config()
     if request.method == "POST":
         p.delete(project_name=project)

@@ -39,8 +39,8 @@ function show_logs(message) {
         <h3 style="color: #0091e6">工程：{{ project }}</h3>
         <form action="" method=post>
             <div>
-			    <span>请输入需发布分支：<input type="text"></span>
-                <button formmethod="get" formaction="{{ url_for('execute') }}">发布!</button>
+			    <span>请输入需发布分支：<input type="text" name="branch"></span>
+                <button formmethod="post" formaction="{{ url_for('deploy_exec',project=project) }}">发布!</button>
             </div><br>
             <hr style="width: 70%;float: left"><br>
             <table>
@@ -75,4 +75,3 @@ function show_logs(message) {
     </div>
     </body>
 {% endblock %}
-

@@ -73,10 +73,11 @@ def project_deploy(project):
     return render_template('deploy_project.html', project=project, records=records)
 
 
-@app.route('/execute')
+@app.route('/execute/<project>', methods=['POST'])
 @login_required
-def deploy_exec():
-    return render_template('execute.html', async_mode=execute.socketio.async_mode)
+def deploy_exec(project):
+    branch = request.form['branch']
+    return render_template('execute.html', project=project, branch=branch, async_mode=execute.socketio.async_mode)
 
 
 @app.route('/config', methods=['GET', 'POST'])

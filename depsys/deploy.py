@@ -25,11 +25,12 @@ class DeployInfo:
         return items
 
 
+# deploy execute process
 thread = None
 thread_lock = Lock()
 
 
-def background_thread():
+def execute_thread():
     """Example of how to send server generated events to clients."""
     count = 0
     while True:
@@ -49,9 +50,9 @@ def disconnect_request():
 
 
 @socketio.on('connect', namespace='/execute')
-def test_connect():
+def execute_do():
     global thread
     with thread_lock:
         if thread is None:
-            thread = socketio.start_background_task(target=background_thread)
+            thread = socketio.start_background_task(target=execute_thread)
     emit('my_response', {'data': 'Connected', 'count': 0})

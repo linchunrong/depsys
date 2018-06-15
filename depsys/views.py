@@ -3,9 +3,9 @@
 
 from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
-from depsys import app,deploy
-from depsys.dashboard import dashboard_index
+from depsys import app, deploy
 from depsys.deploy import DeployInfo
+from depsys.dashboard import dashboard_index
 from depsys.sysconfig import Project_config, System_config, User_config
 from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm
 from depsys.models import User, System, Project

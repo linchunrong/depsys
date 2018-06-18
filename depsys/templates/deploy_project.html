@@ -41,6 +41,7 @@ function show_logs(message) {
             <div>
 			    <span>请输入需发布分支：<input type="text" name="branch"></span>
                 <button formmethod="post" formaction="{{ url_for('deploy_exec',project=project) }}">发布!</button>
+                {% if error %}<p class="error" style="text-align: left; color: red;font-style: oblique;font-weight: 500"><strong>Error:</strong> {{ error }}{% endif %}
             </div><br>
             <hr style="width: 70%;float: left"><br>
             <table>

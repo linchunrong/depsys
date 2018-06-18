@@ -68,15 +68,18 @@ def deploy_index():
 
 @app.route('/deploy/<project>')
 @login_required
-def project_deploy(project):
+def project_deploy(project,error=None):
     records = DeployInfo().records(project)
-    return render_template('deploy_project.html', project=project, records=records)
+    return render_template('deploy_project.html', project=project, records=records, error=error)
 
 
 @app.route('/execute/<project>', methods=['POST'])
 @login_required
 def deploy_exec(project):
     branch = request.form['branch']
+    if not branch:
+        error = "请发版输入分支！"
+        return project_deploy(project=project, error=error)
     return render_template('execute.html', project=project, branch=branch, async_mode=deploy.socketio.async_mode)
 
 

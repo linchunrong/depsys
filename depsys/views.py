@@ -6,7 +6,7 @@ from flask_login import login_user, login_required, logout_user
 from depsys import app, deploy
 from depsys.deploy import DeployInfo
 from depsys.dashboard import dashboard_index
-from depsys.sysconfig import Project_config, System_config, User_config
+from depsys.sysconfig import ProjectConfig, SystemConfig, UserConfig
 from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm
 from depsys.models import User, System, Project
 
@@ -50,7 +50,7 @@ def profile():
     user = User.query.filter_by(id=user_id).first()
     if request.method == "POST":
         if form.validate_on_submit():
-            u = User_config()
+            u = UserConfig()
             u.update(user_id=user_id, password=form.password.data if form.password.data else user.password)
             return redirect(url_for('profile'))
         else:
@@ -91,7 +91,7 @@ def config():
     conf = System.query.first()
     if request.method == "POST":
         if form.validate_on_submit():
-            s = System_config()
+            s = SystemConfig()
             s.update(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
                     repository_server=form.repository_server.data, repository_user=form.repository_user.data,
                      repository_password=form.repository_password.data if form.repository_password.data else conf.repository_pwd,
@@ -111,14 +111,14 @@ def project_config(project):
     conf = Project.query.filter_by(project_name=project).first()
     if request.method == "POST":
         if form.validate_on_submit():
-            p = Project_config()
+            p = ProjectConfig()
             if project == "add_new_project":
                 p.add(project_name=form.project_name.data, servers=form.servers.data,
                                source_address=form.source_address.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
             else:
                 p.update(project_name_old=project, project_name=form.project_name.data, servers=form.servers.data,
                                source_address=form.source_address.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
-            return redirect(url_for('deploy'))
+            return redirect(url_for('deploy_index'))
         else:
             for key in form.errors:
                 error = form.errors[key]
@@ -128,10 +128,10 @@ def project_config(project):
 @app.route('/delete/<project>', methods=['GET', 'POST'])
 @login_required
 def project_delete(project):
-    p = Project_config()
+    p = ProjectConfig()
     if request.method == "POST":
         p.delete(project_name=project)
-        return redirect(url_for('deploy'))
+        return redirect(url_for('deploy_index'))
     return render_template('del_project.html', project=project)
 
 

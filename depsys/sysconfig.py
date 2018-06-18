@@ -4,9 +4,11 @@
 from depsys import db
 from depsys.models import Project, System, User
 
-class System_config:
-    """System config, only have update method"""
-    def update(self, ansible_path, deploy_script, start_script, stop_script, repository_server, repository_user, repository_password, smtp_server, smtp_user, smtp_password):
+
+class SystemConfig:
+    """System config, include get and update method"""
+    def update(self, ansible_path, deploy_script, start_script, stop_script,
+               repository_server, repository_user, repository_password, smtp_server, smtp_user, smtp_password):
         # Should be only one record in DB
         item = System.query.first()
         item.ansible_path = ansible_path
@@ -22,7 +24,13 @@ class System_config:
         db.session.commit()
         db.session.close()
 
-class Project_config:
+    def get(self):
+        """Get system config"""
+        item = System.query.first()
+        return item
+
+
+class ProjectConfig:
     """Action for project"""
     def update(self,project_name_old, project_name, servers, source_address, post_script_type, post_script):
         """Update project config"""
@@ -50,7 +58,13 @@ class Project_config:
         db.session.commit()
         db.session.close()
 
-class User_config:
+    def get(self, project_name):
+        """Get project config"""
+        item = Project.query.filter_by(project_name=project_name).first()
+        return item
+
+
+class UserConfig:
     """Config for user"""
     def update(self, user_id, password):
         """Update user info"""
@@ -59,3 +73,8 @@ class User_config:
         item.password = password
         db.session.commit()
         db.session.close()
+
+    def get(self, user_id):
+        """Get user config"""
+        item = User.query.filter_by(id=user_id).first()
+        return item

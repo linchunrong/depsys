@@ -6,7 +6,7 @@
             namespace = '/execute';
             var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
             socket.on('my_response', function(msg) {
-                $('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ': ' + msg.data + '\n').html());
+                $('#log').append('<br>' + $('<div/>').text(msg.time_stamp + ': ' + msg.data + '\n').html());
             });
 
             $('form#disconnect').submit(function() {

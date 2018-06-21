@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib, time
+import urllib.request, time, os
 from threading import Lock
 from depsys import socketio
 from flask_socketio import disconnect, emit
@@ -39,9 +39,30 @@ def execute_thread():
                       namespace='/execute')
 
 
+def mkdir(path):
+    path = path.strip()
+    isExists = os.path.exists(path)
+    if isExists:
+        # print (path +  "目录已存在！")
+        return False
+    else:
+        os.makedirs(path)
+        # print (path + "创建成功！")
+        return True
+
+
 def get_script():
     """Base on sysconfig, make the script local"""
     conf = SystemConfig()
     remote_script = conf.get().deploy_script
-    local_script = urllib.urlretieve(remote_script, filename="deploy_script.sh")
-    return local_script
+    # check if script path is set in remote http url
+    if 'http' in remote_script:
+        path = "tmp"
+        mkdir(path)
+        local_script = path + "/deploy_script.sh"
+        urllib.request.urlretrieve(remote_script, filename=local_script)
+        return local_script
+    # otherwise, script path is set in local path by default
+    else:
+        local_script = remote_script
+        return local_script

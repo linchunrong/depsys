@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib.request, time, os
+import urllib.request, time, os, random, string
 from threading import Lock
 from depsys import socketio
 from flask_socketio import disconnect, emit
@@ -51,6 +51,12 @@ def mkdir(path):
         return True
 
 
+def random_string(num):
+    """Generate num-bit random sting"""
+    ran_str = ''.join(random.sample(string.ascii_letters + string.digits, int(num)))
+    return ran_str
+
+
 def get_script():
     """Base on sysconfig, make the script local"""
     conf = SystemConfig()
@@ -66,3 +72,11 @@ def get_script():
     else:
         local_script = remote_script
         return local_script
+
+
+def create_playbook():
+    """Create ansible playbook"""
+    src_file = "yml/execute.yml"
+    with open(src_file) as src:
+        playbook = src.read()
+        print (playbook)

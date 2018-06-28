@@ -5,7 +5,7 @@ import urllib.request, time, os, random, string, pathlib, subprocess
 from threading import Lock
 from depsys import socketio
 from flask_socketio import disconnect, emit
-from depsys.sysconfig import SystemConfig
+from depsys.sysconfig import SystemConfig, ProjectConfig
 
 # deploy execute process
 thread = None
@@ -17,7 +17,7 @@ logs_path = "logs"
 @socketio.on('disconnect_request', namespace='/execute')
 def disconnect_request():
     emit('my_response',
-         {'time_stamp': time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()), 'data': "Abort!"})
+         {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "Abort!"})
     disconnect()
 
 
@@ -27,20 +27,33 @@ def execute_do():
     with thread_lock:
         if thread is None:
             thread = socketio.start_background_task(target=execute_thread)
-    emit('my_response', {'time_stamp': time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()), 'data': "Start!"})
+    emit('my_response', {'time_stamp': time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "Start!\n"})
 
 
 def execute_thread():
-    """Example of how to send server generated events to clients."""
-    run_ansible()
-    running = True
+    """Execute process thread"""
+    os.chdir(str(my_path()))
+    mkdir(logs_path)
+    os.chdir(logs_path)
+    # create ansible command
+    #command = "ansible-playbook -i " + get_hosts() + " " + get_playbook()
+    command = "ping 127.0.0.1 -n 5"
+    # run ansible and write logs into temporary log files
+    with open("logs.txt", "w+") as file:
+        status = subprocess.Popen(command, stdout=file)
+    # read out the log file and send to frontend
     with open("logs.txt") as logs:
+        running = True
         while running:
-            output = str(logs.read())
             socketio.sleep(2)
-            socketio.emit('my_response',
-                      {'time_stamp': time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()), 'data': output},
-                      namespace='/execute')
+            output = str(logs.read())
+            if output:
+                socketio.emit('my_response', {'time_stamp': "", 'data': output},namespace='/execute')
+            if status.poll() != None:
+                running = False
+                global thread
+                thread = None
+                socketio.emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "Run script done!"},namespace='/execute')
 
 
 def my_path():
@@ -85,7 +98,7 @@ def get_script():
         return str(local_script)
 
 
-def create_playbook():
+def get_playbook():
     """Create ansible playbook"""
     os.chdir(str(my_path()))
     mkdir(temp_path)
@@ -106,12 +119,15 @@ def create_playbook():
     return dest_file
 
 
-def run_ansible():
-    """execute ansible command for deploy"""
+def get_hosts(project):
+    """Create ansible hosts file"""
     os.chdir(str(my_path()))
-    mkdir(logs_path)
-    os.chdir(logs_path)
-    # write logs into temporary log files
-    command = "ping www.baidu.com -n 5"
-    with open("logs.txt", "w+") as file:
-        subprocess.Popen(command, stdout=file)
+    mkdir(temp_path)
+    file_name = "hosts_" + random_string(16)
+    os.chdir(temp_path)
+    with open(file_name, 'w+') as hosts:
+        conf = ProjectConfig()
+        content = conf.get(project).servers
+        hosts.write(content)
+    hosts_file = str(my_path().joinpath(temp_path, file_name))
+    return hosts_file

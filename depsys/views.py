@@ -3,9 +3,8 @@
 
 from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
-from depsys import app, deploy
-from depsys.deploy import DeployInfo
-from depsys.dashboard import dashboard_index
+from depsys import app
+from depsys.dashboard import DeployInfo
 from depsys.sysconfig import ProjectConfig, SystemConfig, UserConfig
 from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm
 from depsys.models import User, System, Project
@@ -76,6 +75,7 @@ def project_deploy(project,error=None):
 @app.route('/execute/<project>', methods=['POST'])
 @login_required
 def deploy_exec(project):
+    from depsys import deploy
     branch = request.form['branch']
     if not branch:
         error = "请发版输入分支！"
@@ -151,5 +151,6 @@ def project_dashboard(project):
 @app.route('/deploy_num')
 @login_required
 def deploy_num():
-    data = dashboard_index()
+    info = DeployInfo()
+    data = info.status()
     return jsonify(data)

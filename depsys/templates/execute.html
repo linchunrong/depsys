@@ -8,6 +8,10 @@
             socket.on('my_response', function(msg) {
                 $('#log').append('<br>' + $('<div/>').text(msg.time_stamp + msg.data).html());
             });
+            socket.on('script_done', function () {
+                socket.emit('disconnect_request');
+                return false;
+            });
 
             $('form#disconnect').submit(function() {
                 socket.emit('disconnect_request');

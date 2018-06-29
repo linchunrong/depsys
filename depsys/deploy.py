@@ -17,7 +17,7 @@ logs_path = "logs"
 @socketio.on('disconnect_request', namespace='/execute')
 def disconnect_request():
     emit('my_response',
-         {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "Abort!"})
+         {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "Disconnect!"})
     disconnect()
 
 
@@ -53,7 +53,8 @@ def execute_thread():
                 running = False
                 global thread
                 thread = None
-                socketio.emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "Run script done!"},namespace='/execute')
+                socketio.emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "Run script done!"}, namespace='/execute')
+    socketio.emit('script_done', namespace='/execute')
 
 
 def my_path():

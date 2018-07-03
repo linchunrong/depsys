@@ -78,7 +78,7 @@ def deploy_exec(project):
     from depsys import deploy
     branch = request.form['branch']
     if not branch:
-        error = "请发版输入分支！"
+        error = "请输入发版分支！"
         return project_deploy(project=project, error=error)
     return render_template('execute.html', project=project, branch=branch, async_mode=deploy.socketio.async_mode)
 

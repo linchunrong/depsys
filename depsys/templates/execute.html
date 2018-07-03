@@ -5,6 +5,9 @@
         $(document).ready(function() {
             namespace = '/execute';
             var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+            socket.on('connect', function() {
+                socket.emit('my_event', {data: '后台已连接!'});
+            });
             socket.on('my_response', function(msg) {
                 $('#log').append('<br>' + $('<div/>').text(msg.time_stamp + msg.data).html());
             });
@@ -13,20 +16,22 @@
                 return false;
             });
 
-            $('form#disconnect').submit(function() {
-                socket.emit('disconnect_request');
+            $('button#exec_room').click(function() {
+                socket.emit('executing', {room: $('#exec_room').val()});
                 return false;
             });
         });
     </script>
     <body>
     <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
-        <h2>Executing: &nbsp;&nbsp;{{ project }}_{{ branch }}</h2><hr>
-        <form id="disconnect" method="POST" action="#">
-            <div style="width: 65%">
-                <h3>Output:<input style="float: right" type="submit" value="中断！"></h3>
-            </div>
-        </form>
+        <h3 style="color: #98bf21">发布: </h3><hr>
+        <div style="width: 65%">
+            <h4 style="color: #0091e6">项目：{{ project }} &nbsp;&nbsp;版本：{{ branch }}
+                <a><button value="{{ project }}_{{ branch }}" id="exec_room" style="float: right">开始！</button></a>
+                <a style="float: right">&nbsp;&nbsp;</a>
+                <a href="{{ url_for('project_deploy', project=project) }}"><button style="float: right">关闭！</button></a>
+            </h4>
+        </div>
         <textarea id="log" style="width: 65%; height: 500px; background-color: ghostwhite" placeholder="Logs output here..."></textarea>
     </div>
     </body>

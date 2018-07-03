@@ -3,7 +3,7 @@
 
 from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
-from depsys import app, test
+from depsys import app
 from depsys.dashboard import DeployInfo
 from depsys.sysconfig import ProjectConfig, SystemConfig, UserConfig
 from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm
@@ -78,14 +78,9 @@ def deploy_exec(project):
     from depsys import deploy
     branch = request.form['branch']
     if not branch:
-        error = "请发版输入分支！"
+        error = "请输入发版分支！"
         return project_deploy(project=project, error=error)
     return render_template('execute.html', project=project, branch=branch, async_mode=deploy.socketio.async_mode)
-
-
-@app.route('/test')
-def my_test():
-    return render_template('socket_test.html', async_mode=test.socketio.async_mode)
 
 
 @app.route('/config', methods=['GET', 'POST'])

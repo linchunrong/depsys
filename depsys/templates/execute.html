@@ -20,6 +20,11 @@
                 socket.emit('executing', {room: $('#exec_room').val()});
                 return false;
             });
+            $('button#disconnect').click(function () {
+                socket.emit('disconnect_request');
+                window.location.href="{{ url_for('project_deploy', project=project) }}"
+                return false;
+            })
         });
     </script>
     <body>
@@ -27,9 +32,9 @@
         <h3 style="color: #98bf21">发布: </h3><hr>
         <div style="width: 65%">
             <h4 style="color: #0091e6">项目：{{ project }} &nbsp;&nbsp;版本：{{ branch }}
-                <a><button value="{{ project }}_{{ branch }}" id="exec_room" style="float: right">开始！</button></a>
+                <button value="{{ project }}_{{ branch }}" id="exec_room" style="float: right">开始！</button>
                 <a style="float: right">&nbsp;&nbsp;</a>
-                <a href="{{ url_for('project_deploy', project=project) }}"><button style="float: right">关闭！</button></a>
+                <button id="disconnect" style="float: right">关闭！</button>
             </h4>
         </div>
         <textarea id="log" style="width: 65%; height: 500px; background-color: ghostwhite" placeholder="Logs output here..."></textarea>

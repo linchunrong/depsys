@@ -15,7 +15,7 @@ logs_path = "logs"
 
 
 @socketio.on('my_event', namespace='/execute')
-def test_message(message):
+def message(message):
     emit('my_response',
          {'data': message['data'], 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
 
@@ -36,11 +36,16 @@ def disconnect_request():
 
 
 @socketio.on('connect', namespace='/execute')
-def test_connect():
+def connect():
     global thread
     with thread_lock:
         if thread is None:
             emit('my_response', {'data': '开始连接后台...', 'time_stamp': time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
+
+
+@socketio.on('disconnect', namespace='/execute')
+def print_disconnect():
+    print('Client disconnected')
 
 
 def execute_thread(room):

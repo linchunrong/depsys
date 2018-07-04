@@ -6,6 +6,7 @@ from threading import Lock
 from depsys import socketio
 from flask_socketio import disconnect, emit, join_room
 from depsys.sysconfig import SystemConfig, ProjectConfig
+from depsys.dashboard import DeployRecord
 
 # deploy execute process
 thread = None
@@ -50,30 +51,42 @@ def print_disconnect():
 
 def execute_thread(room):
     """Execute process thread"""
+    time_begin = time.localtime()
     os.chdir(str(my_path()))
     mkdir(logs_path)
     os.chdir(logs_path)
     # create ansible command
-    #command = "ansible-playbook -i " + get_hosts() + " " + get_playbook()
+    # command = "ansible-playbook -i " + get_hosts(project) + " " + get_playbook()
     command = "ping 127.0.0.1 -n 5"
-    # run ansible and write logs into temporary log files
     logs_file = "logs_" + random_string(16) + ".txt"
+    # run ansible and write logs into temporary log files
     with open(logs_file, "w+") as file:
         status = subprocess.Popen(command, stdout=file)
+
     # read out the log file and send to frontend
     with open(logs_file) as logs:
         running = True
         while running:
             socketio.sleep(2)
             output = str(logs.read())
+            # only print out when there's output
             if output:
                 emit('my_response', {'time_stamp': "", 'data': output},namespace='/execute', room=room)
+            # poll() func will get return code of subrocess.Popen(), None means running
             if status.poll() != None:
                 running = False
-                global thread
-                thread = None
+                time_end = time.localtime()
                 emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "脚本执行完毕!"}, namespace='/execute', room=room)
     emit('script_done', namespace='/execute')
+
+    # write logs into record, string room should be "project@branch", pick out project name from it.
+    room_split = str(room).split("@")
+    project = room_split[0]
+    branch = room_split[1]
+    with open(logs_file, "w+") as logs:
+        logs = logs.read()
+        DeployRecord().add(project=project, status=status.poll(), version=branch, requester=None, deploy_reason=None, deployer=None,
+                           time_begin=time_begin, time_end=time_end, logs=logs)
 
 
 def my_path():

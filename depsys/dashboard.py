@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from depsys.models import Record, Project
+from depsys.sysconfig import ProjectConfig
+from depsys import db
 
 
 class DeployInfo:
@@ -12,14 +14,6 @@ class DeployInfo:
         for i in range(len(project_info)):
             project_list.append(project_info[i].project_name)
         return project_list
-
-
-    def records(self, project):
-        """Get deployed records of project"""
-        p_id = Project.query.filter_by(project_name=project).first().project_id
-        items = Record.query.filter_by(project_id=p_id).all()
-        return items
-
 
     def status(self):
         """Get deploy status"""
@@ -32,3 +26,25 @@ class DeployInfo:
             'status': ['Success', 'Failed', 'Abort']
         }
         return data
+
+
+class DeployRecord:
+    """Record actions for deploy"""
+    def add(self, project, status, version, requester, deployer, deploy_reason, time_begin, time_end, logs):
+        """Add deployed record"""
+        project_id = ProjectConfig().get(project).project_id
+        item = Record(project_id=project_id, status=status, version=version, requester=requester if requester else None, deployer=deployer if deployer else None,
+                      deploy_reason=deploy_reason if deploy_reason else None, time_begin=time_begin, time_end=time_end, logs=logs)
+        db.session.add(item)
+        db.session.commit()
+        db.session.close()
+
+    def delete(self, project):
+        """Delete deployed record"""
+        pass
+
+    def get(self, project):
+        """Get deployed records"""
+        project_id = ProjectConfig().get(project).project_id
+        items = Record.query.filter_by(project_id=project_id).all()
+        return items

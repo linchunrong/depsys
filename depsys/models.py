@@ -68,9 +68,9 @@ class Record(db.Model):
     requester = db.Column(db.String(16))
     deployer = db.Column(db.String(16))
     deploy_reason = db.Column(db.String(200))
-    time_begin = db.Column(db.Time)
-    time_end = db.Column(db.Time)
-    logs = db.Column(db.String(200))
+    time_begin = db.Column(db.DateTime)
+    time_end = db.Column(db.DateTime)
+    logs = db.Column(db.TEXT(65535))
 
     def __repr__(self):
         return '<Record %r>' % self.project_id

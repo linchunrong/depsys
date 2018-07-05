@@ -62,7 +62,7 @@ def execute_thread(room):
     logs_file = "logs_" + random_string(16) + ".txt"
     # run ansible and write logs into temporary log files
     with open(logs_file, "w+") as file:
-        status = subprocess.Popen(command, stdout=file)
+        proc = subprocess.Popen(command, stdout=file)
 
     # read out the log file and send to frontend
     with open(logs_file) as logs:
@@ -74,7 +74,7 @@ def execute_thread(room):
             if output:
                 emit('my_response', {'time_stamp': "", 'data': output},namespace='/execute', room=room)
             # poll() func will get return code of subrocess.Popen(), None means running
-            if status.poll() != None:
+            if proc.poll() != None:
                 running = False
                 time_end = time.localtime()
                 emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "脚本执行完毕!"}, namespace='/execute', room=room)
@@ -86,7 +86,15 @@ def execute_thread(room):
     branch = room_split[1]
     with open(logs_file) as logs:
         logs = logs.read()
-        DeployRecord().add(project=project, status=status.poll(), version=branch, requester=None, deploy_reason=None, deployer=None,
+        # change return code for status, 0 for successful termination, >0 for termination with an error code, <0 if was killed
+        returncode = proc.poll()
+        if returncode == 0:
+            status = 1
+        elif returncode <0:
+            status = -1
+        else:
+            status = 0
+        DeployRecord().add(project=project, status=status, version=branch, requester=None, deploy_reason=None, deployer=None,
                            time_begin=time_begin, time_end=time_end, logs=logs)
 
 

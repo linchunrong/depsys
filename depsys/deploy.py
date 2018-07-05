@@ -23,9 +23,10 @@ def message(message):
 
 @socketio.on('executing', namespace='/execute')
 def executing(message):
-    # every thread has it's room to get their logs
+    # every thread own their room to get their logs
     join_room(message['room'])
     emit('my_response', {'data': "后台脚本开始执行..." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+    # call deploy thread
     execute_thread(message['room'])
 
 
@@ -57,7 +58,7 @@ def execute_thread(room):
     os.chdir(logs_path)
     # create ansible command
     # command = "ansible-playbook -i " + get_hosts(project) + " " + get_playbook()
-    command = "ping 127.0.0.1 -n 5"
+    command = "ping www.baidu.com -n 5"
     logs_file = "logs_" + random_string(16) + ".txt"
     # run ansible and write logs into temporary log files
     with open(logs_file, "w+") as file:
@@ -83,7 +84,7 @@ def execute_thread(room):
     room_split = str(room).split("@")
     project = room_split[0]
     branch = room_split[1]
-    with open(logs_file, "w+") as logs:
+    with open(logs_file) as logs:
         logs = logs.read()
         DeployRecord().add(project=project, status=status.poll(), version=branch, requester=None, deploy_reason=None, deployer=None,
                            time_begin=time_begin, time_end=time_end, logs=logs)

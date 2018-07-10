@@ -174,6 +174,13 @@ def get_hosts(project):
     hosts_file = str(my_path().joinpath(temp_path, file_name))
     return hosts_file
 
-def get_package(version):
+def get_package(project, version):
     """Get package from repository server"""
-    pass
+    p_repo = ProjectConfig().get(project).source_address
+    s_conf = SystemConfig()
+    repo = p_repo if p_repo else s_conf.get().repository_server
+    remote_pkg = repo + "/" + version
+    os.chdir(str(my_path()))
+    package = temp_path +  "/" + version
+    urllib.request.urlretrieve(remote_pkg, filename=package)
+    return str(package)

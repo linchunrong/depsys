@@ -58,11 +58,11 @@ def execute_thread(room):
     os.chdir(logs_path)
     # create ansible command
     # command = "ansible-playbook -i " + get_hosts(project) + " " + get_playbook()
-    command = "ping www.baidu.com -n 5"
+    command = "ping www.baidu.com -c 5"
     logs_file = "logs_" + random_string(16) + ".txt"
     # run ansible and write logs into temporary log files
     with open(logs_file, "w+") as file:
-        proc = subprocess.Popen(command, stdout=file)
+        proc = subprocess.Popen(command, shell=True, stdout=file)
 
     # read out the log file and send to frontend
     with open(logs_file) as logs:
@@ -173,3 +173,7 @@ def get_hosts(project):
         hosts.write(content)
     hosts_file = str(my_path().joinpath(temp_path, file_name))
     return hosts_file
+
+def get_package(version):
+    """Get package from repository server"""
+    pass

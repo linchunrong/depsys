@@ -18,6 +18,10 @@
             </div><br>
         {% endif %}
             <div>
+                <span>工程类型：</span>
+                <span>{{ form.project_type }}</span>
+            </div><br>
+            <div>
                 <span>服务器列表：</span><hr>
                 <ul style="list-style-type: none">
                     <li><span>IPs：{{ form.servers(style="width:60%",placeholder="多个IP请以 \",\" 号分隔！(必填)",value=conf.servers) }}</span></li>
@@ -31,7 +35,7 @@
                 <span>发布后动作(如果有)：</span><hr>
                 <ul style="list-style-type: none">
                     <li><span>请在下框输入脚本：</span><br>
-                        {{ form.post_script_type }}
+                        <span>{{ form.post_script_type(style="list-style-type:none") }}</span>
                     </li>
                     <li>{{ form.post_script(style="width:40%; height:50px",placeholder="请在此框输入完整脚本！") }}</li>
                 </ul>

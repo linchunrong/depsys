@@ -107,7 +107,6 @@ def my_path():
 
 
 def mkdir(path):
-    path = path.strip()
     os.chdir(str(my_path()))
     exists = os.path.exists(path)
     if exists:
@@ -133,7 +132,10 @@ def get_script():
     if 'http' in remote_script:
         os.chdir(str(my_path()))
         local_script = temp_path + "/deploy_script.sh"
-        urllib.request.urlretrieve(remote_script, filename=local_script)
+        try:
+            urllib.request.urlretrieve(remote_script, filename=local_script)
+        except Exception as Err:
+            return ("Error: ", Err)
         return str(local_script)
     # otherwise, script path is set in local path by default
     else:
@@ -182,10 +184,14 @@ def get_package(project, version):
     s_conf = SystemConfig().get()
     p_repo = p_conf.source_address
     repo = p_repo if p_repo else s_conf.repository_server
-    remote_pkg = repo + "/" + version + "/" + project + '.' + p_conf.type
+    package_name = project + "." + p_conf.type
+    remote_pkg = repo + "/" + version + "/" + package_name
     os.chdir(str(my_path()))
-    project_path = data_path + "/" + project
+    project_path = my_path().joinpath(data_path, project)
     mkdir(project_path)
-    package = project_path +  "/" + version + '.' + p_conf.type
-    urllib.request.urlretrieve(remote_pkg, filename=package)
+    package = project_path.joinpath(version, package_name)
+    try:
+        urllib.request.urlretrieve(remote_pkg, filename=package)
+    except Exception as Err:
+        return ("Error: ", Err)
     return str(package)

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, validators, SelectField, TextAreaField
+from wtforms import StringField, SubmitField, PasswordField, validators, SelectField, TextAreaField, RadioField
 
 class LoginForm(FlaskForm):
     """Login Form"""
@@ -22,7 +22,8 @@ class ConfigForm(FlaskForm):
     project_name = StringField('Project_name', validators=[validators.InputRequired(message="工程名必填!")])
     servers = StringField('IPs', validators=[validators.InputRequired(message="服务器地址必填!")])
     source_address = StringField('Repository_address', validators=[validators.InputRequired(message="源码地址必填！")])
-    post_script_type = SelectField('Post_script_type', choices=[('shell','shell script'),('python','python script')])
+    project_type = SelectField('Project_type', choices=[('zip','zip'),('war','war'),('jar','jar')], default='z')
+    post_script_type = SelectField('Post_script_type', choices=[('shell','shell script'),('python','python script')], default='shell')
     post_script = TextAreaField('Post_script')
     submit = SubmitField('保存')
 

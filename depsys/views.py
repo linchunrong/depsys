@@ -113,11 +113,11 @@ def project_config(project):
         if form.validate_on_submit():
             p = ProjectConfig()
             if project == "add_new_project":
-                p.add(project_name=form.project_name.data, servers=form.servers.data,
-                               source_address=form.source_address.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
+                p.add(project_name=form.project_name.data, servers=form.servers.data, source_address=form.source_address.data,
+                      project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
             else:
                 p.update(project_name_old=project, project_name=form.project_name.data, servers=form.servers.data,
-                               source_address=form.source_address.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
+                         source_address=form.source_address.data, project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
             return redirect(url_for('deploy_index'))
         else:
             for key in form.errors:

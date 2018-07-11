@@ -13,6 +13,7 @@ thread = None
 thread_lock = Lock()
 temp_path = "tmp"
 logs_path = "logs"
+data_path = "data"
 
 
 @socketio.on('my_event', namespace='/execute')
@@ -174,13 +175,17 @@ def get_hosts(project):
     hosts_file = str(my_path().joinpath(temp_path, file_name))
     return hosts_file
 
+
 def get_package(project, version):
     """Get package from repository server"""
-    p_repo = ProjectConfig().get(project).source_address
-    s_conf = SystemConfig()
-    repo = p_repo if p_repo else s_conf.get().repository_server
-    remote_pkg = repo + "/" + version
+    p_conf = ProjectConfig().get(project)
+    s_conf = SystemConfig().get()
+    p_repo = p_conf.source_address
+    repo = p_repo if p_repo else s_conf.repository_server
+    remote_pkg = repo + "/" + version + "/" + project + '.' + p_conf.type
     os.chdir(str(my_path()))
-    package = temp_path +  "/" + version
+    project_path = data_path + "/" + project
+    mkdir(project_path)
+    package = project_path +  "/" + version + '.' + p_conf.type
     urllib.request.urlretrieve(remote_pkg, filename=package)
     return str(package)

@@ -14,6 +14,7 @@ thread_lock = Lock()
 temp_path = "tmp"
 logs_path = "logs"
 data_path = "data"
+bin_path = "bin"
 
 
 @socketio.on('my_event', namespace='/execute')
@@ -57,9 +58,13 @@ def execute_thread(room):
     os.chdir(str(my_path()))
     mkdir(logs_path)
     os.chdir(logs_path)
+    # string room should be "project@branch", pick out project and branch name from it.
+    room_split = str(room).split("@")
+    project = room_split[0]
+    branch = room_split[1]
     # create ansible command
-    # command = "ansible-playbook -i " + get_hosts(project) + " " + get_playbook()
-    command = "ping www.baidu.com -c 5"
+    command = "ansible-playbook -i " + get_hosts(project) + " " + get_playbook("deploy_script.sh")
+    # command = "ping www.baidu.com -c 5"
     logs_file = "logs_" + random_string(16) + ".txt"
     # run ansible and write logs into temporary log files
     with open(logs_file, "w+") as file:
@@ -80,11 +85,7 @@ def execute_thread(room):
                 time_end = time.localtime()
                 emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "脚本执行完毕!"}, namespace='/execute', room=room)
     emit('script_done', namespace='/execute')
-
-    # write logs into record, string room should be "project@branch", pick out project name from it.
-    room_split = str(room).split("@")
-    project = room_split[0]
-    branch = room_split[1]
+    # write logs into record
     with open(logs_file) as logs:
         logs = logs.read()
         # change return code for status, 0 for successful termination, >0 for termination with an error code, <0 if was killed
@@ -124,16 +125,17 @@ def random_string(num):
     return ran_str
 
 
-def get_script():
+def get_script(script_name):
     """Base on sysconfig, make the script local"""
     conf = SystemConfig()
     remote_script = conf.get().deploy_script
     # check if script path is set in remote http url
     if 'http' in remote_script:
         os.chdir(str(my_path()))
-        local_script = temp_path + "/deploy_script.sh"
+        mkdir(bin_path)
+        local_script = my_path().joinpath(bin_path,script_name)
         try:
-            urllib.request.urlretrieve(remote_script, filename=local_script)
+            urllib.request.urlretrieve(remote_script, filename=str(local_script))
         except Exception as Err:
             return ("Error: ", Err)
         return str(local_script)
@@ -143,7 +145,7 @@ def get_script():
         return str(local_script)
 
 
-def get_playbook():
+def get_playbook(script_name):
     """Create ansible playbook"""
     os.chdir(str(my_path()))
     mkdir(temp_path)
@@ -155,7 +157,7 @@ def get_playbook():
     # cd to temporary folder and write a temporary playbook
     os.chdir(temp_path)
     with open(dest_file, 'w+') as dest:
-        content = playbook_template.replace("local_script_path", get_script())
+        content = playbook_template.replace("local_script_path", get_script(script_name))
         dest.write(content)
     # read out the temporary playbook for executing
     #with open(dest_file) as new:

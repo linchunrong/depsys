@@ -30,7 +30,7 @@ function show_logs(msg) {
         title: '日志',
         area: ['800px', '500px'],
         shadeClose: true,
-        content: '\<\pre style="padding: 20px; overflow: auto">' + document.getElementById(msg).innerHTML + '\<\/pre>'
+        content: '\<\pre style="padding: 20px">' + document.getElementById(msg).innerHTML + '\<\/pre>'
     });
 }
 </script>
@@ -68,8 +68,8 @@ function show_logs(msg) {
                     {% endif %}
                     <td>{{ record.deploy_reason }}</td>
                     <td width="100px">{{ record.requester }}</td>
-                    <p style="display: none" id="{{ record.version }}">{{ record.logs }}</p>
-                    <td width="100px"><a href="javascript:void(0)" id="func1" style="text-decoration: none" onclick="show_logs('{{ record.version }}')">点击查看</a></td>
+                    <p style="display: none" id="{{ record.record_id }}">{{ record.logs }}</p>
+                    <td width="100px"><a href="javascript:void(0)" id="func1" style="text-decoration: none" onclick="show_logs('{{ record.record_id }}')">点击查看</a></td>
                 </tr>
                 {% endfor %}
             </table>

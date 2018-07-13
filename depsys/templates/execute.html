@@ -15,6 +15,10 @@
                 socket.emit('disconnect_request');
                 return false;
             });
+            socket.on('error_exit', function () {
+                socket.emit('disconnect_exit');
+                return false;
+            });
 
             $('button#exec_room').click(function() {
                 socket.emit('executing', {room: $('#exec_room').val()});

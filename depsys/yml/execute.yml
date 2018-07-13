@@ -1,7 +1,11 @@
 - hosts: all
   tasks:
-  - name: run local deploy script on target servers
-    script: local_script_path
+  - name: send project package to target servers
+    copy: src=local_pkg_file dest=dest_pkg_file owner=pkg_owner
     register: result01
-  - name: show debug info
-    debug: var=result01.stdout_lines
+  - name: run local deploy script on target servers
+    script: local_script_file
+    register: result02
+    when: result01|success
+  - name: show script debug info
+    debug: var=result02.stdout_lines

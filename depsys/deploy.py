@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib.request, time, os, random, string, pathlib, subprocess
+import urllib.request, time, os, sys, random, string, pathlib, subprocess
 from threading import Lock
-from depsys import socketio
+from depsys import socketio, setting
 from flask_socketio import disconnect, emit, join_room
 from depsys.sysconfig import SystemConfig, ProjectConfig
 from depsys.dashboard import DeployRecord
@@ -39,6 +39,13 @@ def disconnect_request():
     disconnect()
 
 
+@socketio.on('disconnect_exit', namespace='/execute')
+def disconnect_exit():
+    emit('my_response',
+         {'data': "[ERROR] 发生错误，退出！", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
+    disconnect()
+
+
 @socketio.on('connect', namespace='/execute')
 def connect():
     global thread
@@ -62,8 +69,16 @@ def execute_thread(room):
     room_split = str(room).split("@")
     project = room_split[0]
     branch = room_split[1]
+    # get deploy package
+    try:
+        my_hosts = get_hosts(project)
+        my_pkg = get_package(project=project, version=branch)
+        my_playbook = get_playbook("deploy_script.sh", package_name=str(my_pkg[1]), local_package=str(my_pkg[0]))
+    except Exception as Err:
+        print ("Error: ", Err)
+        sys.exit(1)
     # create ansible command
-    command = "ansible-playbook -i " + get_hosts(project) + " " + get_playbook("deploy_script.sh")
+    command = "ansible-playbook -i " + my_hosts + " " + my_playbook
     # command = "ping www.baidu.com -c 5"
     logs_file = "logs_" + random_string(16) + ".txt"
     # run ansible and write logs into temporary log files
@@ -137,7 +152,7 @@ def get_script(script_name):
         try:
             urllib.request.urlretrieve(remote_script, filename=str(local_script))
         except Exception as Err:
-            return ("Error: ", Err)
+            sys.exit(Err)
         return str(local_script)
     # otherwise, script path is set in local path by default
     else:
@@ -145,7 +160,7 @@ def get_script(script_name):
         return str(local_script)
 
 
-def get_playbook(script_name):
+def get_playbook(script_name, package_name, local_package):
     """Create ansible playbook"""
     os.chdir(str(my_path()))
     mkdir(temp_path)
@@ -157,7 +172,10 @@ def get_playbook(script_name):
     # cd to temporary folder and write a temporary playbook
     os.chdir(temp_path)
     with open(dest_file, 'w+') as dest:
-        content = playbook_template.replace("local_script_path", get_script(script_name))
+        content = playbook_template.replace("local_script_file", get_script(script_name))
+        content = content.replace("local_pkg_file", local_package)
+        content = content.replace("dest_pkg_file", setting.DEPLOY_PKG_PATH + package_name)
+        content = content.replace("pkg_owner", setting.PKG_OWNER)
         dest.write(content)
     # read out the temporary playbook for executing
     #with open(dest_file) as new:
@@ -189,11 +207,13 @@ def get_package(project, version):
     package_name = project + "." + p_conf.type
     remote_pkg = repo + "/" + version + "/" + package_name
     os.chdir(str(my_path()))
-    project_path = my_path().joinpath(data_path, project)
-    mkdir(project_path)
-    package = project_path.joinpath(version, package_name)
+    package_path = my_path().joinpath(data_path, project, version)
+    mkdir(package_path)
+    package = package_path.joinpath(package_name)
     try:
         urllib.request.urlretrieve(remote_pkg, filename=package)
     except Exception as Err:
-        return ("Error: ", Err)
-    return str(package)
+        emit('my_response', {'data': str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+        emit('error_exit')
+        sys.exit(Err)
+    return [str(package), package_name]

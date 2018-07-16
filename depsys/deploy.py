@@ -140,10 +140,21 @@ def random_string(num):
     return ran_str
 
 
-def get_script(script_name):
+def get_script(script_type):
     """Base on sysconfig, make the script local"""
     conf = SystemConfig()
-    remote_script = conf.get().deploy_script
+    # check script type
+    if script_type == "start_script":
+        remote_script = conf.get().start_script
+    elif script_type == "deploy_script":
+        remote_script = conf.get().deploy_script
+    elif script_type == "stop_script":
+        remote_script = conf.get().stop_script
+    else:
+        print ("Get script failed! Only support start_script/deploy_script/stop_script.")
+        sys.exit(1)
+    # fetch script name
+    script_name = remote_script.strip().split("/")[-1]
     # check if script path is set in remote http url
     if 'http' in remote_script:
         os.chdir(str(my_path()))
@@ -172,7 +183,9 @@ def get_playbook(script_name, package_name, local_package):
     # cd to temporary folder and write a temporary playbook
     os.chdir(temp_path)
     with open(dest_file, 'w+') as dest:
-        content = playbook_template.replace("local_script_file", get_script(script_name))
+        content = playbook_template.replace("start_script_file", get_script("start_script"))
+        content = content.replace("deploy_script_file", get_script("deploy_script"))
+        content = content.replace("stop_script_file", get_script("stop_script"))
         content = content.replace("local_pkg_file", local_package)
         content = content.replace("dest_pkg_file", setting.DEPLOY_PKG_PATH + package_name)
         content = content.replace("pkg_owner", setting.PKG_OWNER)
@@ -213,7 +226,11 @@ def get_package(project, version):
     try:
         urllib.request.urlretrieve(remote_pkg, filename=package)
     except Exception as Err:
-        emit('my_response', {'data': str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
-        emit('error_exit')
-        sys.exit(Err)
+        emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+        # check if local package exist
+        if os.path.isfile(package):
+            emit('my_response', {'data': "Found local package, use if for deployment." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+        else:
+            emit('error_exit')
+            sys.exit(Err)
     return [str(package), package_name]

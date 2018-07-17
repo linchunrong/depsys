@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib.request, time, os, sys, random, string, pathlib, subprocess
+import urllib.request, time, os, sys, random, string, pathlib, subprocess, shutil
 from threading import Lock
+from git import Repo
 from depsys import socketio, setting
 from flask_socketio import disconnect, emit, join_room
 from depsys.sysconfig import SystemConfig, ProjectConfig
@@ -15,6 +16,7 @@ temp_path = "tmp"
 logs_path = "logs"
 data_path = "data"
 bin_path = "bin"
+workstation = "workstation"
 
 
 @socketio.on('my_event', namespace='/execute')
@@ -62,24 +64,27 @@ def print_disconnect():
 def execute_thread(room):
     """Execute process thread"""
     time_begin = time.localtime()
-    os.chdir(str(my_path()))
-    mkdir(logs_path)
-    os.chdir(logs_path)
     # string room should be "project@branch", pick out project and branch name from it.
     room_split = str(room).split("@")
     project = room_split[0]
     branch = room_split[1]
+    working_path = project_work_path(project)
+    # clean the working path
+    clean_command = 'rm -rf ' + str(working_path)
+    subprocess.Popen(clean_command, shell=True)
     # get deploy package
     try:
         my_hosts = get_hosts(project)
         my_pkg = get_package(project=project, version=branch)
-        my_playbook = get_playbook("deploy_script.sh", package_name=str(my_pkg[1]), local_package=str(my_pkg[0]))
+        my_playbook = get_playbook(package_name=str(my_pkg[1]), local_package=str(my_pkg[0]))
     except Exception as Err:
         print ("Error: ", Err)
         sys.exit(1)
     # create ansible command
-    command = "ansible-playbook -i " + my_hosts + " " + my_playbook
+    ansible_bin = SystemConfig().get().ansible_path
+    command = ansible_bin + "/ansible-playbook -i " + my_hosts + " " + my_playbook
     # command = "ping www.baidu.com -c 5"
+    os.chdir(str(working_path))
     logs_file = "logs_" + random_string(16) + ".txt"
     # run ansible and write logs into temporary log files
     with open(logs_file, "w+") as file:
@@ -113,6 +118,15 @@ def execute_thread(room):
             status = 0
         DeployRecord().add(project=project, status=status, version=branch, requester=None, deploy_reason=None, deployer=None,
                            time_begin=time_begin, time_end=time_end, logs=logs)
+    # save deployed package, str(my_pkg[1]) stand for package name
+    srcfile = working_path.joinpath(str(my_pkg[1]))
+    destfile_path = my_path().joinpath(data_path, str(project), str(branch))
+    mkdir(destfile_path)
+    destfile = destfile_path.joinpath(str(my_pkg[1]))
+    try:
+        shutil.copyfile(str(srcfile),str(destfile))
+    except Exception as Err:
+        return ("Failed to save deployed package due to: " + Err)
 
 
 def my_path():
@@ -120,6 +134,13 @@ def my_path():
     root = os.path.dirname(os.path.realpath(__file__))
     root = pathlib.Path(root)
     return root
+
+
+def project_work_path(project):
+    """Get current project workstation path"""
+    project_path = my_path().joinpath(workstation, project)
+    mkdir(project_path)
+    return project_path
 
 
 def mkdir(path):
@@ -171,17 +192,16 @@ def get_script(script_type):
         return str(local_script)
 
 
-def get_playbook(script_name, package_name, local_package):
+def get_playbook(package_name, local_package):
     """Create ansible playbook"""
-    os.chdir(str(my_path()))
-    mkdir(temp_path)
+    project = package_name.split('.')[0]
+    os.chdir(str(project_work_path(str(project))))
     src_file = my_path()/"yml/execute.yml"
     dest_file = "playbook_" + random_string(16) + ".yml"
     # read playbook template =
     with open(src_file) as src:
         playbook_template = src.read()
     # cd to temporary folder and write a temporary playbook
-    os.chdir(temp_path)
     with open(dest_file, 'w+') as dest:
         content = playbook_template.replace("start_script_file", get_script("start_script"))
         content = content.replace("deploy_script_file", get_script("deploy_script"))
@@ -190,10 +210,6 @@ def get_playbook(script_name, package_name, local_package):
         content = content.replace("dest_pkg_file", setting.DEPLOY_PKG_PATH + package_name)
         content = content.replace("pkg_owner", setting.PKG_OWNER)
         dest.write(content)
-    # read out the temporary playbook for executing
-    #with open(dest_file) as new:
-    #    playbook = new.read()
-
     return dest_file
 
 
@@ -213,24 +229,25 @@ def get_hosts(project):
 
 def get_package(project, version):
     """Get package from repository server"""
-    p_conf = ProjectConfig().get(project)
-    s_conf = SystemConfig().get()
-    p_repo = p_conf.source_address
-    repo = p_repo if p_repo else s_conf.repository_server
-    package_name = project + "." + p_conf.type
-    remote_pkg = repo + "/" + version + "/" + package_name
-    os.chdir(str(my_path()))
-    package_path = my_path().joinpath(data_path, project, version)
-    mkdir(package_path)
-    package = package_path.joinpath(package_name)
-    try:
-        urllib.request.urlretrieve(remote_pkg, filename=package)
-    except Exception as Err:
-        emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
-        # check if local package exist
-        if os.path.isfile(package):
-            emit('my_response', {'data': "Found local package, use if for deployment." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
-        else:
+    os.chdir(str(project_work_path(str(project))))
+    conf = ProjectConfig().get(project)
+    repo = conf.source_address
+    package_name = project + "." + conf.type
+    # check if local package exist
+    deployed_package = my_path().joinpath(data_path, project, version, package_name)
+    if os.path.isfile(deployed_package):
+        emit('my_response',
+             {'data': "Found deployed local package, use it for this deployment." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+        return [str(deployed_package), package_name]
+    else:
+        # pull package via gitPython
+        package = project_work_path(project).joinpath(package_name)
+        empty_repo = Repo.init(str(project_work_path(project)))
+        try:
+            my_remote = empty_repo.create_remote(project, repo)
+            my_remote.pull(version)
+        except Exception as Err:
+            emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
             emit('error_exit')
             sys.exit(Err)
-    return [str(package), package_name]
+        return [str(package), package_name]

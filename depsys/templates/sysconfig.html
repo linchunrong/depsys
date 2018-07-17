@@ -6,7 +6,7 @@
         <form action="" method=post>
             {{ form.hidden_tag() }}
             <div>
-			    <span>Ansible Path：{{ form.ansible_path(placeholder="Ansible执行路径...",value=conf.ansible_path) }}</span>
+			    <span>Ansible Path：{{ form.ansible_path(placeholder="Ansible 执行路径...e.g /usr/bin",value=conf.ansible_path) }}</span>
                 <button type="button" onclick="alert('Still working on it...')">验证</button>
             </div><br>
             <div>

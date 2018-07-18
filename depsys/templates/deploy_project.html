@@ -34,12 +34,18 @@ function show_logs(msg) {
     });
 }
 </script>
+<script>
+function version_select() {
+    var a = $("input[name='selected']:checked").val();
+    $("#branch").val(a);
+}
+</script>
     <body>
     <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
         <h3 style="color: #0091e6">工程：{{ project }}</h3>
         <form action="" method=post>
             <div>
-			    <span>请输入需发布分支：<input type="text" name="branch"></span>
+			    <span>请输入需发布分支：<input type="text" name="branch" id="branch"></span>
                 <button formmethod="post" formaction="{{ url_for('deploy_exec',project=project) }}">发布!</button>
                 {% if error %}<p class="error" id="error" style="text-align: left; color: red;font-style: oblique;font-weight: 500"><strong>Error:</strong> {{ error }}{% endif %}
             </div><br>
@@ -56,7 +62,7 @@ function show_logs(msg) {
                 </tr>
                 {% for record in records %}
                 <tr>
-                    <td width="40px"><input type="radio" name="selected"/></td>
+                    <td width="40px"><input type="radio" name="selected" value="{{ record.version }}" onclick="version_select()"/></td>
                     <td>{{ record.version }}</td>
                     <td>{{ record.time_end }}</td>
                     {% if record.status == 1 %}

@@ -66,19 +66,19 @@ def execute_thread(room):
     time_begin = time.localtime()
     # string room should be "project@branch", pick out project and branch name from it.
     room_split = str(room).split("@")
-    project = room_split[0]
-    branch = room_split[1]
+    project = str(room_split[0])
+    branch = str(room_split[1])
     working_path = project_work_path(project)
     # clean the working path
     clean_command = 'rm -rf ' + str(working_path)
     subprocess.Popen(clean_command, shell=True)
-    # get deploy package
     try:
-        my_hosts = get_hosts(project)
+        # get deploy package
         my_pkg = get_package(project=project, version=branch)
+        my_hosts = get_hosts(project)
         my_playbook = get_playbook(package_name=str(my_pkg[1]), local_package=str(my_pkg[0]))
     except Exception as Err:
-        print ("Error: ", Err)
+        print ("Error: ", str(Err))
         sys.exit(1)
     # create ansible command
     ansible_bin = SystemConfig().get().ansible_path
@@ -119,14 +119,20 @@ def execute_thread(room):
         DeployRecord().add(project=project, status=status, version=branch, requester=None, deploy_reason=None, deployer=None,
                            time_begin=time_begin, time_end=time_end, logs=logs)
     # save deployed package, str(my_pkg[1]) stand for package name
-    srcfile = working_path.joinpath(str(my_pkg[1]))
-    destfile_path = my_path().joinpath(data_path, str(project), str(branch))
-    mkdir(destfile_path)
-    destfile = destfile_path.joinpath(str(my_pkg[1]))
-    try:
-        shutil.copyfile(str(srcfile),str(destfile))
-    except Exception as Err:
-        return ("Failed to save deployed package due to: " + Err)
+    if status == 1:
+        srcfile = working_path.joinpath(str(my_pkg[1]))
+        if os.path.isfile(srcfile):
+            destfile_path = my_path().joinpath(data_path, str(project), str(branch))
+            mkdir(destfile_path)
+            destfile = destfile_path.joinpath(str(my_pkg[1]))
+            try:
+                shutil.copyfile(str(srcfile),str(destfile))
+            except Exception as Err:
+                return ("Failed to save deployed package due to: " + Err)
+        else:
+            return ("Deployed package was saved before, this probably a rollback action.")
+    else:
+        return ("Not a success deployment, package save isn't need.")
 
 
 def my_path():
@@ -215,15 +221,14 @@ def get_playbook(package_name, local_package):
 
 def get_hosts(project):
     """Create ansible hosts file"""
-    os.chdir(str(my_path()))
-    mkdir(temp_path)
+    hosts_path = project_work_path(project)
+    os.chdir(str(hosts_path))
     file_name = "hosts_" + random_string(16)
-    os.chdir(temp_path)
     with open(file_name, 'w+') as hosts:
         conf = ProjectConfig()
         content = conf.get(project).servers
         hosts.write(content)
-    hosts_file = str(my_path().joinpath(temp_path, file_name))
+    hosts_file = str(hosts_path.joinpath(file_name))
     return hosts_file
 
 
@@ -249,5 +254,6 @@ def get_package(project, version):
         except Exception as Err:
             emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
             emit('error_exit')
-            sys.exit(Err)
+            print ("Error: ", str(Err))
+            sys.exit(1)
         return [str(package), package_name]

@@ -7,8 +7,9 @@ from depsys import db
 
 
 class DeployInfo:
-    """Get all projects"""
+    """Get Deploy information"""
     def projects(self):
+        """Get all projects"""
         project_list = []
         project_info = Project.query.all()
         for i in range(len(project_info)):
@@ -25,6 +26,24 @@ class DeployInfo:
             'amount': amount,
             'status': ['Success', 'Failed', 'Abort']
         }
+        return data
+
+    def status_detail(self):
+        """Get deploy status info of every project"""
+        projects_list = self.projects()
+        project_status_list = []
+        for project in projects_list:
+            project_id = ProjectConfig().get(project).project_id
+            amount = []
+            for status in ('1', '0', '-1'):
+                amount.append(len(Record.query.filter_by(project_id=project_id, status=status).all()))
+            project_status_list.append({'project':project, 'Success':amount[0], 'Failed':amount[1], 'Abort':amount[2]})
+
+        data = {
+            'status': ['project','Success', 'Failed', 'Abort'],
+            'status_info': project_status_list
+        }
+
         return data
 
 

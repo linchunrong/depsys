@@ -138,13 +138,13 @@ def project_delete(project):
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return ("Still working on it...")
+    return render_template('dashboard.html')
 
 
 @app.route('/dashboard/<project>')
 @login_required
 def project_dashboard(project):
-    return ("Still working on it...")
+    return ('Still working on in...')
 
 
 # json data pages
@@ -153,4 +153,12 @@ def project_dashboard(project):
 def deploy_num():
     info = DeployInfo()
     data = info.status()
+    return jsonify(data)
+
+
+@app.route('/deploy_detail')
+@login_required
+def deploy_detail():
+    info = DeployInfo()
+    data = info.status_detail()
     return jsonify(data)

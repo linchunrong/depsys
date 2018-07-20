@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block body %}
+    <body>
+    <script src="../static/js/echarts.min.js"></script>
+    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+    <div style="margin-top: 50px; margin-left: 210px">
+        <div id="bar" style="margin-top:60px; width: 55%; height:400px; z-index: -1; float: left"></div>
+    </div>
+    <!--
+    <div style="margin-top: 500px; margin-left: 210px; position: fixed">
+        <div style="width: 50%; height: 400px; z-index: -1; float: left">Top 20 project</div>
+        <div style="width: 50%; height: 400px; z-index: -1; float: right">Top 10 requester</div>
+    </div>
+    -->
+    <script type="text/javascript">
+        // 柱形图
+        var barChart = echarts.init(document.getElementById('bar'));
+        // 显示标题，图例和空的坐标轴
+        barChart.setOption({
+            legend: {},
+            tooltip: {},
+            dataset: {
+                dimensions: ['project','Success', 'Failed', 'Abort'],
+                source: []
+            },
+            xAxis: {type: 'category'},
+            yAxis: {},
+            // Declare several bar series, each will be mapped
+            // to a column of dataset.source by default.
+            series: [
+                {type: 'bar'},
+                {type: 'bar'},
+                {type: 'bar'}
+            ]
+        });
+
+        // 异步加载数据
+        barChart.showLoading();
+        $(function(){
+            $.get('deploy_detail').done(function (data) {
+            // 填入数据
+                barChart.hideLoading();
+                barChart.setOption({
+                    dataset: {
+                        source: data.status_info
+                    }
+                });
+            });
+        });
+    </script>
+    </body>
+{% endblock %}

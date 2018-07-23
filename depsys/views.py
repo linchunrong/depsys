@@ -162,3 +162,19 @@ def deploy_detail():
     info = DeployInfo()
     data = info.status_detail()
     return jsonify(data)
+
+
+@app.route('/deploy_top')
+@login_required
+def deploy_top():
+    info = DeployInfo()
+    data = info.top_deploy(10)
+    return jsonify(data)
+
+
+@app.route('/requester_top')
+@login_required
+def requester_top():
+    info = DeployInfo()
+    data = info.top_requester(10)
+    return jsonify(data)

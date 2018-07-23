@@ -43,6 +43,54 @@ class DeployInfo:
 
         return data
 
+    def top_deploy(self,top_num):
+        """Top num deploy project info"""
+        project_list = self.projects()
+        deploy_num = []
+        for project in project_list:
+            project_id = ProjectConfig().get(project).project_id
+            number = len(Record.query.filter_by(project_id=project_id).all())
+            deploy_num.append((project, number))
+
+        deploy_num = sorted(deploy_num, key=lambda num: num[1], reverse=True)
+        projects = []
+        amount = []
+        for child in deploy_num:
+            projects.append(child[0])
+            amount.append(child[1])
+
+        data = {
+            'projects': projects[:-(top_num+1):-1],
+            'amount': amount[:-(top_num+1):-1]
+        }
+
+        return data
+
+    def top_requester(self,top_num):
+        """Top num requester info"""
+        requesters =[]
+        records = Record.query.all()
+        for record in records:
+            requesters.append(record.requester)
+        # use set to uniq requester
+        requester_num = []
+        for requester in set(requesters):
+            requester_num.append((requester,requesters.count(requester)))
+
+        requester_num = sorted(requester_num, key=lambda num: num[1], reverse=True)
+        #requesters_new = []
+        amount = []
+        for child in requester_num:
+            #requesters_new.append(child[0])
+            amount.append({'value':child[1], 'name': child[0]})
+
+        data = {
+            #'requesters': requesters_new[:-(top_num+1):-1],
+            'amount': amount[:-(top_num+1):-1]
+        }
+
+        return data
+
 
 class DeployRecord:
     """Record actions for deploy"""

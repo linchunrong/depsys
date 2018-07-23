@@ -37,12 +37,9 @@ class DeployInfo:
             amount = []
             for status in ('1', '0', '-1'):
                 amount.append(len(Record.query.filter_by(project_id=project_id, status=status).all()))
-            project_status_list.append({'project':project, 'Success':amount[0], 'Failed':amount[1], 'Abort':amount[2]})
+            project_status_list.append([project, amount[0], amount[1], amount[2]])
 
-        data = {
-            'status': ['project','Success', 'Failed', 'Abort'],
-            'status_info': project_status_list
-        }
+        data = [['project','Success', 'Failed', 'Abort']]+ project_status_list
 
         return data
 

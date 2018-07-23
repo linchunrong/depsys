@@ -4,25 +4,22 @@
     <script src="../static/js/echarts.min.js"></script>
     <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
     <div style="margin-top: 50px; margin-left: 210px">
-        <div id="bar" style="margin-top:60px; width: 55%; height:400px; z-index: -1; float: left"></div>
+        <div id="projects_status" style="margin-top:60px; width: 100%; height:400px; z-index: -1; float: left"></div>
     </div>
-    <!--
-    <div style="margin-top: 500px; margin-left: 210px; position: fixed">
-        <div style="width: 50%; height: 400px; z-index: -1; float: left">Top 20 project</div>
-        <div style="width: 50%; height: 400px; z-index: -1; float: right">Top 10 requester</div>
+    <div style="margin-top: 500px; margin-left: 210px; width:80%; position: fixed">
+        <div id="bar" style="width: 50%; height: 400px; z-index: -1; float: left">发版 TOP 10</div>
+        <div id="pie" style="width: 50%; height: 400px; z-index: -1; float: right">请求人 Top 10</div>
     </div>
-    -->
     <script type="text/javascript">
-        // 柱形图
-        var barChart = echarts.init(document.getElementById('bar'));
+        // 全工程柱形图
+        var p_barChart = echarts.init(document.getElementById('projects_status'));
         // 显示标题，图例和空的坐标轴
-        barChart.setOption({
+        p_barChart.setOption({
+            title: {
+              text: '   全工程发版状况'
+            },
             legend: {},
             tooltip: {},
-            dataset: {
-                dimensions: ['project','Success', 'Failed', 'Abort'],
-                source: []
-            },
             xAxis: {type: 'category'},
             yAxis: {},
             // Declare several bar series, each will be mapped
@@ -35,17 +32,24 @@
         });
 
         // 异步加载数据
-        barChart.showLoading();
+        p_barChart.showLoading();
         $(function(){
-            $.get('deploy_detail').done(function (data) {
+            $.get('deploy_detail').done(function (msg) {
             // 填入数据
-                barChart.hideLoading();
-                barChart.setOption({
+                p_barChart.hideLoading();
+                p_barChart.setOption({
                     dataset: {
-                        source: data.status_info
+                        source: msg
                     }
                 });
             });
+        });
+
+        //echarts 随屏幕缩放
+        setTimeout(function () {
+            window.onresize = function () {
+                p_barChart.resize();
+            }
         });
     </script>
     </body>

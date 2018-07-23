@@ -13,7 +13,7 @@
         // 显示标题，图例和空的坐标轴
         barChart.setOption({
             title: {
-                text: '发版总数概况'
+                text: '    发版总数概况'
             },
             tooltip: {},
             legend: {
@@ -95,6 +95,13 @@
                     }]
                 });
             });
+        });
+        //echarts 随屏幕缩放
+        setTimeout(function () {
+            window.onresize = function () {
+                barChart.resize();
+                pieChart.resize();
+            }
         });
     </script>
     </body>

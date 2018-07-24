@@ -2,10 +2,22 @@
 {% block body %}
     <body>
     <script src="../static/js/echarts.min.js"></script>
-    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
     <div style="margin-top: 50px; margin-left: 210px">
-        <div id="bar" style="margin-top:60px; width: 45%; height:400px; z-index: -1; float: left"></div>
-        <div id="pie" style="margin-top:60px; width: 55%; height:400px; z-index: -1; float: right"></div>
+        <div style="z-index: -1; float: left; width: 60%">
+            <h2 style="font-style: italic; color: darkorange">欢迎使用 CMBFAE 发版系统</h2><hr>
+            <h3 style="color: #1E9FFF">说明：</h3>
+            <ul style="list-style-type: none">
+                <li>系统看板：全工程发版情况报表</li>
+                <li>工程发布：工程配置及发布入口</li>
+                <li>系统配置：系统通用配置项入口</li>
+                <li>个人信息：登录用户信息</li>
+            </ul>
+        </div>
+    </div>
+    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+    <div style="margin-top: 400px; margin-left: 210px; width:80%; position: fixed">
+        <div id="bar" style="width: 50%; height: 400px; z-index: -1; float: left"></div>
+        <div id="pie" style="width: 50%; height: 400px; z-index: -1; float: right"></div>
     </div>
     <script type="text/javascript">
         // 柱形图

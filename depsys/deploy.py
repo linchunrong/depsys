@@ -226,8 +226,9 @@ def get_hosts(project):
     file_name = "hosts_" + random_string(16)
     with open(file_name, 'w+') as hosts:
         conf = ProjectConfig()
-        content = conf.get(project).servers
-        hosts.write(content)
+        hosts_list = conf.get(project).servers.strip().split(',')
+        for host in hosts_list:
+            hosts.write(host + '\n')
     hosts_file = str(hosts_path.joinpath(file_name))
     return hosts_file
 

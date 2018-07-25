@@ -19,7 +19,7 @@
             </div><br>
             <div>
                 <span>源码库连接配置：</span><hr>
-                <span>Repository Server：{{ form.repository_server(style="width:60%",placeholder="请输入源码库地址...",value=conf.repository_server) }}</span>
+                <span>Repository Server：{{ form.repository_server(style="width:60%",placeholder="请输入源码库地址(http格式)...",value=conf.repository_server) }}</span>
                 <ul style="list-style-type: none">
                     <li><span>{{ form.repository_user(placeholder="请输入用户名...",value=conf.repository_user) }}</span></li>
                     <li><span>{{ form.repository_password(placeholder="请输入密码...") }}</span></li>

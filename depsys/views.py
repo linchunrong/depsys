@@ -141,12 +141,6 @@ def dashboard():
     return render_template('dashboard.html')
 
 
-@app.route('/dashboard/<project>')
-@login_required
-def project_dashboard(project):
-    return ('Still working on in...')
-
-
 # json data pages
 @app.route('/deploy_num')
 @login_required

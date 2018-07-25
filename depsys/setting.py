@@ -11,3 +11,6 @@ SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://depsys:123456@127.0.0.1:3306/d
 
 DEPLOY_PKG_PATH = '/home/FaeWork/pkg/'
 PKG_OWNER = 'FaeWork'
+
+# ymal format file, under branch root path by default
+EXTRA_ARGS_FILE = "info.yml"

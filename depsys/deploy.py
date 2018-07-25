@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib.request, time, os, sys, random, string, pathlib, subprocess, shutil
+import urllib.request, urllib.parse, time, os, sys, random, string, pathlib, subprocess, shutil, yaml
 from threading import Lock
 from git import Repo
 from depsys import socketio, setting
@@ -116,8 +116,24 @@ def execute_thread(room):
             status = -1
         else:
             status = 0
-        DeployRecord().add(project=project, status=status, version=branch, requester=None, deploy_reason=None, deployer=None,
-                           time_begin=time_begin, time_end=time_end, logs=logs)
+        # get extra args if exist
+        extra_file = my_path().joinpath(working_path,setting.EXTRA_ARGS_FILE)
+        if os.path.isfile(extra_file):
+            with open(setting.EXTRA_ARGS_FILE, encoding='utf-8') as args:
+                # parse EXTRA_ARGES_FILE
+                args = yaml.load(args)
+                try:
+                    requester = args['requester']
+                    deploy_reason = args['deploy_reason']
+                except Exception as Err:
+                    print("Failed to get extra args due to: " + str(Err))
+                    DeployRecord().add(project=project, status=status, version=branch, requester="N/A",deploy_reason="N/A", deployer="N/A",
+                                       time_begin=time_begin, time_end=time_end, logs=logs)
+                DeployRecord().add(project=project, status=status, version=branch, requester=requester, deploy_reason=deploy_reason, deployer="N/A",
+                                   time_begin=time_begin, time_end=time_end, logs=logs)
+        else:
+            DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer="N/A",
+                               time_begin=time_begin, time_end=time_end, logs=logs)
     # save deployed package, str(my_pkg[1]) stand for package name
     if status == 1:
         srcfile = working_path.joinpath(str(my_pkg[1]))
@@ -128,7 +144,7 @@ def execute_thread(room):
             try:
                 shutil.copyfile(str(srcfile),str(destfile))
             except Exception as Err:
-                return ("Failed to save deployed package due to: " + Err)
+                return ("Failed to save deployed package due to: " + str(Err))
         else:
             return ("Deployed package was saved before, this probably a rollback action.")
     else:
@@ -237,20 +253,27 @@ def get_package(project, version):
     """Get package from repository server"""
     os.chdir(str(project_work_path(str(project))))
     conf = ProjectConfig().get(project)
-    repo = conf.source_address
     package_name = project + "." + conf.type
+    repo_address = conf.source_address.strip()
+    # add username:password into repo address for git auth
+    sysconf = SystemConfig().get()
+    username = sysconf.repository_user
+    password = sysconf.repository_pwd
+    if username and password:
+        repo_address = repo_address.replace("://", "://" + urllib.parse.quote(username) + ":" + urllib.parse.quote(password) + "@")
     # check if local package exist
     deployed_package = my_path().joinpath(data_path, project, version, package_name)
     if os.path.isfile(deployed_package):
         emit('my_response',
              {'data': "Found deployed local package, use it for this deployment." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
         return [str(deployed_package), package_name]
+    # get package from remote git
     else:
         # pull package via gitPython
         package = project_work_path(project).joinpath(package_name)
         empty_repo = Repo.init(str(project_work_path(project)))
         try:
-            my_remote = empty_repo.create_remote(project, repo)
+            my_remote = empty_repo.create_remote(project, repo_address)
             my_remote.pull(version)
         except Exception as Err:
             emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})

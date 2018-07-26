@@ -78,7 +78,7 @@ def execute_thread(room):
         my_hosts = get_hosts(project)
         my_playbook = get_playbook(package_name=str(my_pkg[1]), local_package=str(my_pkg[0]))
     except Exception as Err:
-        print ("Error: ", str(Err))
+        print("Error: ", str(Err))
         sys.exit(1)
     # create ansible command
     ansible_bin = SystemConfig().get().ansible_path
@@ -117,9 +117,9 @@ def execute_thread(room):
         else:
             status = 0
         # get extra args if exist
-        extra_file = my_path().joinpath(working_path,setting.EXTRA_ARGS_FILE)
+        extra_file = str(my_pkg[2])
         if os.path.isfile(extra_file):
-            with open(setting.EXTRA_ARGS_FILE, encoding='utf-8') as args:
+            with open(extra_file, encoding='utf-8') as args:
                 # parse EXTRA_ARGES_FILE
                 args = yaml.load(args)
                 try:
@@ -145,6 +145,13 @@ def execute_thread(room):
                 shutil.copyfile(str(srcfile),str(destfile))
             except Exception as Err:
                 return ("Failed to save deployed package due to: " + str(Err))
+            # save extra args file if exist
+            else:
+                if os.path.isfile(extra_file):
+                    try:
+                        shutil.copyfile(extra_file,str(destfile_path.joinpath(setting.EXTRA_ARGS_FILE)))
+                    except Exception as e:
+                        return ("Failed to save extra args file due to: " + str(e))
         else:
             return ("Deployed package was saved before, this probably a rollback action.")
     else:
@@ -266,7 +273,10 @@ def get_package(project, version):
     if os.path.isfile(deployed_package):
         emit('my_response',
              {'data': "Found deployed local package, use it for this deployment." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
-        return [str(deployed_package), package_name]
+        extra_file = my_path().joinpath(data_path, project, version, setting.EXTRA_ARGS_FILE)
+        if not os.path.isfile(extra_file):
+            extra_file = None
+        return [str(deployed_package), package_name, str(extra_file)]
     # get package from remote git
     else:
         # pull package via gitPython
@@ -278,6 +288,9 @@ def get_package(project, version):
         except Exception as Err:
             emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
             emit('error_exit')
-            print ("Error: ", str(Err))
+            print("Error: ", str(Err))
             sys.exit(1)
-        return [str(package), package_name]
+        extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
+        if not os.path.isfile(extra_file):
+            extra_file = None
+        return [str(package), package_name, str(extra_file)]

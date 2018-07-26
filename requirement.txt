@@ -8,3 +8,4 @@ Flask-WTF==0.14.2
 WTForms==2.1
 mysql-connector-python==8.0.6
 GitPython==2.1.11
+PyYAML==3.13

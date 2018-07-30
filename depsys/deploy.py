@@ -3,7 +3,7 @@
 
 import urllib.request, urllib.parse, time, os, sys, random, string, pathlib, subprocess, shutil, yaml
 from threading import Lock
-from git import Repo
+from git import Repo, Git
 from depsys import socketio, setting
 from flask_socketio import disconnect, emit, join_room
 from depsys.sysconfig import SystemConfig, ProjectConfig
@@ -119,7 +119,19 @@ def execute_thread(room):
         # get extra args if exist
         extra_file = str(my_pkg[2])
         if os.path.isfile(extra_file):
-            with open(extra_file, encoding='utf-8') as args:
+            with open(extra_file, encoding='utf-8') as log:
+                # args content looks like below:
+                ########
+                # commit 6e5376c3899c8d5fc85aed8319dab7a900a5c447
+                # Author: Administrator <admin@example.com>
+                # Date:   Mon Jul 30 14:47:37 2018 +0800
+                #
+                #   requester: testuser
+                #   deploy_reason: deploy sysem test
+                #   data: 20180726
+                ########
+                log = log.read().split('\n')
+                args = '\n'.join(log[4:])
                 # parse EXTRA_ARGES_FILE
                 args = yaml.load(args)
                 try:
@@ -290,7 +302,14 @@ def get_package(project, version):
             emit('error_exit')
             print("Error: ", str(Err))
             sys.exit(1)
-        extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
+        # write commit info into
+        else:
+            os.chdir(str(project_work_path(str(project))))
+            g = Git()
+            commit_info = g.log('-1')
+            with open(setting.EXTRA_ARGS_FILE, 'w+') as info:
+                info.write(commit_info)
+            extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
         if not os.path.isfile(extra_file):
             extra_file = None
         return [str(package), package_name, str(extra_file)]

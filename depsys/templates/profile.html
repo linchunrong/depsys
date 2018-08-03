@@ -11,7 +11,11 @@
             </div>
             <div>
                 <div style="display: inline">所属组：</div>
+                {% if user.group != None %}
                 <div style="display: inline">{{ user.group }}</div>
+                {% else %}
+                <div style="display: inline">无</div>
+                {% endif %}
             </div><br>
             <div>更改密码：{{ form.password(placeholder="******") }}</div>
             <div>确认密码：{{ form.confirm(placeholder="******") }}</div><br>

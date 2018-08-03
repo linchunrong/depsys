@@ -7,7 +7,7 @@ from depsys import app
 from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import ProjectConfig, SystemConfig, UserConfig
 from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm
-from depsys.models import User, System, Project
+from depsys.models import User, Project
 
 
 # Index
@@ -88,7 +88,7 @@ def deploy_exec(project):
 def config():
     error = None
     form = SystemForm()
-    conf = System.query.first()
+    conf = SystemConfig().get()
     if request.method == "POST":
         if form.validate_on_submit():
             s = SystemConfig()

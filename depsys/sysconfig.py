@@ -20,7 +20,7 @@ class SystemConfig:
         item.repository_pwd = repository_password
         item.smtp_server = smtp_server
         item.smtp_user = smtp_user
-        item.smtp_password = smtp_password
+        item.smtp_pwd = smtp_password
         db.session.commit()
         db.session.close()
 

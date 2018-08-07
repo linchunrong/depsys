@@ -171,3 +171,8 @@ def requester_top():
     info = DeployInfo()
     data = info.top_requester(10)
     return jsonify(data)
+
+
+@app.route('/license')
+def license():
+    return render_template('license.html')

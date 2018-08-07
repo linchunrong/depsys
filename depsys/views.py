@@ -173,6 +173,6 @@ def requester_top():
     return jsonify(data)
 
 
-@app.route('/license')
-def license():
-    return render_template('license.html')
+@app.route('/licence')
+def licence():
+    return render_template('licence.html')

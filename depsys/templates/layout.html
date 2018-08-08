@@ -19,6 +19,21 @@
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
     <link rel="stylesheet" type="text/css" href="../static/css/themes/flat-blue.css">
 </head>
+    <!-- Javascript Libs -->
+    <script type="text/javascript" src="../static/lib/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/bootstrap-switch.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/jquery.matchHeight-min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/select2.full.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/ace/ace.js"></script>
+    <script type="text/javascript" src="../static/lib/js/ace/mode-html.js"></script>
+    <script type="text/javascript" src="../static/lib/js/ace/theme-github.js"></script>
+    <!-- Javascript -->
+    <script type="text/javascript" src="../static/js/app.js"></script>
+    <script type="text/javascript" src="../static/js/index.js"></script>
+<!-- body below -->
 <body class="flat-blue">
     <div class="app-container">
         <div class="row content-container">
@@ -58,7 +73,7 @@
                         <!-- Dropdown-->
                         <ul class="nav navbar-nav">
                             <li>
-                                <a href="#Dashboard">
+                                <a href="{{ url_for('index') }}">
                                     <span class="icon fa fa-tachometer"></span><span class="title">Dashboard</span>
                                 </a>
                             </li>
@@ -78,7 +93,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ url_for('licence') }}">
+                                <a href="{{ url_for('license') }}">
                                     <span class="icon fa fa-thumbs-o-up"></span><span class="title">License</span>
                                 </a>
                             </li>
@@ -89,23 +104,6 @@
             </div>
             <!-- Main Content -->
             {% block content %}{% endblock %}
-        </div>
-        <div>
-            <!-- Javascript Libs -->
-            <script type="text/javascript" src="../static/lib/js/jquery.min.js"></script>
-            <script type="text/javascript" src="../static/lib/js/bootstrap.min.js"></script>
-            <script type="text/javascript" src="../static/lib/js/Chart.min.js"></script>
-            <script type="text/javascript" src="../static/lib/js/bootstrap-switch.min.js"></script>
-            <script type="text/javascript" src="../static/lib/js/jquery.matchHeight-min.js"></script>
-            <script type="text/javascript" src="../static/lib/js/jquery.dataTables.min.js"></script>
-            <script type="text/javascript" src="../static/lib/js/dataTables.bootstrap.min.js"></script>
-            <script type="text/javascript" src="../static/lib/js/select2.full.min.js"></script>
-            <script type="text/javascript" src="../static/lib/js/ace/ace.js"></script>
-            <script type="text/javascript" src="../static/lib/js/ace/mode-html.js"></script>
-            <script type="text/javascript" src="../static/lib/js/ace/theme-github.js"></script>
-            <!-- Javascript -->
-            <script type="text/javascript" src="../static/js/app.js"></script>
-            <script type="text/javascript" src="../static/js/index.js"></script>
         </div>
     </div>
 </body>

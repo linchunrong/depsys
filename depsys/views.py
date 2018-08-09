@@ -134,10 +134,10 @@ def project_delete(project):
     return render_template('del_project.html', project=project)
 
 
-@app.route('/dashboard')
+@app.route('/charts')
 @login_required
-def dashboard():
-    return render_template('dashboard.html')
+def charts():
+    return render_template('charts.html')
 
 
 # json data pages

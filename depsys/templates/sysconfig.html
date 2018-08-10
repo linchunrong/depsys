@@ -144,11 +144,15 @@
                 </div>
             </div>
             <div>
-                {{ form.submit(class="btn btn-primary") }}
-                <input class="btn btn-primary" name="reset" type="reset" value="取消"/>
+                {{ form.submit(class="btn btn-lg") }}
+                <input class="btn btn-lg" name="reset" type="reset" value="取消"/>
             </div>
             </form>
-                {% if error %}<p class="error" style="text-align: left; color: red;font-style: oblique;font-weight: 450"><strong>Error:</strong> {{ error }} {% endif %}
+            {% if error %}
+            <div class="alert fresh-color alert-danger col-sm-6" role="alert">
+                <strong>Error:</strong> {{ error }}
+            </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

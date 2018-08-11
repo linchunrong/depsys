@@ -57,11 +57,11 @@ def profile():
     return render_template('profile.html', form=form, user=user, error=error)
 
 
-@app.route('/deploy')
+@app.route('/projects')
 @login_required
-def deploy_index():
+def projects():
     project_list = DeployInfo().projects()
-    return render_template('deploy.html', project_list=project_list)
+    return render_template('projects.html', project_list=project_list)
 
 
 @app.route('/deploy/<project>')
@@ -117,7 +117,7 @@ def project_config(project):
             else:
                 p.update(project_name_old=project, project_name=form.project_name.data, servers=form.servers.data,
                          source_address=form.source_address.data, project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
-            return redirect(url_for('deploy_index'))
+            return redirect(url_for('projects'))
         else:
             for key in form.errors:
                 error = form.errors[key]
@@ -130,7 +130,7 @@ def project_delete(project):
     p = ProjectConfig()
     if request.method == "POST":
         p.delete(project_name=project)
-        return redirect(url_for('deploy_index'))
+        return redirect(url_for('projects'))
     return render_template('del_project.html', project=project)
 
 

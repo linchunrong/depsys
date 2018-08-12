@@ -1,26 +1,81 @@
 {% extends "layout.html" %}
-{% block body %}
-    <body>
+{% block navbar_title %}
+<ol class="breadcrumb navbar-breadcrumb">
+    <li>Projects</li>
+    <li class="active">Config</li>
+</ol>
+{% endblock %}
+{% block content %}
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="side-body">
+            <div class="page-title">
+                <span class="title">工程配置</span>
+                <div class="description">工程详细配置</div>
+            </div>
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                {% if project == "add_new_project" %}
+                                <div class="title">添加新工程：</div>
+                                {% else %}
+                                <div class="title">{{ project }} 设置：</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    {% if project == "add_new_project" %}
+                                    <label>工程名</label>
+                                    {{ form.project_name(class="form-control",placeholder="请输入新工程名(必填)") }}
+                                    {% else %}
+                                    <label>工程重命名</label>
+                                    {{ form.project_name(class="form-control",value=conf.project_name) }}
+                                    {% endif %}
+                                </div>
+                                <div class="form-group">
+                                          <div class="radio3 radio-check radio-inline">
+                                            <input type="radio" id="radio4" name="radio2" value="option1" checked="">
+                                            <label for="radio4">
+                                              Option 1
+                                            </label>
+                                          </div>
+                                          <div class="radio3 radio-check radio-inline">
+                                            <input type="radio" id="radio5" name="radio2" value="option2">
+                                            <label for="radio5">
+                                              Option 2
+                                            </label>
+                                          </div>
+                                          <div class="radio3 radio-check radio-warning radio-inline">
+                                            <input type="radio" id="radio6" name="radio2" value="option3">
+                                            <label for="radio6">
+                                              Option 3
+                                            </label>
+                                          </div>
+                                </div>
+                                    <button type="button" class="btn btn-default" onclick="alert('Still working on it...')">验证</button>
+                            </div>
+                                {% for type in form.project_type %}
+                                <div class="radio3 radio-inline">
+                                    <input>{{ type }}</input>
+                                    <td>{{ type.label }}</td>
+                                </div>
+                                {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+    <!-- old -->
     <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
         <form action="" method=post>
-        {{ form.hidden_tag() }}
-        {% if project == "add_new_project" %}
-        <h3>添加新工程：</h3><hr>
-            <div>
-                <span>工程名：{{ form.project_name(placeholder="请输入新工程名(必填)") }}
-                <button type="button" onclick="alert('Still working on it...')">是否可用</button></span>
-            </div><br>
-        {% else %}
-        <h3>{{ project }} 设置：</h3><hr>
-            <div>
-                <span>工程重命名：{{ form.project_name(value=conf.project_name) }}
-                <button type="button" onclick="alert('Still working on it...')">是否可用</button></span>
-            </div><br>
-        {% endif %}
-            <div>
-                <span>工程类型：</span>
-                <span>{{ form.project_type }}</span>
-            </div><br>
             <div>
                 <span>服务器列表：</span><hr>
                 <ul style="list-style-type: none">
@@ -47,5 +102,4 @@
 		</form>
         {% if error %}<p class="error" style="text-align: left; color: red;font-style: oblique;font-weight: 500"><strong>Error:</strong> {{ error }}{% endif %}
     </div>
-    </body>
 {% endblock %}

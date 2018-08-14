@@ -1,7 +1,14 @@
 {% extends "layout.html" %}
-{% block body %}
-    <script src="../static/js/socket.io.js"></script>
-    <script type="text/javascript" charset="utf-8">
+{% block navbar_title %}
+<ol class="breadcrumb navbar-breadcrumb">
+    <li>Projects</li>
+    <li>Deploy</li>
+    <li class="active">Execute</li>
+</ol>
+{% endblock %}
+{% block content %}
+<script src="../static/lib/js/socket.io.js"></script>
+<script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
             namespace = '/execute';
             var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
@@ -31,17 +38,34 @@
             })
         });
     </script>
-    <body>
-    <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
-        <h3 style="color: #98bf21">发布: </h3><hr>
-        <div style="width: 65%">
-            <h4 style="color: #0091e6">项目：{{ project }} &nbsp;&nbsp;版本：{{ branch }}
-                <button value="{{ project }}@{{ branch }}" id="exec_room" style="float: right">开始！</button>
-                <a style="float: right">&nbsp;&nbsp;</a>
-                <button id="disconnect" style="float: right">关闭！</button>
-            </h4>
+<!-- Main Content -->
+<div class="container-fluid">
+    <div class="side-body">
+        <div class="page-title">
+            <span class="title">{{ project }}</span>
         </div>
-        <textarea id="log" style="width: 65%; height: 500px; background-color: ghostwhite" placeholder="Logs output here..."></textarea>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="title">
+                                <span class="text-primary">版本：{{ branch }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <button class="btn btn-default" value="{{ project }}@{{ branch }}" id="exec_room">开始</button>
+                            <button class="btn btn-default" id="disconnect">关闭</button>
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control" rows="auto" id="log" placeholder="Logs output here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    </body>
+</div>
 {% endblock %}

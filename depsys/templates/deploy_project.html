@@ -1,25 +1,15 @@
 {% extends "layout.html" %}
-{% block body %}
+{% block navbar_title %}
+<ol class="breadcrumb navbar-breadcrumb">
+    <li>Projects</li>
+    <li class="active">Deploy</li>
+</ol>
+{% endblock %}
+{% block content %}
 <style>
-table
-{
-	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
-	width:70%;
-	border-collapse:collapse;
-}
 td,th
 {
-	font-size:1em;
-	border:1px solid #98bf21;
-	padding:3px 7px 2px 7px;
     text-align: center;
-}
-th
-{
-	padding-top:5px;
-	padding-bottom:4px;
-	background-color:#A7C942;
-	color:#ffffff;
 }
 </style>
 <script src="../static/layer/layer.js"></script>
@@ -30,7 +20,7 @@ function show_logs(msg) {
         title: '日志',
         area: ['800px', '500px'],
         shadeClose: true,
-        content: '\<\pre style="padding: 20px">' + document.getElementById(msg).innerHTML + '\<\/pre>'
+        content: '\<\pre style="padding: 20px; background-color: white; border: none">' + document.getElementById(msg).innerHTML + '\<\/pre>'
     });
 }
 </script>
@@ -40,46 +30,91 @@ function version_select() {
     $("#branch").val(a);
 }
 </script>
-    <body>
-    <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
-        <h3 style="color: #0091e6">工程：{{ project }}</h3>
-        <form action="" method=post>
-            <div>
-			    <span>请输入需发布分支：<input type="text" name="branch" id="branch"></span>
-                <button formmethod="post" formaction="{{ url_for('deploy_exec',project=project) }}">发布!</button>
-                {% if error %}<p class="error" id="error" style="text-align: left; color: red;font-style: oblique;font-weight: 500"><strong>Error:</strong> {{ error }}{% endif %}
-            </div><br>
-            <hr style="width: 70%;float: left"><br>
-            <table>
-                <tr>
-                    <th>选择</th>
-                    <th>版本</th>
-                    <th>日期</th>
-                    <th>构建</th>
-                    <th>发版说明</th>
-                    <th>发起人</th>
-                    <th>日志</th>
-                </tr>
-                {% for record in records %}
-                <tr>
-                    <td width="40px"><input type="radio" name="selected" value="{{ record.version }}" onclick="version_select()"/></td>
-                    <td>{{ record.version }}</td>
-                    <td>{{ record.time_end }}</td>
-                    {% if record.status == 1 %}
-                    <td width="80px">成功</td>
-                    {% elif record.status == 0 %}
-                    <td>失败</td>
-                    {% elif record.status == -1 %}
-                    <td>中断</td>
-                    {% endif %}
-                    <td>{{ record.deploy_reason }}</td>
-                    <td width="100px">{{ record.requester }}</td>
-                    <p style="display: none" id="{{ record.record_id }}">{{ record.logs }}</p>
-                    <td width="100px"><a href="javascript:void(0)" id="func1" style="text-decoration: none" onclick="show_logs('{{ record.record_id }}')">点击查看</a></td>
-                </tr>
-                {% endfor %}
-            </table>
-		</form>
+<!-- Main Content -->
+<div class="container-fluid">
+    <div class="side-body">
+        <div class="page-title">
+            <span class="title">{{ project }}</span>
+        </div>
+        <form action="" method="post">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="sub-title form-inline">
+                                请输入需发布分支：<input type="text" name="branch" id="branch" class="form-control input-sm">
+                                <button class="btn btn-default btn-sm" formmethod="post" formaction="{{ url_for('deploy_exec',project=project) }}">发布</button>
+                                {% if error %}
+                                <div class="alert alert-danger">
+                                    <strong>Error:</strong> {{ error }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="datatable table table-striped" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>选择</th>
+                                    <th>版本</th>
+                                    <th>日期</th>
+                                    <th>构建</th>
+                                    <th>发版说明</th>
+                                    <th>发起人</th>
+                                    <th>日志</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>选择</th>
+                                    <th>版本</th>
+                                    <th>日期</th>
+                                    <th>构建</th>
+                                    <th>发版说明</th>
+                                    <th>发起人</th>
+                                    <th>日志</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for record in records %}
+                                <tr>
+                                    <td width="60px">
+                                        <input type="radio" name="selected" value="{{ record.version }}" onclick="version_select()"/>
+                                    </td>
+                                    <td>{{ record.version }}</td>
+                                    <td width="150px">{{ record.time_end }}</td>
+                                    {% if record.status == 1 %}
+                                    <td width="80px">
+                                        <label class="label label-success">成功</label>
+                                    </td>
+                                    {% elif record.status == 0 %}
+                                    <td width="80px">
+                                        <label class="label label-danger">失败</label>
+                                    </td>
+                                    {% elif record.status == -1 %}
+                                    <td width="80px">
+                                        <label class="label label-warning">中断</label>
+                                    </td>
+                                    {% endif %}
+                                    <td>{{ record.deploy_reason }}</td>
+                                    <td width="100px">{{ record.requester }}</td>
+                                        <p style="display: none" id="{{ record.record_id }}">{{ record.logs }}</p>
+                                    <td width="100px">
+                                        <label class="label label-info">
+                                            <a href="javascript:void(0)" style="color: ghostwhite" onclick="show_logs('{{ record.record_id }}')">点击查看</a>
+                                        </label>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
     </div>
-    </body>
+</div>
 {% endblock %}

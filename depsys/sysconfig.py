@@ -47,8 +47,8 @@ class ProjectConfig:
 
     def add(self, project_name, servers, source_address, project_type, post_script_type, post_script):
         """Add project"""
-        item = Project(project_name=project_name, servers=servers, source_address=source_address, type=project_type,
-                              post_script_type=post_script_type, post_script=post_script if post_script else None)
+        item = Project(project_name=project_name, servers=servers, source_address=source_address if source_address else None,
+                       type=project_type, post_script_type=post_script_type, post_script=post_script if post_script else None)
         db.session.add(item)
         db.session.commit()
         db.session.close()

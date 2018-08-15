@@ -1,46 +1,158 @@
 {% extends "layout.html" %}
-{% block body %}
-    <body>
-    <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
-        <h3>全局设置：</h3><hr>
-        <form action="" method=post>
-            {{ form.hidden_tag() }}
-            <div>
-			    <span>Ansible Path：{{ form.ansible_path(placeholder="Ansible 执行路径...e.g /usr/bin",value=conf.ansible_path) }}</span>
-                <button type="button" onclick="alert('Still working on it...')">验证</button>
-            </div><br>
-            <div>
-                <span>发布配置：</span><hr>
-                <ul style="list-style-type: none">
-                    <li><span>发布脚本路径：{{ form.deploy_script(value=conf.deploy_script,style="width:60%") }}</span></li>
-                    <li><span>启动脚本路径：{{ form.start_script(value=conf.start_script,style="width:60%")  }}</span></li>
-                    <li><span>停止脚本路径：{{ form.stop_script(value=conf.stop_script,style="width:60%")  }}</span></li>
-                </ul>
-            </div><br>
-            <div>
-                <span>源码库连接配置：</span><hr>
-                <span>Repository Server：{{ form.repository_server(style="width:60%",placeholder="请输入源码库地址(http格式)...",value=conf.repository_server) }}</span>
-                <ul style="list-style-type: none">
-                    <li><span>{{ form.repository_user(placeholder="请输入用户名...",value=conf.repository_user) }}</span></li>
-                    <li><span>{{ form.repository_password(placeholder="请输入密码...") }}</span></li>
-                    <button type="button" onclick="alert('Still working on it...')">验证</button>
-                </ul>
-            </div><br>
-            <div>
-                <span>邮件发送设置：</span><hr>
-                <span>SMTP Server：{{ form.smtp_server(placeholder="请输入SMTP服务器地址...",value=conf.smtp_server) }}</span>
-                <ul style="list-style-type: none">
-                    <li><span>{{ form.smtp_user(placeholder="SMTP用户名...",value=conf.smtp_user) }}</span></li>
-                    <li><span>{{ form.smtp_password(placeholder="SMTP密码...",value=conf.smtp_pwd) }}</span></li>
-                    <button type="button" onclick="alert('Still working on it...')">验证</button>
-                </ul>
-            </div><br>
-            <div>
-                {{ form.submit }}
-                <input name="reset" type="reset" value="取消"/>
+{% block navbar_title %}
+<ol class="breadcrumb navbar-breadcrumb">
+    <li class="active">System</li>
+</ol>
+{% endblock %}
+{% block content %}
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="side-body">
+            <div class="page-title">
+                <span class="title">系统配置</span>
+                <div class="description">系统相关全局配置</div>
             </div>
-		</form>
-        {% if error %}<p class="error" style="text-align: left; color: red;font-style: oblique;font-weight: 450"><strong>Error:</strong> {{ error }} {% endif %}
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="title">Ansible 配置</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label>Ansible path</label>
+                                    {{ form.ansible_path(class="form-control",placeholder="e.g. /usr/bin/ansible",value=conf.ansible_path) }}
+                                </div>
+                                    <button type="button" class="btn btn-default" onclick="alert('Still working on it...')">验证</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="title">发布配置</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">发布脚本路径</label>
+                                    <div class="col-sm-10">
+                                        {{ form.deploy_script(value=conf.deploy_script,class='form-control') }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">启动脚本路径</label>
+                                    <div class="col-sm-10">
+                                        {{ form.start_script(value=conf.start_script,class='form-control') }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">停止脚本路径</label>
+                                    <div class="col-sm-10">
+                                        {{ form.stop_script(value=conf.stop_script,class='form-control') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="title">源码库连接配置</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Repository Server</label>
+                                    <div class="col-sm-10">
+                                        {{ form.repository_server(placeholder="请输入源码库地址(http格式)...",value=conf.repository_server,class='form-control') }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Username</label>
+                                    <div class="col-sm-10">
+                                        {{ form.repository_user(placeholder="请输入用户名...",value=conf.repository_user,class='form-control') }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Password</label>
+                                    <div class="col-sm-10">
+                                        {{ form.repository_password(placeholder="请输入密码...",class='form-control') }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-10">
+                                        <button type="button" class="btn btn-default" onclick="alert('Still working on it...')">验证</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="title">邮件发送设置</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">SMTP Server</label>
+                                    <div class="col-sm-10">
+                                        {{ form.smtp_server(placeholder="请输入SMTP服务器地址...",value=conf.smtp_server,class='form-control') }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Username</label>
+                                    <div class="col-sm-10">
+                                        {{ form.smtp_user(placeholder="SMTP用户名...",value=conf.smtp_user,class='form-control') }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Password</label>
+                                    <div class="col-sm-10">
+                                        {{ form.smtp_password(placeholder="SMTP密码...",value=conf.smtp_pwd,class='form-control') }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-10">
+                                        <button type="button" class="btn btn-default" onclick="alert('Still working on it...')">验证</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                {{ form.submit(class="btn") }}
+                <input class="btn" name="reset" type="reset" value="取消"/>
+            </div>
+            </form>
+            {% if error %}
+            <div class="alert fresh-color alert-danger col-sm-6" role="alert">
+                <strong>Error:</strong> {{ error }}
+            </div>
+            {% endif %}
+        </div>
     </div>
-    </body>
 {% endblock %}

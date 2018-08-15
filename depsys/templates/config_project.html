@@ -1,51 +1,86 @@
 {% extends "layout.html" %}
-{% block body %}
-    <body>
-    <div style="margin-top: 50px;margin-left: 210px; margin-right: 10px; z-index: -1"><br>
-        <form action="" method=post>
-        {{ form.hidden_tag() }}
-        {% if project == "add_new_project" %}
-        <h3>添加新工程：</h3><hr>
-            <div>
-                <span>工程名：{{ form.project_name(placeholder="请输入新工程名(必填)") }}
-                <button type="button" onclick="alert('Still working on it...')">是否可用</button></span>
-            </div><br>
-        {% else %}
-        <h3>{{ project }} 设置：</h3><hr>
-            <div>
-                <span>工程重命名：{{ form.project_name(value=conf.project_name) }}
-                <button type="button" onclick="alert('Still working on it...')">是否可用</button></span>
-            </div><br>
-        {% endif %}
-            <div>
-                <span>工程类型：</span>
-                <span>{{ form.project_type }}</span>
-            </div><br>
-            <div>
-                <span>服务器列表：</span><hr>
-                <ul style="list-style-type: none">
-                    <li><span>IPs：{{ form.servers(style="width:60%",placeholder="多个IP请以 \",\" 号分隔！(必填)",value=conf.servers) }}</span></li>
-                </ul>
-            </div><br>
-            <div>
-                <span>工程源码库地址：</span><hr>
-                <span>Repository Address：{{ form.source_address(style="width:60%",placeholder="请输入项目源码地址...(必填)",value=conf.source_address) }}</span>
-            </div><br>
-            <div>
-                <span>发布后动作(如果有)：</span><hr>
-                <ul style="list-style-type: none">
-                    <li><span>请在下框输入脚本：</span><br>
-                        <span>{{ form.post_script_type(style="list-style-type:none") }}</span>
-                    </li>
-                    <li>{{ form.post_script(style="width:40%; height:50px",placeholder="请在此框输入完整脚本！") }}</li>
-                </ul>
-            </div><br>
-            <div>
-                {{ form.submit }}
-                <input name="reset" type="reset" value="重置"/>
+{% block navbar_title %}
+<ol class="breadcrumb navbar-breadcrumb">
+    <li>Projects</li>
+    <li class="active">Config</li>
+</ol>
+{% endblock %}
+{% block content %}
+<!-- Main Content -->
+<div class="container-fluid">
+    <div class="side-body">
+        <div class="page-title">
+            <span class="title">工程配置</span>
+            <div class="description">工程详细配置</div>
+        </div>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                {% if project == "add_new_project" %}
+                                <div class="title">添加新工程：</div>
+                                {% else %}
+                                <div class="title">{{ project }} 设置：</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="sub-title">命名/类型</div>
+                            <div class="form-inline">
+                                <div class="form-group">
+                                     Name/Rename
+                                    {% if project == "add_new_project" %}
+                                    {{ form.project_name(class="form-control",placeholder="请输入新工程名(必填)") }}
+                                    {% else %}
+                                    {{ form.project_name(class="form-control",value=conf.project_name) }}
+                                    {% endif %}
+                                </div>
+                                <div class="form-group">
+                                    {% for type in form.project_type %}
+                                    <div class="radio3 radio-inline radio-check">
+                                        <td>{{ type }}</td>
+                                        <td>{{ type.label }}</td>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                    <button type="button" class="btn btn-default" onclick="alert('Still working on it...')">验证</button>
+                            </div>
+                            <div class="sub-title">服务器列表<span class="description">(IPs)</span> </div>
+                            <div class="form-group">
+                                {{ form.servers(class="form-control",placeholder="多个IP请以 \",\" 号分隔！(必填)",value=conf.servers) }}
+                            </div>
+                            <div class="sub-title">源码库地址<span class="description">(Repository Address)</span> </div>
+                            <div class="form-group">
+                                {{ form.source_address(class="form-control",placeholder="请输入项目源码地址...(留空则为系统配置值)",value=conf.source_address) }}
+                            </div>
+                            <div class="sub-title">发布后动作<span class="description">(如果有)</span> </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        请在下框输入脚本 {{ form.post_script_type(class="form-control") }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                {{ form.post_script(class="form-control",rows="3",placeholder="请在此框输入完整脚本！") }}
+                            </div><br>
+                            <div>
+                                {{ form.submit(class="btn btn-default") }}
+                                <input class="btn btn-default" name="reset" type="reset" value="重置"/>
+                            </div>
+                                {% if error %}
+                            <div class="alert fresh-color alert-danger col-sm-6" role="alert">
+                                <strong>Error:</strong> {{ error }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
-		</form>
-        {% if error %}<p class="error" style="text-align: left; color: red;font-style: oblique;font-weight: 500"><strong>Error:</strong> {{ error }}{% endif %}
+        </form>
     </div>
-    </body>
+</div>
 {% endblock %}

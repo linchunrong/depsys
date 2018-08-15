@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block navbar_title %}
+<ol class="breadcrumb navbar-breadcrumb">
+    <li class="active">Projects</li>
+</ol>
+{% endblock %}
+{% block content %}
+  <!-- Main Content -->
+<div class="container-fluid">
+    <div class="side-body">
+        <div class="page-title">
+            <span class="title">Projects list</span>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="title">
+                                <a class="btn btn-info" href="../config/add_new_project">添加工程</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="datatable table table-striped" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Project Name</th>
+                                    <th style="width: 180px">Action</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Name</th>
+                                    <th style="width: 180px">Action</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for project in project_list %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <a class="btn" href="{{ url_for('project_config',project=project) }}">{{ project }}</a>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-default btn-sm" href="{{ url_for('project_deploy',project=project) }}">生产发布</a>
+                                        <a class="btn btn-default btn-sm" href="{{ url_for('project_config',project=project) }}">配置</a>
+                                        <a class="btn btn-default btn-sm" href="{{ url_for('project_delete',project=project) }}">删除</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

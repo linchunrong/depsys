@@ -57,14 +57,14 @@
                     <div class="card-body">
                         <div class="form-group">
                             <span class="text-success" style="font-size: medium">版本：{{ branch }}</span>
+                            <button class="close" id="disconnect"><span aria-hidden="true">&times;</span></button>
                         </div>
                         <div class="form-group">
-                            <textarea class="form-control" rows="25" id="log" placeholder="Logs output here..."></textarea>
+                            <textarea class="form-control" rows="25" id="log" placeholder="Logs output here..." style="background-color: ghostwhite;resize: none"></textarea>
                         </div>
                         <div class="form-inline">
                             <div class="form-group">
                                 <button class="btn btn-default" value="{{ project }}@{{ branch }}" id="exec_room">开始</button>
-                                <button class="btn btn-default" id="disconnect">关闭</button>
                             </div>
                         </div>
                     </div>

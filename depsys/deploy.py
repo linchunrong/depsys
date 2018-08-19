@@ -273,7 +273,11 @@ def get_package(project, version):
     os.chdir(str(project_work_path(str(project))))
     conf = ProjectConfig().get(project)
     package_name = project + "." + conf.type
-    repo_address = conf.source_address.strip()
+    # use system config if project don't have specific repo
+    if conf.source_address:
+        repo_address = conf.source_address.strip()
+    else:
+        repo_address = SystemConfig.get().repository_server.strip()
     # add username:password into repo address for git auth
     sysconf = SystemConfig().get()
     username = sysconf.repository_user
@@ -292,24 +296,29 @@ def get_package(project, version):
     # get package from remote git
     else:
         # pull package via gitPython
-        package = project_work_path(project).joinpath(package_name)
-        empty_repo = Repo.init(str(project_work_path(project)))
-        try:
-            my_remote = empty_repo.create_remote(project, repo_address)
-            my_remote.pull(version)
-        except Exception as Err:
-            emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
-            emit('error_exit')
-            print("Error: ", str(Err))
-            sys.exit(1)
-        # write commit info into
+        if conf.source_address is not None:
+            # if project has a specific repo, let's take care of the whole branch
+            package = project_work_path(project).joinpath(package_name)
+            empty_repo = Repo.init(str(project_work_path(project)))
+            try:
+                my_remote = empty_repo.create_remote(project, repo_address)
+                my_remote.pull(version)
+            except Exception as Err:
+                emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+                emit('error_exit')
+                print("Error: ", str(Err))
+                sys.exit(1)
+            # write commit info into
+            else:
+                os.chdir(str(project_work_path(str(project))))
+                g = Git()
+                commit_info = g.log('-1')
+                with open(setting.EXTRA_ARGS_FILE, 'w+') as info:
+                    info.write(commit_info)
+                extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
+            if not os.path.isfile(extra_file):
+                extra_file = None
         else:
-            os.chdir(str(project_work_path(str(project))))
-            g = Git()
-            commit_info = g.log('-1')
-            with open(setting.EXTRA_ARGS_FILE, 'w+') as info:
-                info.write(commit_info)
-            extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
-        if not os.path.isfile(extra_file):
-            extra_file = None
+            #u se git sparse checkout to get specific files
+            pass
         return [str(package), package_name, str(extra_file)]

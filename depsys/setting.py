@@ -13,4 +13,5 @@ DEPLOY_PKG_PATH = '/home/FaeWork/pkg/'
 PKG_OWNER = 'FaeWork'
 
 # with args in this file which info come from git commit
+EXTRA_ARGS_FILE_PATH="release"
 EXTRA_ARGS_FILE = "commit_info.txt"

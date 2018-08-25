@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib.request, urllib.parse, time, os, sys, random, string, pathlib, subprocess, shutil, yaml
+import urllib.request, urllib.parse, time, os, sys, random, string, pathlib, subprocess, shutil, yaml, json
 from threading import Lock
 from git import Repo, Git
 from depsys import socketio, setting
@@ -119,29 +119,38 @@ def execute_thread(room):
         # get extra args if exist
         extra_file = str(my_pkg[2])
         if os.path.isfile(extra_file):
-            with open(extra_file, encoding='utf-8') as log:
-                # args content looks like below:
-                ########
-                # commit 6e5376c3899c8d5fc85aed8319dab7a900a5c447
-                # Author: Administrator <admin@example.com>
-                # Date:   Mon Jul 30 14:47:37 2018 +0800
-                #
-                #   requester: testuser
-                #   deploy_reason: deploy sysem test
-                #   data: 20180726
-                ########
-                log = log.read().split('\n')
-                args = '\n'.join(log[4:])
-                # parse EXTRA_ARGES_FILE
-                args = yaml.load(args)
+            with open(extra_file, encoding='utf-8') as logs:
+                # parse json format
+                # logs template
+                #{
+                #    "发布列表": [{
+                #        "发布原因": "B2b个人会员微信入会需求",
+                #        "发布人": "伍磊",
+                #        "发布工程名称": "b2b-open-auth.war",
+                #        "发布版本": "20180808_1800",
+                #        "发布类型": "功能优化"
+                #    }, {
+                #        "发布原因": "B2b个人会员微信入会需求",
+                #        "发布人": "伍磊",
+                #        "发布工程名称": "b2b-busi.war",
+                #        "发布版本": "20180808_1801   功能优化",
+                #        "发布类型": "功能优化"
+                #    }
+                #}
                 try:
-                    requester = args['requester']
-                    deploy_reason = args['deploy_reason']
+                    logs = json.load(logs)
                 except Exception as Err:
-                    print("Failed to get extra args due to: " + str(Err))
-                    DeployRecord().add(project=project, status=status, version=branch, requester="N/A",deploy_reason="N/A", deployer="N/A",
+                    emit('my_response', {'data': "Read " + setting.EXTRA_ARGS_FILE + " failed due to: " + str(Err) + "\n",
+                                         'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+                    print("Error: ", str(Err))
+                    DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer="N/A",
                                        time_begin=time_begin, time_end=time_end, logs=logs)
-                DeployRecord().add(project=project, status=status, version=branch, requester=requester, deploy_reason=deploy_reason, deployer="N/A",
+                else:
+                    for log in logs['发布列表']:
+                        if log['发布版本'] == branch:
+                            requester = log['发布人']
+                            deploy_reason = log['发布原因']
+                            DeployRecord().add(project=project, status=status, version=branch, requester=requester, deploy_reason=deploy_reason, deployer="N/A",
                                    time_begin=time_begin, time_end=time_end, logs=logs)
         else:
             DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer="N/A",
@@ -273,7 +282,11 @@ def get_package(project, version):
     os.chdir(str(project_work_path(str(project))))
     conf = ProjectConfig().get(project)
     package_name = project + "." + conf.type
-    repo_address = conf.source_address.strip()
+    # use system config if project don't have specific repo
+    if conf.source_address:
+        repo_address = conf.source_address.strip()
+    else:
+        repo_address = SystemConfig().get().repository_server.strip()
     # add username:password into repo address for git auth
     sysconf = SystemConfig().get()
     username = sysconf.repository_user
@@ -291,25 +304,53 @@ def get_package(project, version):
         return [str(deployed_package), package_name, str(extra_file)]
     # get package from remote git
     else:
-        # pull package via gitPython
-        package = project_work_path(project).joinpath(package_name)
         empty_repo = Repo.init(str(project_work_path(project)))
-        try:
-            my_remote = empty_repo.create_remote(project, repo_address)
-            my_remote.pull(version)
-        except Exception as Err:
-            emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
-            emit('error_exit')
-            print("Error: ", str(Err))
-            sys.exit(1)
-        # write commit info into
+        # if project has a specific repo, let's take care of the whole branch
+        if conf.source_address:
+            package = project_work_path(project).joinpath(package_name)
+            # pull package via gitPython
+            try:
+                my_remote = empty_repo.create_remote(project, repo_address)
+                my_remote.pull(version)
+            except Exception as Err:
+                emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+                emit('error_exit')
+                print("Error: ", str(Err))
+                sys.exit(1)
+            # write commit info into
+            else:
+                # os.chdir(str(project_work_path(str(project))))
+                # get info from commit log
+                # g = Git()
+                # commit_info = g.log('-1')
+                # with open(setting.EXTRA_ARGS_FILE, 'w+') as info:
+                #     info.write(commit_info)
+                extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
+            if not os.path.isfile(extra_file):
+                extra_file = None
+        # use git sparse checkout to get specific files
         else:
+            package = project_work_path(project).joinpath(version, package_name)
+            # checkout the specific package path
             os.chdir(str(project_work_path(str(project))))
-            g = Git()
-            commit_info = g.log('-1')
-            with open(setting.EXTRA_ARGS_FILE, 'w+') as info:
-                info.write(commit_info)
-            extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
-        if not os.path.isfile(extra_file):
-            extra_file = None
+            shell_command = 'git config core.sparseCheckout true && echo "' + version + '" >> .git/info/sparse-checkout && echo "' \
+                            + setting.EXTRA_ARGS_FILE_PATH + '"/' + setting.EXTRA_ARGS_FILE + '" >> .git/info/sparse-checkout'
+            subprocess.Popen(shell_command, shell=True)
+            # pull specific path via gitPython
+            try:
+                my_remote = empty_repo.create_remote(project, repo_address)
+                my_remote.pull('master')
+            except Exception as Err:
+                emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n",
+                                     'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+                emit('error_exit')
+                print("Error: ", str(Err))
+                sys.exit(1)
+                # write commit info into
+            else:
+                os.chdir(str(project_work_path(str(project))))
+                extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE_PATH, setting.EXTRA_ARGS_FILE)
+            if not os.path.isfile(extra_file):
+                extra_file = None
+
         return [str(package), package_name, str(extra_file)]

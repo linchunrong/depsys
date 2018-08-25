@@ -333,7 +333,8 @@ def get_package(project, version):
             package = project_work_path(project).joinpath(version, package_name)
             # checkout the specific package path
             os.chdir(str(project_work_path(str(project))))
-            shell_command = 'git config core.sparseCheckout true && echo "' + version + '" >> .git/info/sparse-checkout'
+            shell_command = 'git config core.sparseCheckout true && echo "' + version + '" >> .git/info/sparse-checkout && echo "' \
+                            + setting.EXTRA_ARGS_FILE_PATH + '"/' + setting.EXTRA_ARGS_FILE + '" >> .git/info/sparse-checkout'
             subprocess.Popen(shell_command, shell=True)
             # pull specific path via gitPython
             try:
@@ -348,7 +349,7 @@ def get_package(project, version):
                 # write commit info into
             else:
                 os.chdir(str(project_work_path(str(project))))
-                extra_file = project_work_path(project).joinpath(version, setting.EXTRA_ARGS_FILE)
+                extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE_PATH, setting.EXTRA_ARGS_FILE)
             if not os.path.isfile(extra_file):
                 extra_file = None
 

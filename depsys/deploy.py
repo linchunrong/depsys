@@ -72,6 +72,7 @@ def execute_thread(room):
     # clean the working path
     clean_command = 'rm -rf ' + str(working_path)
     subprocess.Popen(clean_command, shell=True)
+    time.sleep(2)
     try:
         # get deploy package
         my_pkg = get_package(project=project, version=branch)
@@ -296,8 +297,8 @@ def get_package(project, version):
     # check if local package exist
     deployed_package = my_path().joinpath(data_path, project, version, package_name)
     if os.path.isfile(deployed_package):
-        emit('my_response',
-             {'data': "Found deployed local package, use it for this deployment." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+        emit('my_response', {'data': "Found deployed local package, use it for this deployment." + "\n",
+                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
         extra_file = my_path().joinpath(data_path, project, version, setting.EXTRA_ARGS_FILE)
         if not os.path.isfile(extra_file):
             extra_file = None
@@ -311,9 +312,12 @@ def get_package(project, version):
             # pull package via gitPython
             try:
                 my_remote = empty_repo.create_remote(project, repo_address)
+                emit('my_response', {'data': "Downloading package from gitlab..." + "\n",
+                                     'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
                 my_remote.pull(version)
             except Exception as Err:
-                emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+                emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n",
+                                     'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
                 emit('error_exit')
                 print("Error: ", str(Err))
                 sys.exit(1)
@@ -333,6 +337,8 @@ def get_package(project, version):
             # pull specific path via gitPython
             try:
                 my_remote = empty_repo.create_remote(project, repo_address)
+                emit('my_response', {'data': "Downloading package from gitlab..." + "\n",
+                                     'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
                 my_remote.pull('master')
             except Exception as Err:
                 emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n",
@@ -340,10 +346,15 @@ def get_package(project, version):
                 emit('error_exit')
                 print("Error: ", str(Err))
                 sys.exit(1)
-                # write commit info into
             else:
-                os.chdir(str(project_work_path(str(project))))
-                extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
+                # we maybe check out empty package folder via sparse checkout
+                if os.path.isfile(package):
+                    extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
+                else:
+                    emit('my_response', {'data': "Seems this version doesnt' include a package, please check!" + "\n",
+                                         'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+                    emit('error_exit')
+                    sys.exit(1)
             if not os.path.isfile(extra_file):
                 extra_file = None
 

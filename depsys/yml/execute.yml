@@ -3,21 +3,21 @@
   - name: send project package to target servers
     copy: src=local_pkg_file dest=dest_pkg_file owner=pkg_owner
     register: send_file
-  - name: run start script on target servers
-    script: start_script_file
-    register: start_script
-    when: send_file|success
-  - name: show start script debug info
-    debug: var=start_script.stdout_lines verbosity=0
-  - name: run deploy script on target servers
-    script: deploy_script_file
-    register: deploy_script
-    when: start_script|success
-  - name: show deploy script debug info
-    debug: var=deploy_script.stdout_lines verbosity=0
   - name: run stop deploy script on target servers
     script: stop_script_file
     register: stop_script
-    when: deploy_script|success
+    when: send_file|success
   - name: show stop script debug info
     debug: var=stop_script.stdout_lines verbosity=0
+  - name: run deploy script on target servers
+    script: deploy_script_file
+    register: deploy_script
+    when: stop_script|success
+  - name: show deploy script debug info
+    debug: var=deploy_script.stdout_lines verbosity=0
+  - name: run start script on target servers
+    script: start_script_file
+    register: start_script
+    when: deploy_script|success
+  - name: show start script debug info
+    debug: var=start_script.stdout_lines verbosity=0

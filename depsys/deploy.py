@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib.request, urllib.parse, time, os, sys, random, string, pathlib, subprocess, shutil, yaml, json
+import urllib.request, urllib.parse, time, os, sys, random, string, pathlib, subprocess, shutil, json
 from threading import Lock
-from git import Repo, Git
+from git import Repo
 from depsys import socketio, setting
 from flask_socketio import disconnect, emit, join_room
 from depsys.sysconfig import SystemConfig, ProjectConfig
@@ -119,7 +119,7 @@ def execute_thread(room):
         # get extra args if exist
         extra_file = str(my_pkg[2])
         if os.path.isfile(extra_file):
-            with open(extra_file, encoding='utf-8') as logs:
+            with open(extra_file, encoding='utf-8') as release_info:
                 # parse json format
                 # logs template
                 #{
@@ -138,7 +138,7 @@ def execute_thread(room):
                 #    }
                 #}
                 try:
-                    logs = json.load(logs)
+                    release_info = json.load(release_info)
                 except Exception as Err:
                     emit('my_response', {'data': "Read " + setting.EXTRA_ARGS_FILE + " failed due to: " + str(Err) + "\n",
                                          'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
@@ -146,10 +146,10 @@ def execute_thread(room):
                     DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer="N/A",
                                        time_begin=time_begin, time_end=time_end, logs=logs)
                 else:
-                    for log in logs['发布列表']:
-                        if log['发布版本'] == branch:
-                            requester = log['发布人']
-                            deploy_reason = log['发布原因']
+                    for info in release_info['发布列表']:
+                        if info['发布版本'] == branch:
+                            requester = info['发布人']
+                            deploy_reason = info['发布原因']
                             DeployRecord().add(project=project, status=status, version=branch, requester=requester, deploy_reason=deploy_reason, deployer="N/A",
                                    time_begin=time_begin, time_end=time_end, logs=logs)
         else:
@@ -157,11 +157,11 @@ def execute_thread(room):
                                time_begin=time_begin, time_end=time_end, logs=logs)
     # save deployed package, str(my_pkg[1]) stand for package name
     if status == 1:
-        srcfile = working_path.joinpath(str(my_pkg[1]))
-        if os.path.isfile(srcfile):
-            destfile_path = my_path().joinpath(data_path, str(project), str(branch))
+        srcfile = my_pkg[0]
+        destfile_path = my_path().joinpath(data_path, str(project), str(branch))
+        destfile = destfile_path.joinpath(str(my_pkg[1]))
+        if os.path.isfile(srcfile) and srcfile != str(destfile):
             mkdir(destfile_path)
-            destfile = destfile_path.joinpath(str(my_pkg[1]))
             try:
                 shutil.copyfile(str(srcfile),str(destfile))
             except Exception as Err:
@@ -319,12 +319,6 @@ def get_package(project, version):
                 sys.exit(1)
             # write commit info into
             else:
-                # os.chdir(str(project_work_path(str(project))))
-                # get info from commit log
-                # g = Git()
-                # commit_info = g.log('-1')
-                # with open(setting.EXTRA_ARGS_FILE, 'w+') as info:
-                #     info.write(commit_info)
                 extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
             if not os.path.isfile(extra_file):
                 extra_file = None
@@ -334,7 +328,7 @@ def get_package(project, version):
             # checkout the specific package path
             os.chdir(str(project_work_path(str(project))))
             shell_command = 'git config core.sparseCheckout true && echo "' + version + '" >> .git/info/sparse-checkout && echo "' \
-                            + setting.EXTRA_ARGS_FILE_PATH + '"/' + setting.EXTRA_ARGS_FILE + '" >> .git/info/sparse-checkout'
+                            + setting.EXTRA_ARGS_FILE + '" >> .git/info/sparse-checkout'
             subprocess.Popen(shell_command, shell=True)
             # pull specific path via gitPython
             try:
@@ -349,7 +343,7 @@ def get_package(project, version):
                 # write commit info into
             else:
                 os.chdir(str(project_work_path(str(project))))
-                extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE_PATH, setting.EXTRA_ARGS_FILE)
+                extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
             if not os.path.isfile(extra_file):
                 extra_file = None
 

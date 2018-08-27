@@ -12,6 +12,5 @@ SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://depsys:123456@127.0.0.1:3306/d
 DEPLOY_PKG_PATH = '/home/FaeWork/pkg/'
 PKG_OWNER = 'FaeWork'
 
-# with args in this file which info come from git commit
-EXTRA_ARGS_FILE_PATH="release"
-EXTRA_ARGS_FILE = "commit_info.txt"
+# with args in this file which info come from git commit, file should under gitlab root path
+EXTRA_ARGS_FILE = "release_note.json"

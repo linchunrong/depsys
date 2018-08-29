@@ -225,6 +225,7 @@ def get_script(script_type):
     else:
         print ("Get script failed! Only support start_script/deploy_script/stop_script.")
         sys.exit(1)
+    '''
     # fetch script name
     script_name = remote_script.strip().split("/")[-1]
     # check if script path is set in remote http url
@@ -241,6 +242,8 @@ def get_script(script_type):
     else:
         local_script = remote_script
         return str(local_script)
+    '''
+    return str(remote_script)
 
 
 def get_playbook(package_name, local_package):
@@ -254,9 +257,9 @@ def get_playbook(package_name, local_package):
         playbook_template = src.read()
     # cd to temporary folder and write a temporary playbook
     with open(dest_file, 'w+') as dest:
-        content = playbook_template.replace("start_script_file", get_script("start_script"))
-        content = content.replace("deploy_script_file", get_script("deploy_script"))
-        content = content.replace("stop_script_file", get_script("stop_script"))
+        content = playbook_template.replace("start_script_file", "curl -s " + get_script("start_script") + " | sh -s " + str(project))
+        content = content.replace("deploy_script_file","curl -s " + get_script("deploy_script") + " | sh -s " + str(project))
+        content = content.replace("stop_script_file", "curl -s " + get_script("stop_script") + " | sh -s " + str(project))
         content = content.replace("local_pkg_file", local_package)
         content = content.replace("dest_pkg_file", setting.DEPLOY_PKG_PATH + package_name)
         content = content.replace("pkg_owner", setting.PKG_OWNER)

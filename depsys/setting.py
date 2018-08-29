@@ -9,7 +9,7 @@ SECRET_KEY = '\x84\x96\x04\xe9\xc5\xe1\xb4\xc5\xa4M\xcd\x9a\xf4b"\xce\x88\xe36\x
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://depsys:123456@127.0.0.1:3306/depsys'
 
 
-DEPLOY_PKG_PATH = '/home/FaeWork/pkg/'
+DEPLOY_PKG_PATH = '/home/FaeWork/pkgs/'
 PKG_OWNER = 'FaeWork'
 
 # with args in this file which info come from git commit, file should under gitlab root path

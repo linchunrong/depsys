@@ -14,7 +14,7 @@ async_mode = None
 app = Flask(__name__)
 app.config.from_object('depsys.setting')
 # app.config.from_envvar('FLASKR_SETTINGS')
-socketio = SocketIO(app, async_mode=async_mode)
+socketio = SocketIO(app, async_mode=async_mode, engineio_logger=True, manage_session=True)
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()

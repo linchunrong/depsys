@@ -31,7 +31,15 @@ def executing(message):
     join_room(message['room'])
     emit('my_response', {'data': "后台脚本开始执行..." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
     # call deploy thread
-    execute_thread(message['room'])
+    #execute_thread(message['room'])
+    execute()
+
+def execute():
+    print("Start?")
+    socketio.emit('my_response', {'data': "Start" + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+    time.sleep(65)
+    socketio.emit('my_response', {'data': "Stop" + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+    print("End?")
 
 
 @socketio.on('disconnect_request', namespace='/execute')
@@ -49,11 +57,12 @@ def disconnect_exit():
 
 
 @socketio.on('connect', namespace='/execute')
-def connect():
+def test_connect():
     global thread
     with thread_lock:
         if thread is None:
-            emit('my_response', {'data': '开始连接后台...', 'time_stamp': time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
+            thread = socketio.start_background_task(target=execute)
+        emit('my_response', {'data': '开始连接后台...', 'time_stamp': time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
 
 
 @socketio.on('disconnect', namespace='/execute')

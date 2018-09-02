@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import urllib.request, urllib.parse, time, os, sys, random, string, pathlib, subprocess, shutil, json
+from flask import request
 from threading import Lock
 from git import Repo
 from depsys import socketio, setting
@@ -28,18 +29,18 @@ def message(message):
 @socketio.on('executing', namespace='/execute')
 def executing(message):
     # every thread own their room to get their logs
-    join_room(message['room'])
-    emit('my_response', {'data': "后台脚本开始执行..." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+    with thread_lock:
+        join_room(message['room'])
+        emit('my_response', {'data': "后台脚本开始执行..." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
     # call deploy thread
     #execute_thread(message['room'])
-    execute()
+        thread = socketio.start_background_task(target=execute, room=message['room'])
 
-def execute():
-    print("Start?")
-    socketio.emit('my_response', {'data': "Start" + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
-    time.sleep(65)
-    socketio.emit('my_response', {'data': "Stop" + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
-    print("End?")
+def execute(room):
+    for i in range(3):
+        socketio.emit('my_response', {'data': "Round " + str(i) + " in room: " + room + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},namespace='/execute',room=room)
+        time.sleep(65)
+    socketio.emit('my_response', {'data': "Round done in room: " + room + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},namespace='/execute',room=room)
 
 
 @socketio.on('disconnect_request', namespace='/execute')
@@ -58,16 +59,16 @@ def disconnect_exit():
 
 @socketio.on('connect', namespace='/execute')
 def test_connect():
-    global thread
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(target=execute)
-        emit('my_response', {'data': '开始连接后台...', 'time_stamp': time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
+    #global thread
+    #with thread_lock:
+    #    if thread is None:
+    #        thread = socketio.start_background_task(target=execute)
+    emit('my_response', {'data': '开始连接后台...', 'time_stamp': time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
 
 
 @socketio.on('disconnect', namespace='/execute')
 def print_disconnect():
-    print('Client disconnected')
+    print('Client disconnected', request.sid)
 
 
 def execute_thread(room):

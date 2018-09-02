@@ -14,7 +14,7 @@ function exec() {
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
     socket.on('connect', function () {
         socket.emit('my_event', {data: '后台已连接!'});
-        //socket.emit('executing', {room: $('#exec_room').val()});
+        socket.emit('executing', {room: $('#exec_room').val()});
     });
     socket.on('my_response', function (msg) {
         $('#log').append('<br>' + $('<div/>').text(msg.time_stamp + msg.data).html());

@@ -19,15 +19,6 @@ function exec() {
     socket.on('my_response', function (msg) {
         $('#log').append('<br>' + $('<div/>').text(msg.time_stamp + msg.data).html());
     });
-    socket.on('script_done', function () {
-        socket.emit('disconnect_request');
-        return false;
-    });
-    socket.on('error_exit', function () {
-        socket.emit('disconnect_exit');
-        return false;
-    });
-
     $('button#disconnect').click(function () {
         socket.emit('disconnect_request');
         window.location.href = "{{ url_for('project_deploy', project=project) }}"

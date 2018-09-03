@@ -11,7 +11,7 @@ from depsys.sysconfig import SystemConfig, ProjectConfig
 from depsys.dashboard import DeployRecord
 
 # deploy execute process
-thread = None
+# thread = None
 thread_lock = Lock()
 temp_path = "tmp"
 logs_path = "logs"
@@ -32,28 +32,12 @@ def executing(message):
     with thread_lock:
         join_room(message['room'])
         emit('my_response', {'data': "后台脚本开始执行..." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
-    # call deploy thread
-    #execute_thread(message['room'])
-        thread = socketio.start_background_task(target=execute, room=message['room'])
-
-def execute(room):
-    for i in range(3):
-        socketio.emit('my_response', {'data': "Round " + str(i) + " in room: " + room + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},namespace='/execute',room=room)
-        time.sleep(65)
-    socketio.emit('my_response', {'data': "Round done in room: " + room + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},namespace='/execute',room=room)
+        # call deploy thread
+        socketio.start_background_task(target=execute_thread, room=message['room'])
 
 
 @socketio.on('disconnect_request', namespace='/execute')
 def disconnect_request():
-    emit('my_response',
-         {'data': '后台已退出!', 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
-    disconnect()
-
-
-@socketio.on('disconnect_exit', namespace='/execute')
-def disconnect_exit():
-    emit('my_response',
-         {'data': "[ERROR] 发生错误，退出！", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
     disconnect()
 
 
@@ -85,7 +69,7 @@ def execute_thread(room):
     time.sleep(2)
     try:
         # get deploy package
-        my_pkg = get_package(project=project, version=branch)
+        my_pkg = get_package(project=project, version=branch, room=room)
         my_hosts = get_hosts(project)
         my_playbook = get_playbook(package_name=str(my_pkg[1]), local_package=str(my_pkg[0]))
     except Exception as Err:
@@ -109,13 +93,13 @@ def execute_thread(room):
             output = str(logs.read())
             # only print out when there's output
             if output:
-                emit('my_response', {'time_stamp': "", 'data': output},namespace='/execute', room=room)
+                socketio.emit('my_response', {'time_stamp': "", 'data': output}, namespace='/execute', room=room)
             # poll() func will get return code of subrocess.Popen(), None means running
             if proc.poll() != None:
                 running = False
                 time_end = time.localtime()
-                emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "脚本执行完毕!"}, namespace='/execute', room=room)
-    emit('script_done', namespace='/execute')
+                socketio.emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "脚本执行完毕!"}, namespace='/execute', room=room)
+    socketio.emit('my_response',{'data': "请检查进程是否正常！", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"}, namespace='/execute', room=room)
     # write logs into record
     with open(logs_file) as logs:
         logs = logs.read()
@@ -151,8 +135,8 @@ def execute_thread(room):
                 try:
                     release_info = json.load(release_info)
                 except Exception as Err:
-                    emit('my_response', {'data': "Read " + setting.EXTRA_ARGS_FILE + " failed due to: " + str(Err) + "\n",
-                                         'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+                    socketio.emit('my_response', {'data': "Read " + setting.EXTRA_ARGS_FILE + " failed due to: " + str(Err) + "\n",
+                                         'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                     print("Error: ", str(Err))
                     DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer="N/A",
                                        time_begin=time_begin, time_end=time_end, logs=logs)
@@ -291,7 +275,7 @@ def get_hosts(project):
     return hosts_file
 
 
-def get_package(project, version):
+def get_package(project, version, room):
     """Get package from repository server"""
     os.chdir(str(project_work_path(str(project))))
     conf = ProjectConfig().get(project)
@@ -310,8 +294,8 @@ def get_package(project, version):
     # check if local package exist
     deployed_package = my_path().joinpath(data_path, project, version, package_name)
     if os.path.isfile(deployed_package):
-        emit('my_response', {'data': "Found deployed local package, use it for this deployment." + "\n",
-                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+        socketio.emit('my_response', {'data': "Found deployed local package, use it for this deployment." + "\n",
+                    'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
         extra_file = my_path().joinpath(data_path, project, version, setting.EXTRA_ARGS_FILE)
         if not os.path.isfile(extra_file):
             extra_file = None
@@ -325,13 +309,14 @@ def get_package(project, version):
             # pull package via gitPython
             try:
                 my_remote = empty_repo.create_remote(project, repo_address)
-                emit('my_response', {'data': "Downloading package from gitlab..." + "\n",
-                                     'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+                socketio.emit('my_response', {'data': "Downloading package from gitlab..." + "\n",
+                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 my_remote.pull(version)
             except Exception as Err:
-                emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n",
-                                     'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
-                emit('error_exit')
+                socketio.emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n",
+                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
+                socketio.emit('my_response', {'data': "[ERROR] 发生错误，退出！",
+                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"}, namespace='/execute', room=room)
                 print("Error: ", str(Err))
                 sys.exit(1)
             # write commit info into
@@ -350,13 +335,14 @@ def get_package(project, version):
             # pull specific path via gitPython
             try:
                 my_remote = empty_repo.create_remote(project, repo_address)
-                emit('my_response', {'data': "Downloading package from gitlab..." + "\n",
-                                     'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+                socketio.emit('my_response', {'data': "Downloading package from gitlab..." + "\n",
+                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 my_remote.pull('master')
             except Exception as Err:
-                emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n",
-                                     'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
-                emit('error_exit')
+                socketio.emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n",
+                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
+                socketio.emit('my_response', {'data': "[ERROR] 发生错误，退出！",
+                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 print("Error: ", str(Err))
                 sys.exit(1)
             else:
@@ -364,9 +350,10 @@ def get_package(project, version):
                 if os.path.isfile(package):
                     extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
                 else:
-                    emit('my_response', {'data': "Seems this version doesnt' include a package, please check!" + "\n",
-                                         'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
-                    emit('error_exit')
+                    socketio.emit('my_response', {'data': "Seems this version doesnt' include a package, please check!" + "\n",
+                                'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
+                    socketio.emit('my_response', {'data': "[ERROR] 发生错误，退出！",
+                                'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                     sys.exit(1)
             if not os.path.isfile(extra_file):
                 extra_file = None

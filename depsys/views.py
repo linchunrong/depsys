@@ -7,7 +7,6 @@ from depsys import app
 from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import ProjectConfig, SystemConfig, UserConfig
 from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm
-from depsys.models import User, System, Project
 
 
 # Index
@@ -23,7 +22,7 @@ def login():
     error = None
     form = LoginForm()
     if form.validate_on_submit() and request.method == 'POST':
-        user = User.query.filter_by(username=form.username.data).first()
+        user = UserConfig().get(username=form.username.data)
         if user is None:
             error = 'Invalid username'
         elif user.password != form.password.data:
@@ -46,7 +45,7 @@ def profile():
     error = None
     form = UserForm()
     user_id = session['user_id']
-    user = User.query.filter_by(id=user_id).first()
+    user = UserConfig().get(user_id=user_id)
     if request.method == "POST":
         if form.validate_on_submit():
             u = UserConfig()
@@ -88,7 +87,7 @@ def deploy_exec(project):
 def config():
     error = None
     form = SystemForm()
-    conf = System.query.first()
+    conf = SystemConfig().get()
     if request.method == "POST":
         if form.validate_on_submit():
             s = SystemConfig()
@@ -108,7 +107,7 @@ def config():
 def project_config(project):
     error = None
     form = ConfigForm()
-    conf = Project.query.filter_by(project_name=project).first()
+    conf = ProjectConfig().get(project)
     if request.method == "POST":
         if form.validate_on_submit():
             p = ProjectConfig()

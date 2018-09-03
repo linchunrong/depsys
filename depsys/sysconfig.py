@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
 from depsys import db
 from depsys.models import Project, System, User
 
@@ -20,7 +21,7 @@ class SystemConfig:
         item.repository_pwd = repository_password
         item.smtp_server = smtp_server
         item.smtp_user = smtp_user
-        item.smtp_password = smtp_password
+        item.smtp_pwd = smtp_password
         db.session.commit()
         db.session.close()
 
@@ -75,7 +76,14 @@ class UserConfig:
         db.session.commit()
         db.session.close()
 
-    def get(self, user_id):
+    def get(self, user_id=None, username=None):
         """Get user config"""
-        item = User.query.filter_by(id=user_id).first()
+        if user_id:
+            item = User.query.filter_by(id=user_id).first()
+        elif username:
+            item = User.query.filter_by(username=username).first()
+        else:
+            print("Error: Either user_id or username as arguments!")
+            sys.exit(1)
+
         return item

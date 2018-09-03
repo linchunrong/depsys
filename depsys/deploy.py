@@ -313,10 +313,8 @@ def get_package(project, version, room):
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 my_remote.pull(version)
             except Exception as Err:
-                socketio.emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n",
+                socketio.emit('my_response', {'data': "[ERROR] Download package failed due to: " + str(Err) + "\n",
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
-                socketio.emit('my_response', {'data': "[ERROR] 发生错误，退出！",
-                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"}, namespace='/execute', room=room)
                 print("Error: ", str(Err))
                 sys.exit(1)
             # write commit info into
@@ -339,9 +337,7 @@ def get_package(project, version, room):
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 my_remote.pull('master')
             except Exception as Err:
-                socketio.emit('my_response', {'data': "Download package failed due to: " + str(Err) + "\n",
-                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
-                socketio.emit('my_response', {'data': "[ERROR] 发生错误，退出！",
+                socketio.emit('my_response', {'data': "[ERROR] Download package failed due to: " + str(Err) + "\n",
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 print("Error: ", str(Err))
                 sys.exit(1)
@@ -350,9 +346,7 @@ def get_package(project, version, room):
                 if os.path.isfile(package):
                     extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
                 else:
-                    socketio.emit('my_response', {'data': "Seems this version doesnt' include a package, please check!" + "\n",
-                                'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
-                    socketio.emit('my_response', {'data': "[ERROR] 发生错误，退出！",
+                    socketio.emit('my_response', {'data': "[ERROR] Seems this version doesnt' include a package, please check!" + "\n",
                                 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                     sys.exit(1)
             if not os.path.isfile(extra_file):

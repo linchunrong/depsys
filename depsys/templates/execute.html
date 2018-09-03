@@ -9,22 +9,26 @@
 {% block content %}
 <script src="../static/lib/js/socket.io.js"></script>
 <script type="text/javascript" charset="utf-8">
-function exec() {
+$(document).ready(function() {
     namespace = '/execute';
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
     socket.on('connect', function () {
         socket.emit('my_event', {data: '后台已连接!'});
-        socket.emit('executing', {room: $('#exec_room').val()});
+        //socket.emit('executing', {room: $('#exec_room').val()});
     });
     socket.on('my_response', function (msg) {
         $('#log').append('<br>' + $('<div/>').text(msg.time_stamp + msg.data).html());
     });
+    $('button#exec_room').click(function () {
+        socket.emit('executing', {room: $('#exec_room').val()});
+        return false
+    })
     $('button#disconnect').click(function () {
         socket.emit('disconnect_request');
         window.location.href = "{{ url_for('project_deploy', project=project) }}"
         return false;
     })
-}
+});
 </script>
 <!-- Main Content -->
 <div class="container-fluid">
@@ -52,7 +56,7 @@ function exec() {
                         </div>
                         <div class="form-inline">
                             <div class="form-group">
-                                <button class="btn btn-default" value="{{ project }}@{{ branch }}" id="exec_room" onclick="exec()">开始</button>
+                                <button class="btn btn-default" value="{{ project }}@{{ branch }}" id="exec_room">开始</button>
                             </div>
                         </div>
                     </div>

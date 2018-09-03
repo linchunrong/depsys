@@ -9,35 +9,27 @@
 {% block content %}
 <script src="../static/lib/js/socket.io.js"></script>
 <script type="text/javascript" charset="utf-8">
-        $(document).ready(function() {
-            namespace = '/execute';
-            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-            socket.on('connect', function() {
-                socket.emit('my_event', {data: '后台已连接!'});
-            });
-            socket.on('my_response', function(msg) {
-                $('#log').append('<br>' + $('<div/>').text(msg.time_stamp + msg.data).html());
-            });
-            socket.on('script_done', function () {
-                socket.emit('disconnect_request');
-                return false;
-            });
-            socket.on('error_exit', function () {
-                socket.emit('disconnect_exit');
-                return false;
-            });
-
-            $('button#exec_room').click(function() {
-                socket.emit('executing', {room: $('#exec_room').val()});
-                return false;
-            });
-            $('button#disconnect').click(function () {
-                socket.emit('disconnect_request');
-                window.location.href="{{ url_for('project_deploy', project=project) }}"
-                return false;
-            })
-        });
-    </script>
+$(document).ready(function() {
+    namespace = '/execute';
+    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+    socket.on('connect', function () {
+        socket.emit('my_event', {data: '后台已连接!'});
+        //socket.emit('executing', {room: $('#exec_room').val()});
+    });
+    socket.on('my_response', function (msg) {
+        $('#log').append('<br>' + $('<div/>').text(msg.time_stamp + msg.data).html());
+    });
+    $('button#exec_room').click(function () {
+        socket.emit('executing', {room: $('#exec_room').val()});
+        return false
+    })
+    $('button#disconnect').click(function () {
+        socket.emit('disconnect_request');
+        window.location.href = "{{ url_for('project_deploy', project=project) }}"
+        return false;
+    })
+});
+</script>
 <!-- Main Content -->
 <div class="container-fluid">
     <div class="side-body">

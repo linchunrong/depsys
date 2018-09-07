@@ -9,7 +9,8 @@
 <div class="container-fluid">
     <div class="side-body">
         <div class="page-title">
-            <span class="title">Projects list</span>
+            <span class="title">Projects</span>
+            <div class="description">工程发布，配置，报表发送</div>
         </div>
         <div class="row">
             <div class="col-xs-12">
@@ -56,7 +57,43 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="title">报表发送</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-inline">
+                            <label>To:</label>
+                            <div class="form-group">
+                                <select class="form-control">
+                                    <option value="op">operate@cmbfae.com</option>
+                                    <option value="it">cmbfae-it@cmbfae.com</option>
+                                </select>
+                            </div>
+                            <div class="form-group form-control" style="border: none">
+                                <div class="radio3 radio-check radio-inline">
+                                    <input type="radio" id="radio1" name="date_range" value="7days" checked="">
+                                    <label for="radio1">
+                                        最近七天
+                                    </label>
+                                </div>
+                                <div class="radio3 radio-check radio-inline">
+                                    <input type="radio" id="radio2" name="date_range" value="today">
+                                    <label for="radio2">
+                                        今天
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-default" onclick="alert('Still working on it...')">发送</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
-

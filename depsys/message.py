@@ -13,13 +13,13 @@ def email(receiver, attachment=None):
     conf = SystemConfig().get()
     mail_host = conf.smtp_server
     fromaddr = conf.smtp_user
-    frompass = conf.smtp_pwd
+    # frompass = conf.smtp_pwd
     sender = fromaddr
     tolist = receiver
 
     message = EmailMessage()
     message['From'] = sender
-    message['To'] = ",".join(tolist)
+    message['To'] = tolist
     subject = 'Deploy info ' + time.strftime("%Y-%m-%d", time.localtime())
     message['subject'] = subject
     message.set_content("FYI")
@@ -29,9 +29,10 @@ def email(receiver, attachment=None):
 
     try:
         s = smtplib.SMTP(mail_host, 25)
-        #s.login(fromaddr, frompass)
+        # s.login(fromaddr, frompass)
         s.send_message(message, sender, tolist)
-        print("Send success")
         s.quit()
+        return "Send success!"
+
     except smtplib.SMTPException as e:
-        print("Error due to", e)
+        return "Error: " + str(e)

@@ -3,10 +3,10 @@
 
 from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
-from depsys import app
+from depsys import app, message
 from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import ProjectConfig, SystemConfig, UserConfig
-from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm
+from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm, ReportForm
 
 
 # Index
@@ -57,11 +57,16 @@ def profile():
     return render_template('profile.html', form=form, user=user, error=error)
 
 
-@app.route('/projects')
+@app.route('/projects', methods=['GET', 'POST'])
 @login_required
 def projects():
     project_list = DeployInfo().projects()
-    return render_template('projects.html', project_list=project_list)
+    form = ReportForm()
+    if request.method == "POST":
+        if form.validate_on_submit():
+            info = message.email(receiver=form.receiver.data)
+            return render_template('projects.html', project_list=project_list, form=form, info=info)
+    return render_template('projects.html', project_list=project_list, form=form, info=None)
 
 
 @app.route('/deploy/<project>')

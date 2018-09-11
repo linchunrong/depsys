@@ -4,6 +4,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, validators, SelectField, TextAreaField, RadioField
 
+
 class LoginForm(FlaskForm):
     """Login Form"""
     username = StringField('Username', validators=[validators.InputRequired()])
@@ -11,11 +12,13 @@ class LoginForm(FlaskForm):
     #remember_me = BooleanField('Remember me')
     submit = SubmitField('登录')
 
+
 class UserForm(FlaskForm):
     """User change password"""
     password = PasswordField('New Password', validators=[validators.EqualTo('confirm',message="密码不一致！")])
     confirm = PasswordField('Repeat Password')
     submit = SubmitField('更新')
+
 
 class ConfigForm(FlaskForm):
     """Config Form"""
@@ -27,6 +30,7 @@ class ConfigForm(FlaskForm):
     post_script_type = SelectField('Post_script_type', choices=[('shell','shell script'),('python','python script')], default='shell')
     post_script = TextAreaField('Post_script')
     submit = SubmitField('保存')
+
 
 class SystemForm(FlaskForm):
     """System Form"""
@@ -41,3 +45,10 @@ class SystemForm(FlaskForm):
     smtp_user = StringField('Smtp_user')
     smtp_password = PasswordField('Smtp_pwd')
     submit = SubmitField('保存')
+
+
+class ReportForm(FlaskForm):
+    """Report Form"""
+    receiver = SelectField('Receiver', choices=[('operate@cmbfae.com','系统运行部'),('cmbfae-it@cmbfae.com','信息技术部'),('lincr@cmbfae.com','lin')], default='lincr@cmbfae.com')
+    date_range = RadioField('Date_range', choices=[('7days','最近七天'),('today','今天')], default='7days')
+    submit = SubmitField('发送')

@@ -60,6 +60,8 @@
                 </div>
             </div>
         </div>
+        <form action="" method="post">
+        {{ form.hidden_tag() }}
         <div class="row">
             <div class="col-xs-12">
                 <div class="card">
@@ -68,12 +70,16 @@
                             <div class="sub-title">发送报表</div>
                             <label>To:</label>
                             <div class="form-group">
+                                <!--
                                 <select class="form-control">
                                     <option value="op">operate@cmbfae.com</option>
                                     <option value="it">cmbfae-it@cmbfae.com</option>
                                 </select>
+                                -->
+                                {{ form.receiver(class='form-control') }}
                             </div>
                             <div class="form-group form-control" style="border: none">
+                                <!--
                                 <div class="radio3 radio-check radio-inline">
                                     <input type="radio" id="radio1" name="date_range" value="7days" checked="">
                                     <label for="radio1">
@@ -86,13 +92,33 @@
                                         今天
                                     </label>
                                 </div>
+                                -->
+                                {% for type in form.date_range %}
+                                    <div class="radio3 radio-inline radio-check">
+                                        <td>{{ type }}</td>
+                                        <td>{{ type.label }}</td>
+                                    </div>
+                                {% endfor %}
                             </div>
-                            <button type="button" class="btn btn-default" onclick="alert('Still working on it...')">发送</button>
+                            <!--<button type="button" class="btn btn-default" onclick="alert('Still working on it...')">发送</button>-->
+                            {{ form.submit(class='btn btn-default') }}
                         </div>
+                        {% if info %}
+                            {% if "Error" in info %}
+                            <div class="alert alert-danger col-sm-6" role="alert">
+                                {{ info }}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-success col-sm-6" role="alert">
+                                {{ info }}
+                            </div>
+                            {% endif %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
+        </form>
     </div>
 </div>
 {% endblock %}

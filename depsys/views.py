@@ -59,14 +59,13 @@ def profile():
 
 @app.route('/projects', methods=['GET', 'POST'])
 @login_required
-def projects():
+def projects(info=None):
     project_list = DeployInfo().projects()
     form = ReportForm()
     if request.method == "POST":
         if form.validate_on_submit():
             info = message.email(receiver=form.receiver.data)
-            return render_template('projects.html', project_list=project_list, form=form, info=info)
-    return render_template('projects.html', project_list=project_list, form=form, info=None)
+    return render_template('projects.html', project_list=project_list, form=form, info=info)
 
 
 @app.route('/deploy/<project>')

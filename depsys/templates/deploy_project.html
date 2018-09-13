@@ -57,7 +57,7 @@ function version_select() {
                         <table class="datatable table table-striped" cellspacing="0" width="100%">
                             <thead>
                                 <tr>
-                                    <th>选择</th>
+                                    <th class="text-left">选择</th>
                                     <th>版本</th>
                                     <th>日期</th>
                                     <th>构建</th>
@@ -68,7 +68,7 @@ function version_select() {
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th>选择</th>
+                                    <th class="text-left">选择</th>
                                     <th>版本</th>
                                     <th>日期</th>
                                     <th>构建</th>
@@ -80,8 +80,11 @@ function version_select() {
                             <tbody>
                                 {% for record in records %}
                                 <tr>
-                                    <td width="60px">
-                                        <input type="radio" name="selected" value="{{ record.version }}" onclick="version_select()"/>
+                                    <td width="65px">
+                                        <div class="radio3 radio-check radio-inline">
+                                            <input type="radio" id="{{ record.version }}" name="selected" value="{{ record.version }}" onclick="version_select()"/>
+                                            <label for="{{ record.version }}">&nbsp;</label>
+                                        </div>
                                     </td>
                                     <td>{{ record.version }}</td>
                                     <td width="150px">{{ record.time_end }}</td>

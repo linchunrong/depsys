@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib.request, urllib.parse, time, os, sys, random, string, pathlib, subprocess, shutil, json
+import setting, urllib.request, urllib.parse, time, os, sys, random, string, pathlib, subprocess, shutil, json
 from flask import request
 from threading import Lock
 from git import Repo
-from depsys import socketio, setting
+from depsys import socketio
 from flask_socketio import disconnect, emit, join_room
 from depsys.sysconfig import SystemConfig, ProjectConfig
 from depsys.dashboard import DeployRecord

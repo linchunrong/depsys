@@ -12,7 +12,7 @@ from flask_socketio import SocketIO
 async_mode = None
 
 app = Flask(__name__)
-app.config.from_object('depsys.setting')
+app.config.from_object('setting')
 # app.config.from_envvar('FLASKR_SETTINGS')
 socketio = SocketIO(app, async_mode=async_mode)
 

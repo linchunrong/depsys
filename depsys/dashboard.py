@@ -97,9 +97,20 @@ class DeployRecord:
     def add(self, project, status, version, requester, deployer, deploy_reason, time_begin, time_end, logs):
         """Add deployed record"""
         project_id = ProjectConfig().get(project).project_id
-        item = Record(project_id=project_id, status=status, version=version, requester=requester if requester else None, deployer=deployer if deployer else None,
-                      deploy_reason=deploy_reason if deploy_reason else None, time_begin=time_begin, time_end=time_end, logs=logs)
-        db.session.add(item)
+        # check if record exist, if yes update, else add
+        record_exist = Record.query.filter_by(project_id=project_id, version=version).first()
+        if record_exist:
+            record_exist.status = status
+            record_exist.requester = requester if requester else "N/A"
+            record_exist.deployer = deployer if deployer else "N/A"
+            record_exist.deploy_reason = deploy_reason if deploy_reason else "N/A"
+            record_exist.time_begin = time_begin
+            record_exist.time_end = time_end
+            record_exist.logs = logs
+        else:
+            record_new = Record(project_id=project_id, status=status, version=version, requester=requester if requester else "N/A", deployer=deployer if deployer else "N/A",
+                          deploy_reason=deploy_reason if deploy_reason else "N/A", time_begin=time_begin, time_end=time_end, logs=logs)
+            db.session.add(record_new)
         db.session.commit()
         db.session.close()
 

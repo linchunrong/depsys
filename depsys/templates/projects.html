@@ -19,9 +19,9 @@
                         <div class="card-title" style="float: none">
                             <div class="title">
                                 工程列表
-                                <a class="btn btn-default" style="float: right; margin-top: 0px" onclick="alert('Still working on it...')">批量添加</a>
+                                <a class="btn btn-success" style="float: right; margin-top: 0px" onclick="alert('Still working on it...')">批量发布</a>
                                 <a style="float: right">&nbsp;</a>
-                                <a class="btn btn-default" style="float: right; margin-top: 0px" href="../config/add_new_project">添加工程</a>
+                                <a class="btn btn-info" style="float: right; margin-top: 0px" href="../config/add_new_project">添加工程</a>
                             </div>
                         </div>
                     </div>
@@ -48,7 +48,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <a class="btn btn-default btn-sm" href="{{ url_for('project_deploy',project=project) }}">生产发布</a>
+                                        <a class="btn btn-default btn-sm" href="{{ url_for('project_deploy',project=project) }}" target="_blank">生产发布</a>
                                         <a class="btn btn-default btn-sm" href="{{ url_for('project_config',project=project) }}">配置</a>
                                         <a class="btn btn-default btn-sm" href="{{ url_for('project_delete',project=project) }}">删除</a>
                                     </td>
@@ -94,7 +94,7 @@
                                 </div>
                                 -->
                                 {% for type in form.date_range %}
-                                    <div class="radio3 radio-inline radio-check">
+                                    <div class="radio3 radio-inline radio-check radio-success">
                                         <td>{{ type }}</td>
                                         <td>{{ type.label }}</td>
                                     </div>

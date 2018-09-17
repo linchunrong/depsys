@@ -81,7 +81,7 @@ function version_select() {
                                 {% for record in records %}
                                 <tr>
                                     <td width="65px">
-                                        <div class="radio3 radio-check radio-inline">
+                                        <div class="radio3 radio-check radio-inline radio-success">
                                             <input type="radio" id="{{ record.version }}" name="selected" value="{{ record.version }}" onclick="version_select()"/>
                                             <label for="{{ record.version }}">&nbsp;</label>
                                         </div>

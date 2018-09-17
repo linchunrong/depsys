@@ -95,10 +95,15 @@ def config():
     if request.method == "POST":
         if form.validate_on_submit():
             s = SystemConfig()
-            s.update(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
-                    repository_server=form.repository_server.data, repository_user=form.repository_user.data,
-                     repository_password=form.repository_password.data if form.repository_password.data else conf.repository_pwd,
-                    smtp_server=form.smtp_server.data, smtp_user=form.smtp_user.data, smtp_password=form.smtp_password.data)
+            if conf:
+                s.update(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
+                        repository_server=form.repository_server.data, repository_user=form.repository_user.data,
+                        repository_password=form.repository_password.data if form.repository_password.data else conf.repository_pwd,
+                        smtp_server=form.smtp_server.data, smtp_user=form.smtp_user.data, smtp_password=form.smtp_password.data)
+            else:
+                s.add(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
+                        repository_server=form.repository_server.data, repository_user=form.repository_user.data, repository_password=form.repository_password.data,
+                        smtp_server=form.smtp_server.data, smtp_user=form.smtp_user.data, smtp_password=form.smtp_password.data)
             return redirect(url_for('config'))
         else:
             for key in form.errors:

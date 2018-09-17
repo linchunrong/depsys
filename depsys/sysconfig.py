@@ -10,6 +10,7 @@ class SystemConfig:
     """System config, include get and update method"""
     def update(self, ansible_path, deploy_script, start_script, stop_script,
                repository_server, repository_user, repository_password, smtp_server, smtp_user, smtp_password):
+        """Update system config"""
         # Should be only one record in DB
         item = System.query.first()
         item.ansible_path = ansible_path
@@ -22,6 +23,16 @@ class SystemConfig:
         item.smtp_server = smtp_server
         item.smtp_user = smtp_user
         item.smtp_pwd = smtp_password
+        db.session.commit()
+        db.session.close()
+
+    def add(self,ansible_path, deploy_script, start_script, stop_script,
+            repository_server, repository_user, repository_password, smtp_server, smtp_user, smtp_password):
+        """Add system config"""
+        item = System(ansible_path=ansible_path, deploy_script=deploy_script, start_script=start_script, stop_script=stop_script,
+                      repository_server=repository_server, repository_user=repository_user, repository_pwd=repository_password,
+                      smtp_server=smtp_server, smtp_user=smtp_user, smtp_pwd=smtp_password)
+        db.session.add(item)
         db.session.commit()
         db.session.close()
 

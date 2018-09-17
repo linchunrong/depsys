@@ -136,9 +136,10 @@ def project_config(project):
 @app.route('/delete/<project>', methods=['GET', 'POST'])
 @login_required
 def project_delete(project):
-    p = ProjectConfig()
+    # p = ProjectConfig()
     if request.method == "POST":
-        p.delete(project_name=project)
+        # forbidden project delete until RBAC func done
+        # p.delete(project_name=project)
         return redirect(url_for('projects'))
     return render_template('del_project.html', project=project)
 

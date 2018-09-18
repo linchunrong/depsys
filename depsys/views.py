@@ -3,7 +3,7 @@
 
 from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
-from depsys import app, message
+from depsys import app, sendmsg
 from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import ProjectConfig, SystemConfig, UserConfig
 from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm, ReportForm
@@ -64,7 +64,7 @@ def projects(info=None):
     form = ReportForm()
     if request.method == "POST":
         if form.validate_on_submit():
-            info = message.email(receiver=form.receiver.data)
+            info = sendmsg.email(receiver=form.receiver.data)
     return render_template('projects.html', project_list=project_list, form=form, info=info)
 
 

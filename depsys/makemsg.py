@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from depsys.models import Record, Project
-import datetime
+import datetime, pdfkit, os, pathlib
+
+# create pdf report in temp_path here
+temp_path = "tmp"
 
 
 class Report:
@@ -74,5 +77,22 @@ class Report:
 
         return html
 
-    def make_pdf(self):
-        pass
+    def make_pdf(self, srcfile, destfile):
+        """Convert html string to pdf file"""
+        # get and cd current path
+        root = os.path.dirname(os.path.realpath(__file__))
+        root = pathlib.Path(root)
+        os.chdir(str(root))
+        # mkdir temp path
+        exists = os.path.exists(temp_path)
+        if not exists:
+            os.makedirs(temp_path)
+
+        html = srcfile
+        pdf = root.joinpath(temp_path, destfile)
+        try:
+            pdfkit.from_string(html, pdf)
+        except Exception as Err:
+            return ("Failed to convert pdf file duo to: ", str(Err))
+        else:
+            return True

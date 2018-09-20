@@ -3,7 +3,7 @@
 
 from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
-from depsys import app, sendmsg
+from depsys import app, sendmsg, makemsg
 from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import ProjectConfig, SystemConfig, UserConfig
 from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm, ReportForm
@@ -59,12 +59,15 @@ def profile():
 
 @app.route('/projects', methods=['GET', 'POST'])
 @login_required
-def projects(info=None):
+def projects():
+    info = None
     project_list = DeployInfo().projects()
     form = ReportForm()
-    if request.method == "POST":
-        if form.validate_on_submit():
-            info = sendmsg.email(receiver=form.receiver.data)
+    if request.method == "POST" and form.validate_on_submit():
+        report = makemsg.Report()
+        records = report.get_records(int(form.date_range.data))
+        content = report.make_html(records)
+        info = sendmsg.email(receiver=form.receiver.data, content=content, subtype='html')
     return render_template('projects.html', project_list=project_list, form=form, info=info)
 
 

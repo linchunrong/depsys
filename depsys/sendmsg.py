@@ -18,7 +18,7 @@ def email(receiver, attachment=None, content='FYI', subtype='plain'):
     message = EmailMessage()
     message['From'] = sender
     message['To'] = tolist
-    subject = 'Deploy info ' + time.strftime("%Y-%m-%d", time.localtime())
+    subject = '最近发布记录 GENERATED AT ' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     message['Subject'] = subject
     message.set_content(content, subtype=subtype)
 

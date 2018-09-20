@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import time
 from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
 from depsys import app, sendmsg, makemsg
@@ -67,13 +68,14 @@ def projects():
         report = makemsg.Report()
         records = report.get_records(int(form.date_range.data))
         content = report.make_html(records)
-        info = sendmsg.email(receiver=form.receiver.data, content=content, subtype='html')
+        subject = '最近' + form.date_range.data + '天发布记录 GENERATED AT ' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        info = sendmsg.email(receiver=form.receiver.data, subject=subject, content=content, subtype='html')
     return render_template('projects.html', project_list=project_list, form=form, info=info)
 
 
 @app.route('/deploy/<project>')
 @login_required
-def project_deploy(project,error=None):
+def project_deploy(project, error=None):
     records = DeployRecord().get(project)
     return render_template('deploy_project.html', project=project, records=records, error=error)
 

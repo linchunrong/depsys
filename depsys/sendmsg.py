@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time, smtplib, os
+import smtplib, os
 from email.message import EmailMessage
 from depsys.sysconfig import SystemConfig
 
 
-def email(receiver, attachment=None, content='FYI', subtype='plain'):
+def email(receiver, attachment=None, subject=None, content='FYI', subtype='plain'):
     """Send email"""
     conf = SystemConfig().get()
     mail_host = conf.smtp_server
@@ -18,7 +18,6 @@ def email(receiver, attachment=None, content='FYI', subtype='plain'):
     message = EmailMessage()
     message['From'] = sender
     message['To'] = tolist
-    subject = '最近发布记录 GENERATED AT ' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     message['Subject'] = subject
     message.set_content(content, subtype=subtype)
 

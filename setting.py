@@ -17,6 +17,6 @@ EXTRA_ARGS_FILE = "release_note.json"
 
 # WeChat interface
 API_URL = 'https://qyapi.weixin.qq.com/cgi-bin/'
-corpid = 'wxd5b7127792af7a87'
-corpsecret = '3HiF997xDje54TS5Oyy2acN4Xdh2kP2FU49LG0OzwRE'
-AgentId = '1000003'
+corpid = '******'
+corpsecret = '******'
+AgentId = '******'

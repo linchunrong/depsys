@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib.request, json, smtplib, os, setting
+import json, smtplib, os, setting, requests
 from email.message import EmailMessage
 from depsys.sysconfig import SystemConfig
 
@@ -38,43 +38,66 @@ def email(receiver, attachment=None, subject=None, content='FYI', subtype='plain
         return "Send success!"
 
 
-def wechat(message):
-    """Send WeChat"""
+def wechat(type, message=None, post_file=None):
+    """Send message via WeChat"""
     # args in need, API doc refer to - https://work.weixin.qq.com/api/doc
     corpid = setting.corpid
     corpsecret = setting.corpsecret
 
-    ### get access_token ####
-    get_token_url = setting.API_URL + "gettoken?corpid=" + corpid + "&corpsecret=" + corpsecret
-    request = urllib.request.Request(get_token_url)
-    try:
-        response = urllib.request.urlopen(request)
-    except Exception as Err:
-        return "Error: " + str(Err)
-    else:
-        page = response.read()
-
-    access_token = json.loads(page)['access_token']
-    ##########################
-    ### send message #########
+    access_token = get_token(corpid=corpid, corpsecret=corpsecret)
     send_url = setting.API_URL + "message/send?access_token=" + access_token
-    send_text = {
+    send_data = {
         "touser": "@all",
         "toparty": "@all",
-        "msgtype": "text",
+        "msgtype": type,
         "agentid": setting.AgentId,
-        "text": {
-            "content": message
-        },
         "safe": 0
     }
+    if type == 'file':
+        media_id = get_media_id(type, access_token, post_file)
+        send_data[type] = {"media_id": media_id}
+    if type == 'text':
+        send_data[type] = {"content": message}
 
-    send_text = bytes(json.dumps(send_text, ensure_ascii=False), encoding='utf-8')
-    request = urllib.request.Request(send_url, data=send_text)
+    send_data = bytes(json.dumps(send_data, ensure_ascii=False), encoding='utf-8')
+    # send message
     try:
-        response = urllib.request.urlopen(request)
+        request = requests.post(send_url, data=send_data)
     except Exception as Err:
         return "Error: " + str(Err)
     else:
-        # status = json.loads(response.read())
+        # page = request.json()
         return "Send success!"
+
+
+def get_token(corpid, corpsecret):
+    """"Get wechat access_token"""
+    get_token_url = setting.API_URL + "gettoken?corpid=" + corpid + "&corpsecret=" + corpsecret
+    try:
+        request = requests.get(get_token_url)
+    except Exception as Err:
+        return "Error: " + str(Err)
+    else:
+        page = request.json()
+
+    access_token = page['access_token']
+
+    return access_token
+
+
+def get_media_id(type, access_token, target_file):
+    """Get wechat media_id"""
+    get_media_id_url = setting.API_URL + "media/upload?access_token=" +  access_token + "&type=" + type
+
+    with open(target_file, 'rb') as f:
+        files = {'file': f}
+        try:
+            request = requests.post(get_media_id_url, files=files)
+        except Exception as Err:
+            return "Error: " + str(Err)
+        else:
+            page = request.json()
+
+    media_id = page['media_id']
+
+    return media_id

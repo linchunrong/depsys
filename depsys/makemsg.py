@@ -77,7 +77,7 @@ class Report:
 
         return html
 
-    def make_pdf(self, srcfile, destfile):
+    def make_pdf(self, srcfile, filename):
         """Convert html string to pdf file"""
         # get and cd current path
         root = os.path.dirname(os.path.realpath(__file__))
@@ -89,10 +89,10 @@ class Report:
             os.makedirs(temp_path)
 
         html = srcfile
-        pdf = root.joinpath(temp_path, destfile)
+        pdf_file = root.joinpath(temp_path, filename)
         try:
-            pdfkit.from_string(html, pdf)
+            pdfkit.from_string(html, pdf_file)
         except Exception as Err:
             return ("Failed to convert pdf file duo to: ", str(Err))
         else:
-            return True
+            return pdf_file

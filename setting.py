@@ -14,3 +14,9 @@ PKG_OWNER = 'FaeWork'
 
 # with args in this file which info come from git commit, file should under gitlab root path
 EXTRA_ARGS_FILE = "release_note.json"
+
+# WeChat interface
+API_URL = 'https://qyapi.weixin.qq.com/cgi-bin/'
+corpid = '******'
+corpsecret = '******'
+AgentId = '******'

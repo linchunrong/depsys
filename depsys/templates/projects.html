@@ -68,7 +68,30 @@
                     <div class="card-body">
                         <div class="form-inline">
                             <div class="sub-title">发送报表</div>
-                            <label>To:</label>
+                            <div>
+                                <!--
+                                <div class="checkbox3 checkbox-success checkbox-inline checkbox-check checkbox-round checkbox-light">
+                                    <input type="checkbox" id="checkbox-fa-light-1" checked="">
+                                    <label for="checkbox-fa-light-1">
+                                        <strong>邮件 </strong><em>(请于下方选择收件人)</em>
+                                    </label>
+                                </div>
+                                <div class="checkbox3 checkbox-success checkbox-inline checkbox-check checkbox-round  checkbox-light">
+                                    <input type="checkbox" id="checkbox-fa-light-2" checked="">
+                                    <label for="checkbox-fa-light-2">
+                                        <strong>微信 </strong><em>(版本发布公众号)</em>
+                                    </label>
+                                </div>
+                                -->
+                                <div class="checkbox3 checkbox-success checkbox-inline checkbox-check checkbox-round  checkbox-light">
+                                    <td>{{ form.media_email }}</td>
+                                    <td>{{ form.media_email.label }}</td>
+                                </div>
+                                <div class="checkbox3 checkbox-success checkbox-inline checkbox-check checkbox-round  checkbox-light">
+                                    <td>{{ form.media_wechat }}</td>
+                                    <td>{{ form.media_wechat.label }}</td>
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <!--
                                 <select class="form-control">
@@ -76,7 +99,7 @@
                                     <option value="it">cmbfae-it@cmbfae.com</option>
                                 </select>
                                 -->
-                                {{ form.receiver(class='form-control') }}
+                                收件人 {{ form.receiver(class='form-control') }}
                             </div>
                             <div class="form-group form-control" style="border: none">
                                 <!--

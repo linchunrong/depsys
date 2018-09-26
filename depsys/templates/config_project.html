@@ -41,7 +41,11 @@
                                 <div class="form-group">
                                     {% for type in form.project_type %}
                                     <div class="radio3 radio-inline radio-check">
+                                        {% if type.label.text == conf.type %}
+                                        <td>{{ type(checked="") }}</td>
+                                        {% else %}
                                         <td>{{ type }}</td>
+                                        {% endif %}
                                         <td>{{ type.label }}</td>
                                     </div>
                                     {% endfor %}

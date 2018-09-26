@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import time
 from flask import render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, login_required, logout_user
-from depsys import app, message
+from depsys import app, sendmsg, makemsg
 from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import ProjectConfig, SystemConfig, UserConfig
 from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm, ReportForm
@@ -59,18 +60,40 @@ def profile():
 
 @app.route('/projects', methods=['GET', 'POST'])
 @login_required
-def projects(info=None):
+def projects():
+    info = ""
     project_list = DeployInfo().projects()
     form = ReportForm()
-    if request.method == "POST":
-        if form.validate_on_submit():
-            info = message.email(receiver=form.receiver.data)
+    if request.method == "POST" and form.validate_on_submit():
+        report = makemsg.Report()
+        records = report.get_records(int(form.date_range.data))
+        content = report.make_html(records)
+        # form.media_email.data/form.media_wechat.data should be True or False
+        if form.media_email.data:
+            subject = '最近' + form.date_range.data + '天发布记录 GENERATED AT ' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            # sendmsg.email should return True or Error
+            send_mail = sendmsg.email(receiver=form.receiver.data, subject=subject, content=content, subtype='html')
+            if send_mail:
+                info = info + "Email report sent!\t\t"
+            else:
+                info = info + send_mail
+        if form.media_wechat.data:
+            pdf_file = report.make_pdf(content, 'deploy_report.pdf')
+            text_msg = 'Dear team，今晚所有工程发布完毕，\n请对应的团队开始验证业务！！\n以下是最近' + form.date_range.data + '天发布报表，请查阅。'
+            send_wechat_text = sendmsg.wechat('text', message=text_msg)
+            if send_wechat_text:
+                info = info + "WeChat msg sent!\t\t"
+            send_wechat_file = sendmsg.wechat('file', post_file=pdf_file)
+            if send_wechat_file:
+                info = info + "WeChat pdf report sent!\t\t"
+        if not form.media_email.data and not form.media_wechat.data:
+            info = "Error: 请选择（邮件/微信）至少一个!"
     return render_template('projects.html', project_list=project_list, form=form, info=info)
 
 
 @app.route('/deploy/<project>')
 @login_required
-def project_deploy(project,error=None):
+def project_deploy(project, error=None):
     records = DeployRecord().get(project)
     return render_template('deploy_project.html', project=project, records=records, error=error)
 

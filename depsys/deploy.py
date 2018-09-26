@@ -13,8 +13,6 @@ from depsys.dashboard import DeployRecord
 # deploy execute process
 # thread = None
 thread_lock = Lock()
-temp_path = "tmp"
-logs_path = "logs"
 data_path = "data"
 bin_path = "bin"
 workstation = "workstation"

@@ -28,8 +28,10 @@ class Report:
     def make_html(self, records_list):
         """Format content to html table"""
         html_head = """\
-        <meta http-equiv=Content-Type content=text/html; charset=utf-8 />\
-        <html lang=en>\
+        <html>\
+        <head>\
+        <meta charset="UTF-8">\
+        </head>\
             <h1>最近""" + str(len(records_list)) + """天发布记录</h1>\
             """
         html_tables = ""

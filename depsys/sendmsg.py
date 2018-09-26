@@ -54,7 +54,7 @@ def wechat(type, message=None, post_file=None):
         "safe": 0
     }
     if type == 'file':
-        media_id = get_media_id(type, access_token, post_file)
+        media_id = get_media_id(type, access_token, target_file=post_file)
         send_data[type] = {"media_id": media_id}
     if type == 'text':
         send_data[type] = {"content": message}

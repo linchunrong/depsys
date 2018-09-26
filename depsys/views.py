@@ -61,7 +61,7 @@ def profile():
 @app.route('/projects', methods=['GET', 'POST'])
 @login_required
 def projects():
-    info = None
+    info = ""
     project_list = DeployInfo().projects()
     form = ReportForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -74,7 +74,7 @@ def projects():
             # sendmsg.email should return True or Error
             send_mail = sendmsg.email(receiver=form.receiver.data, subject=subject, content=content, subtype='html')
             if send_mail:
-                info = info + "Email report sent!"
+                info = info + "Email report sent!\t\t"
             else:
                 info = info + send_mail
         if form.media_wechat.data:
@@ -82,10 +82,10 @@ def projects():
             text_msg = 'Dear team，今晚所有工程发布完毕，\n请对应的团队开始验证业务！！\n以下是最近' + form.date_range.data + '天发布报表，请查阅。'
             send_wechat_text = sendmsg.wechat('text', message=text_msg)
             if send_wechat_text:
-                info = info + "WeChat msg sent!"
-            send_wechat_file = sendmsg.wechat('file', pdf_file)
+                info = info + "WeChat msg sent!\t\t"
+            send_wechat_file = sendmsg.wechat('file', post_file=pdf_file)
             if send_wechat_file:
-                info = info + "WeChat pdf report sent!"
+                info = info + "WeChat pdf report sent!\t\t"
         if not form.media_email.data and not form.media_wechat.data:
             info = "Error: 请选择（邮件/微信）至少一个!"
     return render_template('projects.html', project_list=project_list, form=form, info=info)

@@ -35,7 +35,7 @@ def email(receiver, attachment=None, subject=None, content='FYI', subtype='plain
     except smtplib.SMTPException as e:
         return "Error: " + str(e)
     else:
-        return "Send success!"
+        return True
 
 
 def wechat(type, message=None, post_file=None):
@@ -67,7 +67,7 @@ def wechat(type, message=None, post_file=None):
         return "Error: " + str(Err)
     else:
         # page = request.json()
-        return "Send success!"
+        return True
 
 
 def get_token(corpid, corpsecret):

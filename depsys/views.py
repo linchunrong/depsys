@@ -68,8 +68,26 @@ def projects():
         report = makemsg.Report()
         records = report.get_records(int(form.date_range.data))
         content = report.make_html(records)
-        subject = '最近' + form.date_range.data + '天发布记录 GENERATED AT ' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        info = sendmsg.email(receiver=form.receiver.data, subject=subject, content=content, subtype='html')
+        # form.media_email.data/form.media_wechat.data should be True or False
+        if form.media_email.data:
+            subject = '最近' + form.date_range.data + '天发布记录 GENERATED AT ' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            # sendmsg.email should return True or Error
+            send_mail = sendmsg.email(receiver=form.receiver.data, subject=subject, content=content, subtype='html')
+            if send_mail:
+                info = info + "Email report sent!"
+            else:
+                info = info + send_mail
+        if form.media_wechat.data:
+            pdf_file = report.make_pdf(content, 'deploy_report.pdf')
+            text_msg = 'Dear team，今晚所有工程发布完毕，\n请对应的团队开始验证业务！！\n以下是最近' + form.date_range.data + '天发布报表，请查阅。'
+            send_wechat_text = sendmsg.wechat('text', message=text_msg)
+            if send_wechat_text:
+                info = info + "WeChat msg sent!"
+            send_wechat_file = sendmsg.wechat('file', pdf_file)
+            if send_wechat_file:
+                info = info + "WeChat pdf report sent!"
+        if not form.media_email.data and not form.media_wechat.data:
+            info = "Error: 请选择（邮件/微信）至少一个!"
     return render_template('projects.html', project_list=project_list, form=form, info=info)
 
 

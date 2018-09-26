@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, validators, SelectField, TextAreaField, RadioField
+from wtforms import StringField, SubmitField, PasswordField, validators, SelectField, TextAreaField, RadioField, BooleanField
 
 
 class LoginForm(FlaskForm):
@@ -49,6 +49,8 @@ class SystemForm(FlaskForm):
 
 class ReportForm(FlaskForm):
     """Report Form"""
+    media_email = BooleanField('<strong>邮件 </strong><em>(请于下方选择收件人)</em>', default=True)
+    media_wechat = BooleanField('<strong>微信 </strong><em>(版本发布公众号)</em>', default=True)
     receiver = SelectField('Receiver', choices=[('operate@cmbfae.com', '系统运行部'), ('cmbfae-it@cmbfae.com', '信息技术部'), ('lincr@cmbfae.com', 'lin')], default='lincr@cmbfae.com')
     date_range = RadioField('Date_range', choices=[('7', '最近七天'), ('1', '今天')], default='7')
     submit = SubmitField('发送')

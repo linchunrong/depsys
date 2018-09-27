@@ -20,42 +20,46 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    error = None
     form = LoginForm()
     if form.validate_on_submit() and request.method == 'POST':
         user = UserConfig().get(username=form.username.data)
-        if user is None:
-            error = 'Invalid username'
-        elif user.password != form.password.data:
-            error = 'Invalid password'
-        else:
-            login_user(user)
-            return redirect(url_for('index'))
-    return render_template('login.html', form=form, title='登录', error=error)
+        if user:
+            if user.password != form.password.data:
+                flash("Invalid password")
+            else:
+                login_user(user)
+                return redirect(url_for('index'))
+        return redirect(url_for('login'))
+    return render_template('login.html', form=form)
 
 
 @app.route('/logout')
 def logout():
     logout_user()
+    flash("You have logout!")
     return redirect(url_for('login'))
 
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    error = None
     form = UserForm()
     user_id = session['user_id']
     user = UserConfig().get(user_id=user_id)
     if request.method == "POST":
         if form.validate_on_submit():
-            u = UserConfig()
-            u.update(user_id=user_id, password=form.password.data if form.password.data else user.password)
-            return redirect(url_for('profile'))
+            if form.password.data:
+                u = UserConfig()
+                u.update(user_id=user_id, password=form.password.data if form.password.data else user.password)
+                flash("密码已更改！")
+            else:
+                flash("密码无变动！")
         else:
             for key in form.errors:
-                error = form.errors[key]
-    return render_template('profile.html', form=form, user=user, error=error)
+                flash("Error: " + form.errors[key][0])
+        return redirect(url_for('profile'))
+
+    return render_template('profile.html', form=form, user=user)
 
 
 @app.route('/projects', methods=['GET', 'POST'])
@@ -113,7 +117,6 @@ def deploy_exec(project):
 @app.route('/config', methods=['GET', 'POST'])
 @login_required
 def config():
-    error = None
     form = SystemForm()
     conf = SystemConfig().get()
     if request.method == "POST":
@@ -128,11 +131,12 @@ def config():
                 s.add(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
                         repository_server=form.repository_server.data, repository_user=form.repository_user.data, repository_password=form.repository_password.data,
                         smtp_server=form.smtp_server.data, smtp_user=form.smtp_user.data, smtp_password=form.smtp_password.data)
-            return redirect(url_for('config'))
+            flash("配置已保存！")
         else:
             for key in form.errors:
-                error = form.errors[key]
-    return render_template('sysconfig.html', form=form, conf=conf, error=error)
+                flash("Error: "+ form.errors[key][0])
+        return redirect(url_for('config'))
+    return render_template('sysconfig.html', form=form, conf=conf)
 
 
 @app.route('/config/<project>', methods=['GET', 'POST'])

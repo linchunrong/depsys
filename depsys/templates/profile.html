@@ -38,11 +38,21 @@
                                     <input class="btn btn-default" name="reset" type="reset" value="重置"/>
                                 </div>
 		                    </form>
-                            {% if error %}
-                            <div class="alert fresh-color alert-danger col-sm-6" role="alert">
-                                <strong>Error:</strong> {{ error }}
-                            </div>
-                            {% endif %}
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if "Error" in message %}
+                                        <div class="alert alert-danger col-sm-12" role="alert">
+                                            {{ message }}
+                                        </div>
+                                        {% else %}
+                                        <div class="alert alert-success col-sm-12" role="alert">
+                                            {{ message }}
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
                         </div>
                     </div>
                 </div>

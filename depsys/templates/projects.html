@@ -126,17 +126,21 @@
                             <!--<button type="button" class="btn btn-default" onclick="alert('Still working on it...')">发送</button>-->
                             {{ form.submit(class='btn btn-default') }}
                         </div>
-                        {% if info %}
-                            {% if "Error" in info %}
-                            <div class="alert alert-danger col-sm-6" role="alert">
-                                {{ info }}
-                            </div>
-                            {% else %}
-                            <div class="alert alert-success col-sm-6" role="alert">
-                                {{ info }}
-                            </div>
+                        {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    {% if "Error" in message %}
+                                    <div class="alert alert-danger col-sm-6" role="alert">
+                                        {{ message }}
+                                    </div>
+                                    {% else %}
+                                    <div class="alert alert-success col-sm-6" role="alert">
+                                        {{ message }}
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
                             {% endif %}
-                        {% endif %}
+                        {% endwith %}
                     </div>
                 </div>
             </div>

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import time
-from flask import render_template, redirect, url_for, request, jsonify, session
+from flask import render_template, redirect, url_for, request, jsonify, session, flash
 from flask_login import login_user, login_required, logout_user
 from depsys import app, sendmsg, makemsg
 from depsys.dashboard import DeployInfo, DeployRecord
@@ -61,7 +61,6 @@ def profile():
 @app.route('/projects', methods=['GET', 'POST'])
 @login_required
 def projects():
-    info = ""
     project_list = DeployInfo().projects()
     form = ReportForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -74,21 +73,23 @@ def projects():
             # sendmsg.email should return True or Error
             send_mail = sendmsg.email(receiver=form.receiver.data, subject=subject, content=content, subtype='html')
             if send_mail:
-                info = info + "Email report sent!\t\t"
+                flash("Email report sent!")
             else:
-                info = info + send_mail
+                flash(send_mail)
         if form.media_wechat.data:
             pdf_file = report.make_pdf(content, 'deploy_report.pdf')
             text_msg = 'Dear team，今晚所有工程发布完毕，\n请对应的团队开始验证业务！！\n以下是最近' + form.date_range.data + '天发布报表，请查阅。'
             send_wechat_text = sendmsg.wechat('text', message=text_msg)
             if send_wechat_text:
-                info = info + "WeChat msg sent!\t\t"
+                flash("WeChat msg sent!")
             send_wechat_file = sendmsg.wechat('file', post_file=pdf_file)
             if send_wechat_file:
-                info = info + "WeChat pdf report sent!\t\t"
+                flash("WeChat pdf report sent!")
         if not form.media_email.data and not form.media_wechat.data:
-            info = "Error: 请选择（邮件/微信）至少一个!"
-    return render_template('projects.html', project_list=project_list, form=form, info=info)
+            flash("Error: 请选择（邮件/微信）至少一个!")
+        return redirect(url_for('projects'))
+
+    return render_template('projects.html', project_list=project_list, form=form)
 
 
 @app.route('/deploy/<project>')

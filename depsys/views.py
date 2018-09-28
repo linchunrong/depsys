@@ -76,7 +76,7 @@ def projects():
             subject = '最近' + form.date_range.data + '天发布记录 GENERATED AT ' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             # sendmsg.email should return True or Error
             send_mail = sendmsg.email(receiver=form.receiver.data, subject=subject, content=content, subtype='html')
-            if send_mail:
+            if send_mail == True:
                 flash("Email report sent!")
             else:
                 flash(send_mail)
@@ -84,11 +84,15 @@ def projects():
             pdf_file = report.make_pdf(content, 'deploy_report.pdf')
             text_msg = 'Dear team，今晚所有工程发布完毕，\n请对应的团队开始验证业务！！\n以下是最近' + form.date_range.data + '天发布报表，请查阅。'
             send_wechat_text = sendmsg.wechat('text', message=text_msg)
-            if send_wechat_text:
+            if send_wechat_text == True:
                 flash("WeChat msg sent!")
+            else:
+                flash(send_wechat_text)
             send_wechat_file = sendmsg.wechat('file', post_file=pdf_file)
-            if send_wechat_file:
+            if send_wechat_file == True:
                 flash("WeChat pdf report sent!")
+            else:
+                flash(send_wechat_file)
         if not form.media_email.data and not form.media_wechat.data:
             flash("Error: 请选择（邮件/微信）至少一个!")
         return redirect(url_for('projects'))

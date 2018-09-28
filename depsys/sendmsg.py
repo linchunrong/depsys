@@ -45,6 +45,10 @@ def wechat(type, message=None, post_file=None):
     corpsecret = setting.corpsecret
 
     access_token = get_token(corpid=corpid, corpsecret=corpsecret)
+    # if there's error when call get_token, return Error
+    if "Error" in access_token:
+        return access_token
+
     send_url = setting.API_URL + "message/send?access_token=" + access_token
     send_data = {
         "touser": "@all",
@@ -55,6 +59,9 @@ def wechat(type, message=None, post_file=None):
     }
     if type == 'file':
         media_id = get_media_id(type, access_token, target_file=post_file)
+        # if there's error when call get_media, return Error
+        if "Error" in media_id:
+            return media_id
         send_data[type] = {"media_id": media_id}
     if type == 'text':
         send_data[type] = {"content": message}
@@ -66,8 +73,12 @@ def wechat(type, message=None, post_file=None):
     except Exception as Err:
         return "Error: " + str(Err)
     else:
-        # page = request.json()
-        return True
+        page = request.json()
+        # refer to get_token/get_media
+        if page['errcode'] == 0:
+            return True
+        else:
+            return "Error: " + str(page['errmsg'])
 
 
 def get_token(corpid, corpsecret):
@@ -79,10 +90,14 @@ def get_token(corpid, corpsecret):
         return "Error: " + str(Err)
     else:
         page = request.json()
-
-    access_token = page['access_token']
-
-    return access_token
+        # example of page content
+        # {'errcode': 40013, 'errmsg': 'invalid corpid', '*key':' *values'}
+        # only when errcode is 0 means success
+        if page['errcode'] == 0:
+            access_token = page['access_token']
+            return access_token
+        else:
+            return "Error: " + str(page['errmsg'])
 
 
 def get_media_id(type, access_token, target_file):
@@ -97,7 +112,17 @@ def get_media_id(type, access_token, target_file):
             return "Error: " + str(Err)
         else:
             page = request.json()
-
-    media_id = page['media_id']
-
-    return media_id
+            # example of page content
+            # {
+            #   "errcode": 0,
+            #   "errmsg": ""，
+            #   "type": "image",
+            #   "media_id": "1G6nrLmr5EC3MMb_-zK1dDdzmd0p7cNliYu9V5w7o8K0",
+            #   "created_at": "1380000000"
+            #  }
+            # only when errcode is 0 means success
+            if page['errcode'] == 0:
+                media_id = page['media_id']
+                return media_id
+            else:
+                return "Error: " + str(page['errmsg'])

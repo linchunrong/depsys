@@ -20,42 +20,46 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    error = None
     form = LoginForm()
     if form.validate_on_submit() and request.method == 'POST':
         user = UserConfig().get(username=form.username.data)
-        if user is None:
-            error = 'Invalid username'
-        elif user.password != form.password.data:
-            error = 'Invalid password'
-        else:
-            login_user(user)
-            return redirect(url_for('index'))
-    return render_template('login.html', form=form, title='登录', error=error)
+        if user:
+            if user.password != form.password.data:
+                flash("Invalid password")
+            else:
+                login_user(user)
+                return redirect(url_for('index'))
+        return redirect(url_for('login'))
+    return render_template('login.html', form=form)
 
 
 @app.route('/logout')
 def logout():
     logout_user()
+    flash("You have logout!")
     return redirect(url_for('login'))
 
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    error = None
     form = UserForm()
     user_id = session['user_id']
     user = UserConfig().get(user_id=user_id)
     if request.method == "POST":
         if form.validate_on_submit():
-            u = UserConfig()
-            u.update(user_id=user_id, password=form.password.data if form.password.data else user.password)
-            return redirect(url_for('profile'))
+            if form.password.data:
+                u = UserConfig()
+                u.update(user_id=user_id, password=form.password.data if form.password.data else user.password)
+                flash("密码已更改！")
+            else:
+                flash("密码无变动！")
         else:
             for key in form.errors:
-                error = form.errors[key]
-    return render_template('profile.html', form=form, user=user, error=error)
+                flash("Error: " + form.errors[key][0])
+        return redirect(url_for('profile'))
+
+    return render_template('profile.html', form=form, user=user)
 
 
 @app.route('/projects', methods=['GET', 'POST'])
@@ -72,7 +76,7 @@ def projects():
             subject = '最近' + form.date_range.data + '天发布记录 GENERATED AT ' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             # sendmsg.email should return True or Error
             send_mail = sendmsg.email(receiver=form.receiver.data, subject=subject, content=content, subtype='html')
-            if send_mail:
+            if send_mail == True:
                 flash("Email report sent!")
             else:
                 flash(send_mail)
@@ -80,11 +84,15 @@ def projects():
             pdf_file = report.make_pdf(content, 'deploy_report.pdf')
             text_msg = 'Dear team，今晚所有工程发布完毕，\n请对应的团队开始验证业务！！\n以下是最近' + form.date_range.data + '天发布报表，请查阅。'
             send_wechat_text = sendmsg.wechat('text', message=text_msg)
-            if send_wechat_text:
+            if send_wechat_text == True:
                 flash("WeChat msg sent!")
+            else:
+                flash(send_wechat_text)
             send_wechat_file = sendmsg.wechat('file', post_file=pdf_file)
-            if send_wechat_file:
+            if send_wechat_file == True:
                 flash("WeChat pdf report sent!")
+            else:
+                flash(send_wechat_file)
         if not form.media_email.data and not form.media_wechat.data:
             flash("Error: 请选择（邮件/微信）至少一个!")
         return redirect(url_for('projects'))
@@ -94,9 +102,9 @@ def projects():
 
 @app.route('/deploy/<project>')
 @login_required
-def project_deploy(project, error=None):
+def project_deploy(project):
     records = DeployRecord().get(project)
-    return render_template('deploy_project.html', project=project, records=records, error=error)
+    return render_template('deploy_project.html', project=project, records=records)
 
 
 @app.route('/execute/<project>', methods=['POST'])
@@ -105,15 +113,14 @@ def deploy_exec(project):
     from depsys import deploy
     branch = request.form['branch']
     if not branch:
-        error = "请输入发版分支！"
-        return project_deploy(project=project, error=error)
+        flash("请输入发版分支！")
+        return redirect(url_for('project_deploy', project=project))
     return render_template('execute.html', project=project, branch=branch, async_mode=deploy.socketio.async_mode)
 
 
 @app.route('/config', methods=['GET', 'POST'])
 @login_required
 def config():
-    error = None
     form = SystemForm()
     conf = SystemConfig().get()
     if request.method == "POST":
@@ -128,17 +135,17 @@ def config():
                 s.add(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
                         repository_server=form.repository_server.data, repository_user=form.repository_user.data, repository_password=form.repository_password.data,
                         smtp_server=form.smtp_server.data, smtp_user=form.smtp_user.data, smtp_password=form.smtp_password.data)
-            return redirect(url_for('config'))
+            flash("配置已保存！")
         else:
             for key in form.errors:
-                error = form.errors[key]
-    return render_template('sysconfig.html', form=form, conf=conf, error=error)
+                flash("Error: "+ form.errors[key][0])
+        return redirect(url_for('config'))
+    return render_template('sysconfig.html', form=form, conf=conf)
 
 
 @app.route('/config/<project>', methods=['GET', 'POST'])
 @login_required
 def project_config(project):
-    error = None
     form = ConfigForm()
     conf = ProjectConfig().get(project)
     if request.method == "POST":
@@ -147,14 +154,16 @@ def project_config(project):
             if project == "add_new_project":
                 p.add(project_name=form.project_name.data, servers=form.servers.data, source_address=form.source_address.data,
                       project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
+                flash("添加工程 "+ form.project_name.data + " 成功！")
             else:
                 p.update(project_name_old=project, project_name=form.project_name.data, servers=form.servers.data,
                          source_address=form.source_address.data, project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
-            return redirect(url_for('projects'))
+                flash("工程 " + form.project_name.data + " 配置已更新！")
         else:
             for key in form.errors:
-                error = form.errors[key]
-    return render_template('config_project.html', project=project, form=form, conf=conf, error=error)
+                flash("Error: " + form.errors[key][0])
+        return redirect(url_for('project_config', project=form.project_name.data))
+    return render_template('config_project.html', project=project, form=form, conf=conf)
 
 
 @app.route('/delete/<project>', methods=['GET', 'POST'])

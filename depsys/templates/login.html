@@ -12,7 +12,7 @@
 			<h1>发版系统</h1>
 			<div class="inset">
 				<!--start-main-->
-				<form action="{{ url_for('login') }}" method=post>
+				<form action="" method=post>
                     {{ form.hidden_tag() }}
 			         <div>
 						<!--<span><label>用户名</label></span>-->
@@ -26,10 +26,9 @@
                         {{ form.submit(class="submit") }}
 					</div>
 					</form>
-                    {% if error %}<p class="error" style="text-align: center; color: red;font-style: oblique;font-weight: 450"><strong>Error:</strong> {{ error }}{% endif %}
-                    {# {% for message in get_flashed_messages() %}
-                        <div class=flash>{{ message }}</div>
-                    {% endfor %} #}
+                    {% for message in get_flashed_messages() %}
+                        <p class="error" style="text-align: center; color: red;font-style: oblique;font-weight: 450">{{ message }}
+                    {% endfor %}
 				</div>
 			</div>
 		<!--//end-main-->

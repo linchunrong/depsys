@@ -98,9 +98,9 @@ def projects():
 
 @app.route('/deploy/<project>')
 @login_required
-def project_deploy(project, error=None):
+def project_deploy(project):
     records = DeployRecord().get(project)
-    return render_template('deploy_project.html', project=project, records=records, error=error)
+    return render_template('deploy_project.html', project=project, records=records)
 
 
 @app.route('/execute/<project>', methods=['POST'])
@@ -109,8 +109,8 @@ def deploy_exec(project):
     from depsys import deploy
     branch = request.form['branch']
     if not branch:
-        error = "请输入发版分支！"
-        return project_deploy(project=project, error=error)
+        flash("请输入发版分支！")
+        return redirect(url_for('project_deploy', project=project))
     return render_template('execute.html', project=project, branch=branch, async_mode=deploy.socketio.async_mode)
 
 
@@ -142,7 +142,6 @@ def config():
 @app.route('/config/<project>', methods=['GET', 'POST'])
 @login_required
 def project_config(project):
-    error = None
     form = ConfigForm()
     conf = ProjectConfig().get(project)
     if request.method == "POST":
@@ -151,14 +150,16 @@ def project_config(project):
             if project == "add_new_project":
                 p.add(project_name=form.project_name.data, servers=form.servers.data, source_address=form.source_address.data,
                       project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
+                flash("添加工程 "+ form.project_name.data + " 成功！")
             else:
                 p.update(project_name_old=project, project_name=form.project_name.data, servers=form.servers.data,
                          source_address=form.source_address.data, project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
-            return redirect(url_for('projects'))
+                flash("工程 " + form.project_name.data + " 配置已更新！")
         else:
             for key in form.errors:
-                error = form.errors[key]
-    return render_template('config_project.html', project=project, form=form, conf=conf, error=error)
+                flash("Error: " + form.errors[key][0])
+        return redirect(url_for('project_config', project=form.project_name.data))
+    return render_template('config_project.html', project=project, form=form, conf=conf)
 
 
 @app.route('/delete/<project>', methods=['GET', 'POST'])

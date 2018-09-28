@@ -45,11 +45,11 @@ function version_select() {
                             <div class="sub-title form-inline">
                                 请输入需发布分支：<input type="text" name="branch" id="branch" class="form-control input-sm">
                                 <button class="btn btn-default btn-sm" formmethod="post" formaction="{{ url_for('deploy_exec',project=project) }}">发布</button>
-                                {% if error %}
+                                {% for message in get_flashed_messages() %}
                                 <div class="alert alert-danger">
-                                    <strong>Error:</strong> {{ error }}
+                                    <strong>Error:</strong> {{ message }}
                                 </div>
-                                {% endif %}
+                                {% endfor %}
                             </div>
                         </div>
                     </div>

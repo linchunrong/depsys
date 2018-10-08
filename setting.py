@@ -8,6 +8,9 @@ SECRET_KEY = '\x84\x96\x04\xe9\xc5\xe1\xb4\xc5\xa4M\xcd\x9a\xf4b"\xce\x88\xe36\x
 
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://depsys:123456@127.0.0.1:3306/depsys'
 
+# default admin user/password
+admin_user = 'admin'
+admin_pass = '888888'
 
 DEPLOY_PKG_PATH = '/home/FaeWork/pkgs/'
 PKG_OWNER = 'FaeWork'

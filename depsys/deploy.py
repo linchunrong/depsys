@@ -71,8 +71,7 @@ def execute_thread(room):
         my_hosts = get_hosts(project)
         my_playbook = get_playbook(package_name=str(my_pkg[1]), local_package=str(my_pkg[0]))
     except Exception as Err:
-        print("Error: ", str(Err))
-        sys.exit(1)
+        sys.exit(str(Err))
     # create ansible command
     ansible_bin = SystemConfig().get().ansible_path
     command = ansible_bin + "/ansible-playbook -i " + my_hosts + " " + my_playbook
@@ -216,7 +215,7 @@ def get_script(script_type):
         remote_script = conf.get().stop_script
     else:
         print ("Get script failed! Only support start_script/deploy_script/stop_script.")
-        sys.exit(1)
+        raise Exception("Wrong Script Name Error")
     '''
     # fetch script name
     script_name = remote_script.strip().split("/")[-1]
@@ -311,10 +310,10 @@ def get_package(project, version, room):
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 my_remote.pull(version)
             except Exception as Err:
-                socketio.emit('my_response', {'data': "[ERROR] Download package failed due to: " + str(Err) + "\n",
+                socketio.emit('my_response', {'data': "[ERROR] Download package from repository failed, please check your setting! \n",
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 print("Error: ", str(Err))
-                sys.exit(1)
+                raise Exception("Package Download Error")
             # write commit info into
             else:
                 extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
@@ -335,10 +334,10 @@ def get_package(project, version, room):
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 my_remote.pull('master')
             except Exception as Err:
-                socketio.emit('my_response', {'data': "[ERROR] Download package failed due to: " + str(Err) + "\n",
+                socketio.emit('my_response', {'data': "[ERROR] Download package from repository failed, please check your setting! \n",
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 print("Error: ", str(Err))
-                sys.exit(1)
+                raise Exception("Package Download Error")
             else:
                 # we maybe check out empty package folder via sparse checkout
                 if os.path.isfile(package):
@@ -346,7 +345,7 @@ def get_package(project, version, room):
                 else:
                     socketio.emit('my_response', {'data': "[ERROR] Seems this version doesnt' include a package, please check!" + "\n",
                                 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
-                    sys.exit(1)
+                    raise Exception("Version Empty Error")
             if not os.path.isfile(extra_file):
                 extra_file = None
 

@@ -127,14 +127,14 @@ def config():
         if form.validate_on_submit():
             s = SystemConfig()
             if conf:
-                s.update(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
-                        repository_server=form.repository_server.data, repository_user=form.repository_user.data,
+                s.update(ansible_path=form.ansible_path.data.strip(), deploy_script=form.deploy_script.data.strip(), start_script=form.start_script.data.strip(), stop_script=form.stop_script.data.strip(),
+                        repository_server=form.repository_server.data.strip(), repository_user=form.repository_user.data.strip(),
                         repository_password=form.repository_password.data if form.repository_password.data else conf.repository_pwd,
-                        smtp_server=form.smtp_server.data, smtp_user=form.smtp_user.data, smtp_password=form.smtp_password.data)
+                        smtp_server=form.smtp_server.data.strip(), smtp_user=form.smtp_user.data.strip(), smtp_password=form.smtp_password.data)
             else:
-                s.add(ansible_path=form.ansible_path.data, deploy_script=form.deploy_script.data, start_script=form.start_script.data, stop_script=form.stop_script.data,
-                        repository_server=form.repository_server.data, repository_user=form.repository_user.data, repository_password=form.repository_password.data,
-                        smtp_server=form.smtp_server.data, smtp_user=form.smtp_user.data, smtp_password=form.smtp_password.data)
+                s.add(ansible_path=form.ansible_path.data.strip(), deploy_script=form.deploy_script.data.strip(), start_script=form.start_script.data.strip(), stop_script=form.stop_script.data.strip(),
+                        repository_server=form.repository_server.data.strip(), repository_user=form.repository_user.data.strip(), repository_password=form.repository_password.data,
+                        smtp_server=form.smtp_server.data.strip(), smtp_user=form.smtp_user.data.strip(), smtp_password=form.smtp_password.data)
             flash("配置已保存！")
         else:
             for key in form.errors:
@@ -152,17 +152,17 @@ def project_config(project):
         if form.validate_on_submit():
             p = ProjectConfig()
             if project == "add_new_project":
-                p.add(project_name=form.project_name.data, servers=form.servers.data, source_address=form.source_address.data,
+                p.add(project_name=form.project_name.data.strip(), servers=form.servers.data.strip(), source_address=form.source_address.data.strip(),
                       project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
-                flash("添加工程 "+ form.project_name.data + " 成功！")
+                flash("添加工程 "+ form.project_name.data.strip() + " 成功！")
             else:
-                p.update(project_name_old=project, project_name=form.project_name.data, servers=form.servers.data,
-                         source_address=form.source_address.data, project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
-                flash("工程 " + form.project_name.data + " 配置已更新！")
+                p.update(project_name_old=project, project_name=form.project_name.data.strip(), servers=form.servers.data.strip(),
+                         source_address=form.source_address.data.strip(), project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
+                flash("工程 " + form.project_name.data.strip() + " 配置已更新！")
         else:
             for key in form.errors:
                 flash("Error: " + form.errors[key][0])
-        return redirect(url_for('project_config', project=form.project_name.data))
+        return redirect(url_for('project_config', project=form.project_name.data.strip()))
     return render_template('config_project.html', project=project, form=form, conf=conf)
 
 

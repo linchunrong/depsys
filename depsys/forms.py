@@ -20,8 +20,8 @@ class UserForm(FlaskForm):
     submit = SubmitField('更新')
 
 
-class ConfigForm(FlaskForm):
-    """Config Form"""
+class ProjectForm(FlaskForm):
+    """Project Form"""
     project_name = StringField('Project_name', validators=[validators.InputRequired(message="工程名必填!")])
     servers = StringField('IPs', validators=[validators.InputRequired(message="服务器地址必填!")])
     # source_address = StringField('Repository_address', validators=[validators.InputRequired(message="源码地址必填！")])

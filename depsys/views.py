@@ -7,7 +7,7 @@ from flask_login import login_user, login_required, logout_user
 from depsys import app, sendmsg, makemsg
 from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import ProjectConfig, SystemConfig, UserConfig
-from depsys.forms import LoginForm, ConfigForm, SystemForm, UserForm, ReportForm
+from depsys.forms import LoginForm, ProjectForm, SystemForm, UserForm, ReportForm
 
 
 # Index
@@ -146,7 +146,7 @@ def config():
 @app.route('/config/<project>', methods=['GET', 'POST'])
 @login_required
 def project_config(project):
-    form = ConfigForm()
+    form = ProjectForm()
     conf = ProjectConfig().get(project)
     if request.method == "POST":
         if form.validate_on_submit():

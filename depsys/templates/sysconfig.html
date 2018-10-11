@@ -28,7 +28,6 @@
                                     <label>Ansible path</label>
                                     {{ form.ansible_path(class="form-control",placeholder="e.g. /usr/bin",value=conf.ansible_path) }}
                                 </div>
-                                    <button type="button" class="btn btn-default" onclick="alert('Still working on it...')">验证</button>
                             </div>
                         </div>
                     </div>
@@ -95,11 +94,6 @@
                                         {{ form.repository_password(placeholder="请输入密码...",class='form-control') }}
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <button type="button" class="btn btn-default" onclick="alert('Still working on it...')">验证</button>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -131,11 +125,6 @@
                                     <label class="col-sm-2 control-label">Password</label>
                                     <div class="col-sm-10">
                                         {{ form.smtp_password(placeholder="SMTP密码...",value=conf.smtp_pwd,class='form-control') }}
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <button type="button" class="btn btn-default" onclick="alert('Still working on it...')">验证</button>
                                     </div>
                                 </div>
                             </div>

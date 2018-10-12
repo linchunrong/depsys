@@ -23,10 +23,12 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="form-inline">
+                            <div class="form-horizontal">
                                 <div class="form-group">
-                                    <label>Ansible path</label>
-                                    {{ form.ansible_path(class="form-control",placeholder="e.g. /usr/bin",value=conf.ansible_path) }}
+                                    <label class="col-sm-2 control-label">Ansible path</label>
+                                    <div class="col-sm-9">
+                                        {{ form.ansible_path(class="form-control",placeholder="e.g. /usr/bin",value=conf.ansible_path) }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -45,19 +47,19 @@
                             <div class="form-horizontal">
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">发布脚本路径</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-sm-9">
                                         {{ form.deploy_script(value=conf.deploy_script,class='form-control') }}
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">启动脚本路径</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-sm-9">
                                         {{ form.start_script(value=conf.start_script,class='form-control') }}
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">停止脚本路径</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-sm-9">
                                         {{ form.stop_script(value=conf.stop_script,class='form-control') }}
                                     </div>
                                 </div>
@@ -78,19 +80,19 @@
                             <div class="form-horizontal">
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">Repository Server</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-sm-9">
                                         {{ form.repository_server(placeholder="请输入源码库地址(http格式)...",value=conf.repository_server,class='form-control') }}
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">Username</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-sm-9">
                                         {{ form.repository_user(placeholder="请输入用户名...",value=conf.repository_user,class='form-control') }}
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">Password</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-sm-9">
                                         {{ form.repository_password(placeholder="请输入密码...",class='form-control') }}
                                     </div>
                                 </div>
@@ -111,19 +113,19 @@
                             <div class="form-horizontal">
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">SMTP Server</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-sm-9">
                                         {{ form.smtp_server(placeholder="请输入SMTP服务器地址...",value=conf.smtp_server,class='form-control') }}
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">Username</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-sm-9">
                                         {{ form.smtp_user(placeholder="SMTP用户名...",value=conf.smtp_user,class='form-control') }}
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">Password</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-sm-9">
                                         {{ form.smtp_password(placeholder="SMTP密码...",value=conf.smtp_pwd,class='form-control') }}
                                     </div>
                                 </div>

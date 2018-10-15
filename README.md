@@ -19,8 +19,14 @@ $ python manage.py init
 ---
 #### Depends
 python==3.6.0  
-mysql==5.7  
+mysql==5.6  
+ansible==2.4.2  
 git==1.8.3.1  
 wkhtmltopdf==0.12.5
+
+所引入的 python 类库见 requirement.txt, pip 安装：
+```shell
+pip install -r requiremente.txt
+```
 
 `注：版本仅作参考用`

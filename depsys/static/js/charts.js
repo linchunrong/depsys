@@ -86,7 +86,7 @@ $(function (){
             pieChart.resize();
         }
     });
-})
+});
 
 $(function () {
     // 全工程柱形图
@@ -126,7 +126,7 @@ $(function () {
             barChart.resize();
         }
     });
-})
+});
 
 $(function () {
     // 发版 top
@@ -185,7 +185,7 @@ $(function () {
             barChart.resize();
         }
     });
-})
+});
 
 $(function () {
     // 请求人Top
@@ -243,4 +243,4 @@ $(function () {
             pieChart.resize();
         }
     });
-})
+});

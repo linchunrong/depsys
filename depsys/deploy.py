@@ -13,8 +13,12 @@ from depsys.dashboard import DeployRecord
 # deploy execute process
 # thread = None
 thread_lock = Lock()
-data_path = "data"
-bin_path = "bin"
+# define variables
+data_path = setting.data_path.strip()
+bin_path = setting.bin_path.strip()
+extra_args_file = setting.EXTRA_ARGS_FILE.strip()
+deploy_pkg_path = setting.DEPLOY_PKG_PATH.strip()
+pkg_owner = setting.PKG_OWNER.strip()
 workstation = "workstation"
 
 
@@ -132,7 +136,7 @@ def execute_thread(room):
                 try:
                     release_info = json.load(release_info)
                 except Exception as Err:
-                    socketio.emit('my_response', {'data': "Read " + setting.EXTRA_ARGS_FILE + " failed due to: " + str(Err) + "\n",
+                    socketio.emit('my_response', {'data': "Read " + extra_args_file + " failed due to: " + str(Err) + "\n",
                                          'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                     print("Error: ", str(Err))
                     DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer="N/A",
@@ -162,7 +166,7 @@ def execute_thread(room):
             else:
                 if os.path.isfile(extra_file):
                     try:
-                        shutil.copyfile(extra_file,str(destfile_path.joinpath(setting.EXTRA_ARGS_FILE)))
+                        shutil.copyfile(extra_file,str(destfile_path.joinpath(extra_args_file)))
                     except Exception as e:
                         return ("Failed to save extra args file due to: " + str(e))
         else:
@@ -252,8 +256,8 @@ def get_playbook(package_name, local_package):
         content = content.replace("deploy_script_file","curl -s " + get_script("deploy_script") + " | sh -s " + str(project))
         content = content.replace("stop_script_file", "curl -s " + get_script("stop_script") + " | sh -s " + str(project))
         content = content.replace("local_pkg_file", local_package)
-        content = content.replace("dest_pkg_file", setting.DEPLOY_PKG_PATH + package_name)
-        content = content.replace("pkg_owner", setting.PKG_OWNER)
+        content = content.replace("dest_pkg_file", deploy_pkg_path + package_name)
+        content = content.replace("pkg_owner", pkg_owner)
         dest.write(content)
     return dest_file
 
@@ -293,7 +297,7 @@ def get_package(project, version, room):
     if os.path.isfile(deployed_package):
         socketio.emit('my_response', {'data': "Found deployed local package, use it for this deployment." + "\n",
                     'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
-        extra_file = my_path().joinpath(data_path, project, version, setting.EXTRA_ARGS_FILE)
+        extra_file = my_path().joinpath(data_path, project, version, extra_args_file)
         if not os.path.isfile(extra_file):
             extra_file = None
         return [str(deployed_package), package_name, str(extra_file)]
@@ -316,7 +320,7 @@ def get_package(project, version, room):
                 raise Exception("Package Download Error")
             # write commit info into
             else:
-                extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
+                extra_file = project_work_path(project).joinpath(extra_args_file)
             if not os.path.isfile(extra_file):
                 extra_file = None
         # use git sparse checkout to get specific files
@@ -325,7 +329,7 @@ def get_package(project, version, room):
             # checkout the specific package path
             os.chdir(str(project_work_path(str(project))))
             shell_command = 'git config core.sparseCheckout true && echo "' + version + '" >> .git/info/sparse-checkout && echo "' \
-                            + setting.EXTRA_ARGS_FILE + '" >> .git/info/sparse-checkout'
+                            + extra_args_file + '" >> .git/info/sparse-checkout'
             subprocess.Popen(shell_command, shell=True)
             # pull specific path via gitPython
             try:
@@ -341,7 +345,7 @@ def get_package(project, version, room):
             else:
                 # we maybe check out empty package folder via sparse checkout
                 if os.path.isfile(package):
-                    extra_file = project_work_path(project).joinpath(setting.EXTRA_ARGS_FILE)
+                    extra_file = project_work_path(project).joinpath(extra_args_file)
                 else:
                     socketio.emit('my_response', {'data': "[ERROR] Seems this version doesnt' include a package, please check!" + "\n",
                                 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)

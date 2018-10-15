@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from depsys import app, socketio
+from setting import *
 
 if __name__ == '__main__':
     #app.run(debug=True)
-    socketio.run(app, host='0.0.0.0', debug=True)
+    socketio.run(app, host=Host, port=Port, debug=DEBUG)

@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json, smtplib, os, setting, requests
+import json, smtplib, os, requests
 from email.message import EmailMessage
 from depsys.sysconfig import SystemConfig
+from setting import *
 
 
 def email(receiver, attachment=None, subject=None, content='FYI', subtype='plain'):
@@ -40,21 +41,18 @@ def email(receiver, attachment=None, subject=None, content='FYI', subtype='plain
 
 def wechat(type, message=None, post_file=None):
     """Send message via WeChat"""
-    # args in need, API doc refer to - https://work.weixin.qq.com/api/doc
-    corpid = setting.corpid
-    corpsecret = setting.corpsecret
-
+    # API doc refer to - https://work.weixin.qq.com/api/doc, get variables rom setting
     access_token = get_token(corpid=corpid, corpsecret=corpsecret)
     # if there's error when call get_token, return Error
     if "Error" in access_token:
         return access_token
 
-    send_url = setting.API_URL + "message/send?access_token=" + access_token
+    send_url = API_URL + "message/send?access_token=" + access_token
     send_data = {
         "touser": "@all",
         "toparty": "@all",
         "msgtype": type,
-        "agentid": setting.AgentId,
+        "agentid": AgentId,
         "safe": 0
     }
     if type == 'file':
@@ -83,7 +81,7 @@ def wechat(type, message=None, post_file=None):
 
 def get_token(corpid, corpsecret):
     """"Get wechat access_token"""
-    get_token_url = setting.API_URL + "gettoken?corpid=" + corpid + "&corpsecret=" + corpsecret
+    get_token_url = API_URL + "gettoken?corpid=" + corpid + "&corpsecret=" + corpsecret
     try:
         request = requests.get(get_token_url)
     except Exception as Err:
@@ -102,7 +100,7 @@ def get_token(corpid, corpsecret):
 
 def get_media_id(type, access_token, target_file):
     """Get wechat media_id"""
-    get_media_id_url = setting.API_URL + "media/upload?access_token=" +  access_token + "&type=" + type
+    get_media_id_url = API_URL + "media/upload?access_token=" +  access_token + "&type=" + type
 
     with open(target_file, 'rb') as f:
         files = {'file': f}

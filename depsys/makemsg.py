@@ -3,9 +3,10 @@
 
 from depsys.models import Record, Project
 import datetime, pdfkit, os, pathlib
+import setting
 
 # create pdf report in temp_path here
-temp_path = "tmp"
+temp_path = setting.temp_path
 
 
 class Report:

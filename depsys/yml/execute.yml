@@ -3,6 +3,12 @@
   - name: send project package to target servers
     copy: src=local_pkg_file dest=dest_pkg_file owner=pkg_owner
     register: send_file
+  - name: get package md5 value
+    shell: /usr/bin/md5sum dest_pkg_file | awk '{print $1}'
+    register: md5_value
+    when: send_file|success
+  - name: show package md5 value
+    debug: var=md5_value.stdout_lines verbosity=0
   - name: run stop deploy script on target servers
     shell: stop_script_file chdir=/home/FaeWork
     register: stop_script

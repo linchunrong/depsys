@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import setting, urllib.request, urllib.parse, time, os, sys, random, string, pathlib, subprocess, shutil, json
+import setting, urllib.request, urllib.parse, time, os, sys, random, string, pathlib, subprocess, shutil, json, re
 from flask import request
 from threading import Lock
 from git import Repo
@@ -112,6 +112,11 @@ def execute_thread(room):
             status = -1
         else:
             status = 0
+        # grab package md5 from logs
+        search_line = '''md5_value.stdout_lines": \[\n ([^>]+) ]'''
+        result = re.compile(search_line).findall(logs)
+        # example of result:  "11706132cfe495581a63c1f9d30241a4", need to cut down ""
+        pkg_md5 = result[0].strip()[1:-1]
         # get extra args if exist
         extra_file = str(my_pkg[2])
         if os.path.isfile(extra_file):
@@ -140,17 +145,17 @@ def execute_thread(room):
                                          'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                     print("Error: ", str(Err))
                     DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer="N/A",
-                                       time_begin=time_begin, time_end=time_end, logs=logs)
+                                       time_begin=time_begin, time_end=time_end, pkg_md5=pkg_md5, logs=logs)
                 else:
                     for info in release_info['发布列表']:
                         if info['发布版本'] == branch:
                             requester = info['发布人']
                             deploy_reason = info['发布原因']
                             DeployRecord().add(project=project, status=status, version=branch, requester=requester, deploy_reason=deploy_reason, deployer="N/A",
-                                   time_begin=time_begin, time_end=time_end, logs=logs)
+                                   time_begin=time_begin, time_end=time_end, pkg_md5=pkg_md5, logs=logs)
         else:
             DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer="N/A",
-                               time_begin=time_begin, time_end=time_end, logs=logs)
+                               time_begin=time_begin, time_end=time_end, pkg_md5=pkg_md5, logs=logs)
     # save deployed package, str(my_pkg[1]) stand for package name
     if status == 1:
         srcfile = my_pkg[0]

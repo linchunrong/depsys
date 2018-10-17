@@ -73,6 +73,7 @@ class Record(db.Model):
     deploy_reason = db.Column(db.String(200))
     time_begin = db.Column(db.DateTime)
     time_end = db.Column(db.DateTime)
+    pkg_md5 = db.Column(db.String(64))
     logs = db.Column(db.TEXT(65535))
 
     def __repr__(self):

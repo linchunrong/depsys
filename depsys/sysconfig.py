@@ -44,10 +44,12 @@ class SystemConfig:
 
 class ProjectConfig:
     """Action for project"""
-    def update(self,project_name_old, project_name, servers, source_address, project_type, post_script_type, post_script):
+    def update(self,project_name_old, project_name, group, describe, servers, source_address, project_type, post_script_type, post_script):
         """Update project config"""
         item = Project.query.filter_by(project_name=project_name_old).first()
         item.project_name = project_name
+        item.group = group
+        item.describe = describe
         item.servers = servers
         item.source_address = source_address
         item.type = project_type
@@ -56,9 +58,9 @@ class ProjectConfig:
         db.session.commit()
         db.session.close()
 
-    def add(self, project_name, servers, source_address, project_type, post_script_type, post_script):
+    def add(self, project_name, group, describe, servers, source_address, project_type, post_script_type, post_script):
         """Add project"""
-        item = Project(project_name=project_name, servers=servers, source_address=source_address,
+        item = Project(project_name=project_name, group=group, describe=describe, servers=servers, source_address=source_address,
                        type=project_type, post_script_type=post_script_type, post_script=post_script)
         db.session.add(item)
         db.session.commit()

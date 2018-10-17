@@ -24,8 +24,9 @@ class ProjectForm(FlaskForm):
     """Project Form"""
     project_name = StringField('Project_name', validators=[validators.InputRequired(message="工程名必填!")])
     servers = StringField('IPs', validators=[validators.InputRequired(message="服务器地址必填!")])
-    # source_address = StringField('Repository_address', validators=[validators.InputRequired(message="源码地址必填！")])
+    group = RadioField('Group', choices=[('dev01', '研发1部'), ('dev02', '研发2部'), ('dev03', '研发3部'), ('dev04', '研发4部')], default='dev01')
     source_address = StringField('Repository_address')
+    describe = StringField('Describe', validators=[validators.InputRequired(message="项目描述必填！")])
     project_type = RadioField('Project_type', choices=[('zip', 'zip'), ('war', 'war'), ('jar', 'jar')], default='zip')
     post_script_type = SelectField('Post_script_type', choices=[('shell', 'shell script'), ('python', 'python script')], default='shell')
     post_script = TextAreaField('Post_script')

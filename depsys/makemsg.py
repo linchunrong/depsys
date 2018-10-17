@@ -59,6 +59,7 @@ class Report:
                         <TH>责任团队</TH>\
                         <TH>发起人</TH>\
                         <TH>工程</TH>\
+                        <TH>应用简述</TH>\
                         <TH>主机</TH>\
                         <TH>MD5</TH>\
                         <TH>发布原因</TH>\
@@ -66,16 +67,14 @@ class Report:
                 """
                 for record in records['records']:
                     project = Project.query.filter_by(project_id=record.project_id).first()
-                    project_name = project.project_name
-                    group = project.group
-                    servers = project.servers
                     html_table = html_table + """\
                     <TR>\
                         <TD>""" + str(record.time_begin) + """</TD>\
-                        <TD>""" + group + """</TD>\
+                        <TD>""" + project.group + """</TD>\
                         <TD>""" + record.requester + """</TD>\
-                        <TD>""" + project_name + """</TD>\
-                        <TD>""" + servers + """</TD>\
+                        <TD>""" + project.project_name + """</TD>\
+                        <TD>""" + project.describe + """</TD>\
+                        <TD>""" + project.servers + """</TD>\
                         <TD>""" + record.pkg_md5 + """</TD>\
                         <TD>""" + record.deploy_reason + """</TD>\
                     </TR>\

@@ -28,20 +28,21 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="sub-title">命名/类型</div>
+                            <div class="sub-title">基本信息</div>
                             <div class="form-inline">
                                 <div class="form-group">
-                                     Name/Rename
                                     {% if project == "add_new_project" %}
+                                        命名
                                     {{ form.project_name(class="form-control",placeholder="请输入新工程名(必填)") }}
                                     {% else %}
+                                        重命名
                                     {{ form.project_name(class="form-control",value=conf.project_name) }}
                                     {% endif %}
                                 </div>
                                 <div class="form-group">
                                     {% for type in form.project_type %}
                                     <div class="radio3 radio-inline radio-check">
-                                        {% if type.label.text == conf.type %}
+                                        {% if type.data == conf.type %}
                                         <td>{{ type(checked="") }}</td>
                                         {% else %}
                                         <td>{{ type }}</td>
@@ -50,16 +51,35 @@
                                     </div>
                                     {% endfor %}
                                 </div>
+                            </div><br>
+                            <div>
+                                责任团队（勾选）
+                                {% for team in form.group %}
+                                    <div class="radio3 radio-inline radio-check radio-success">
+                                        {% if team.data == conf.group %}
+                                        <td>{{ team(checked="") }}</td>
+                                        {% else %}
+                                        <td>{{ team }}</td>
+                                        {% endif %}
+                                        <td>{{ team.label }}</td>
+                                    </div>
+                                {% endfor %}
                             </div>
-                            <div class="sub-title">服务器列表<span class="description">(IPs)</span> </div>
-                            <div class="form-group">
+                            <div class="sub-title">
+                                项目描述
+                            </div>
+                            <div>
+                                {{ form.describe(class="form-control",placeholder="项目的简单说明。(必填)",value=conf.describe) }}
+                            </div>
+                            <div class="sub-title">服务器列表<span class="description">(IPs)</span></div>
+                            <div>
                                 {{ form.servers(class="form-control",placeholder="多个IP请以 \",\" 号分隔！(必填)",value=conf.servers) }}
                             </div>
-                            <div class="sub-title">源码库地址<span class="description">(Repository Address)</span> </div>
-                            <div class="form-group">
+                            <div class="sub-title">源码库地址<span class="description">(Repository Address)</span></div>
+                            <div>
                                 {{ form.source_address(class="form-control",placeholder="请输入项目源码地址...(留空则为系统配置值)",value=conf.source_address) }}
                             </div>
-                            <div class="sub-title">发布后动作<span class="description">(如果有)</span> </div>
+                            <div class="sub-title">发布后动作<span class="description">(如果有)</span></div>
                             <div class="form-group">
                                 <div class="form-inline">
                                     <div class="form-group">

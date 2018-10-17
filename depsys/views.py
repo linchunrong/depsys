@@ -152,11 +152,13 @@ def project_config(project):
         if form.validate_on_submit():
             p = ProjectConfig()
             if project == "add_new_project":
-                p.add(project_name=form.project_name.data.strip(), servers=form.servers.data.strip(), source_address=form.source_address.data.strip(),
+                p.add(project_name=form.project_name.data.strip(), group=form.group.data.strip(), describe=form.describe.data.strip(),
+                      servers=form.servers.data.strip(), source_address=form.source_address.data.strip(),
                       project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
                 flash("添加工程 "+ form.project_name.data.strip() + " 成功！")
             else:
-                p.update(project_name_old=project, project_name=form.project_name.data.strip(), servers=form.servers.data.strip(),
+                p.update(project_name_old=project, project_name=form.project_name.data.strip(), group=form.group.data.strip(), describe=form.describe.data.strip(),
+                         servers=form.servers.data.strip(),
                          source_address=form.source_address.data.strip(), project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
                 flash("工程 " + form.project_name.data.strip() + " 配置已更新！")
         else:

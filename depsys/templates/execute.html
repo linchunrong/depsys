@@ -22,10 +22,10 @@ $(document).ready(function() {
     $('button#exec_room').click(function () {
         socket.emit('executing', {room: $('#exec_room').val()});
         return false
-    })
+    });
     $('button#disconnect').click(function () {
         socket.emit('disconnect_request');
-        window.location.href = "{{ url_for('project_deploy', project=project) }}"
+        window.location.href = "{{ url_for('project_deploy', project=project) }}";
         return false;
     })
 });

@@ -130,11 +130,11 @@ def config():
                 s.update(ansible_path=form.ansible_path.data.strip(), deploy_script=form.deploy_script.data.strip(), start_script=form.start_script.data.strip(), stop_script=form.stop_script.data.strip(),
                         repository_server=form.repository_server.data.strip(), repository_user=form.repository_user.data.strip(),
                         repository_password=form.repository_password.data if form.repository_password.data else conf.repository_pwd,
-                        smtp_server=form.smtp_server.data.strip(), smtp_user=form.smtp_user.data.strip(), smtp_password=form.smtp_password.data)
+                        smtp_server=form.smtp_server.data.strip(), mail_address=form.mail_address.data.strip(), smtp_user=form.smtp_user.data.strip(), smtp_password=form.smtp_password.data)
             else:
                 s.add(ansible_path=form.ansible_path.data.strip(), deploy_script=form.deploy_script.data.strip(), start_script=form.start_script.data.strip(), stop_script=form.stop_script.data.strip(),
                         repository_server=form.repository_server.data.strip(), repository_user=form.repository_user.data.strip(), repository_password=form.repository_password.data,
-                        smtp_server=form.smtp_server.data.strip(), smtp_user=form.smtp_user.data.strip(), smtp_password=form.smtp_password.data)
+                        smtp_server=form.smtp_server.data.strip(), mail_address=form.mail_address.data.strip(), smtp_user=form.smtp_user.data.strip(), smtp_password=form.smtp_password.data)
             flash("配置已保存！")
         else:
             for key in form.errors:
@@ -156,25 +156,26 @@ def project_config(project):
                       servers=form.servers.data.strip(), source_address=form.source_address.data.strip(),
                       project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
                 flash("添加工程 "+ form.project_name.data.strip() + " 成功！")
+                return redirect(url_for('project_config', project=form.project_name.data.strip()))
             else:
                 p.update(project_name_old=project, project_name=form.project_name.data.strip(), group=form.group.data.strip(), describe=form.describe.data.strip(),
                          servers=form.servers.data.strip(),
                          source_address=form.source_address.data.strip(), project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
                 flash("工程 " + form.project_name.data.strip() + " 配置已更新！")
+                return redirect(url_for('project_config', project=form.project_name.data.strip()))
         else:
             for key in form.errors:
                 flash("Error: " + form.errors[key][0])
-        return redirect(url_for('project_config', project=form.project_name.data.strip()))
+        return redirect(url_for('project_config', project=project))
     return render_template('config_project.html', project=project, form=form, conf=conf)
 
 
 @app.route('/delete/<project>', methods=['GET', 'POST'])
 @login_required
 def project_delete(project):
-    # p = ProjectConfig()
+    p = ProjectConfig()
     if request.method == "POST":
-        # forbidden project delete until RBAC func done
-        # p.delete(project_name=project)
+        p.delete(project_name=project)
         return redirect(url_for('projects'))
     return render_template('del_project.html', project=project)
 

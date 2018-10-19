@@ -43,6 +43,7 @@ class SystemForm(FlaskForm):
     repository_user = StringField('Rep_user', validators=[validators.InputRequired(message="源码库用户必填！")])
     repository_password = PasswordField('Rep_pwd')
     smtp_server = StringField('Smtp_server')
+    mail_address = StringField('Mail_address')
     smtp_user = StringField('Smtp_user')
     smtp_password = PasswordField('Smtp_pwd')
     submit = SubmitField('保存')

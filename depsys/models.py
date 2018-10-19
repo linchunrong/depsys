@@ -35,6 +35,7 @@ class System(db.Model):
     repository_user = db.Column(db.String(24))
     repository_pwd = db.Column(db.String(24))
     smtp_server = db.Column(db.String(50))
+    mail_address = db.Column(db.String(36))
     smtp_user = db.Column(db.String(24))
     smtp_pwd = db.Column(db.String(24))
 

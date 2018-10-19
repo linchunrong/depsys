@@ -118,7 +118,13 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">Username</label>
+                                    <label class="col-sm-2 control-label">Mail Address</label>
+                                    <div class="col-sm-9">
+                                        {{ form.mail_address(placeholder="邮件地址...",value=conf.mail_address,class='form-control') }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Login User</label>
                                     <div class="col-sm-9">
                                         {{ form.smtp_user(placeholder="SMTP用户名...",value=conf.smtp_user,class='form-control') }}
                                     </div>

@@ -13,7 +13,7 @@ def email(receiver, attachment=None, subject=None, content='FYI', subtype='plain
     mail_host = conf.smtp_server
     # auth_user = conf.smtp_user
     # auth_pass = conf.smtp_pwd
-    sender = conf.smtp_user
+    sender = conf.mail_address
     tolist = receiver
 
     message = EmailMessage()

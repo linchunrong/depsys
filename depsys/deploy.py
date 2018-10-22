@@ -38,6 +38,11 @@ def executing(message):
         socketio.start_background_task(target=execute_thread, room=message['room'])
 
 
+@socketio.on('batch_executing', namespace='/execute')
+def batch_exec():
+    pass
+
+
 @socketio.on('disconnect_request', namespace='/execute')
 def disconnect_request():
     disconnect()

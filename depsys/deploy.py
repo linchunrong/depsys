@@ -16,6 +16,7 @@ thread_lock = Lock()
 # define variables
 data_path = setting.data_path.strip()
 bin_path = setting.bin_path.strip()
+temp_path = setting.temp_path.strip()
 extra_args_file = setting.EXTRA_ARGS_FILE.strip()
 deploy_pkg_path = setting.DEPLOY_PKG_PATH.strip()
 pkg_owner = setting.PKG_OWNER.strip()
@@ -40,7 +41,18 @@ def executing(message):
 
 @socketio.on('batch_executing', namespace='/execute')
 def batch_exec():
-    pass
+    """Func for batch deploy"""
+    room = 'batch_execute'
+    join_room(room)
+    emit('my_response', {'data': "Projects version detail refer to file: " + extra_args_file + ", which post in " + SystemConfig().get().repository_server,
+                         'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=room)
+    try:
+        batch_list = get_branches(room)
+    except Exception as Err:
+        emit('my_response', {'data': "Failed to get release list due to: " + str(Err), 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+        raise Exception("Get Deploy List Error")
+    else:
+        emit('my_response', {'data': "Got release list: \n" + str(batch_list), 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
 
 
 @socketio.on('disconnect_request', namespace='/execute')
@@ -364,3 +376,64 @@ def get_package(project, version, room):
                 extra_file = None
 
         return [str(package), package_name, str(extra_file)]
+
+
+def get_branches(room):
+    """Get projects & branches list"""
+    # using temp path as work path
+    working_path = my_path().joinpath(temp_path, 'batch')
+    # clean the working path
+    clean_command = 'rm -rf ' + str(working_path)
+    subprocess.Popen(clean_command, shell=True)
+    time.sleep(2)
+    mkdir(working_path)
+    os.chdir(str(working_path))
+    # get repository address
+    sysconf = SystemConfig().get()
+    repo_address = sysconf.repository_server.strip()
+    username = sysconf.repository_user
+    password = sysconf.repository_pwd
+    # add username:password into repo address for git auth
+    if username and password:
+        repo_address = repo_address.replace("://", "://" + urllib.parse.quote(username) + ":" + urllib.parse.quote(password) + "@")
+    # get extra_args_file
+    empty_repo = Repo.init(str(working_path))
+    # update config to check out extra_args_file only
+    shell_command = 'git config core.sparseCheckout true && echo "' + extra_args_file + '" >> .git/info/sparse-checkout'
+    subprocess.Popen(shell_command, shell=True)
+    # pull specific path via gitPython
+    try:
+        my_remote = empty_repo.create_remote("batch", repo_address)
+        socketio.emit('my_response', {'data': "Downloading " + extra_args_file + " from repository...",
+                                      'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
+                      namespace='/execute', room=room)
+        my_remote.pull('master')
+    except Exception as Err:
+        socketio.emit('my_response', {'data': "[ERROR] Download " + extra_args_file + " from repository failed, please check your setting!",
+                                      'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
+                      namespace='/execute', room=room)
+        print("Error: ", str(Err))
+        raise Exception("File Download Error")
+    else:
+        socketio.emit('my_response', {'data': "Downloaded " + extra_args_file + " to " + str(working_path),
+                                      'time_stamp' : "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
+        with open(extra_args_file, encoding='utf-8') as release_info:
+            # release_info is a json format file
+            try:
+                release_info = json.load(release_info)
+            except Exception as Err:
+                socketio.emit('my_response', {'data': "Read " + extra_args_file + " failed due to: " + str(Err),
+                                              'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
+                              namespace='/execute', room=room)
+                print("Error: ", str(Err))
+                raise Exception("Read File Error")
+            else:
+                batch_list = []
+                for info in release_info['发布列表']:
+                    # use split cut down project type
+                    project = info['发布工程名称'].strip().split('.')[:-1][0]
+                    branch = info['发布版本'].strip()
+                    project_branch = project + '@' + branch
+                    batch_list.append(project_branch)
+                # sample of batch_list - ['isp_finance@20180820_1500', 'isp-forward@20180820_1501', 'isp_web@20180820_1502']
+                return batch_list

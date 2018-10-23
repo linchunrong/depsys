@@ -20,7 +20,7 @@ $(document).ready(function() {
         $('#log').append('<br>' + $('<div/>').text(msg.time_stamp + msg.data).html());
     });
     $('button#exec_room').click(function () {
-        if ($('#exec_room').val() == 'batch_execute') {
+        if ($('#exec_room').val() === 'batch_execute') {
             socket.emit('batch_executing');
         }
         else {
@@ -30,7 +30,7 @@ $(document).ready(function() {
     });
     $('button#disconnect').click(function () {
         socket.emit('disconnect_request');
-        if ($('#exec_room').val() == 'batch_execute')
+        if ($('#exec_room').val() === 'batch_execute')
         {
             window.location.href = "{{ url_for('projects') }}";
         }
@@ -46,6 +46,7 @@ $(document).ready(function() {
     <div class="side-body">
         <div class="page-title">
             <span class="title">发布</span>
+            <div class="description hidden">Async Mode: {{ async_mode }}</div>
         </div>
         <div class="row">
             <div class="col-xs-12">

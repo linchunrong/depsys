@@ -20,6 +20,7 @@ temp_path = setting.temp_path.strip()
 extra_args_file = setting.EXTRA_ARGS_FILE.strip()
 deploy_pkg_path = setting.DEPLOY_PKG_PATH.strip()
 pkg_owner = setting.PKG_OWNER.strip()
+batch_socket_room = "batch_execute"
 workstation = "workstation"
 
 
@@ -34,25 +35,32 @@ def executing(message):
     # every thread own their room to get their logs
     with thread_lock:
         join_room(message['room'])
-        emit('my_response', {'data': "后台脚本开始执行..." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+        emit('my_response', {'data': "后台脚本开始执行..." + "\n", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=message['room'])
         # call deploy thread
-        socketio.start_background_task(target=execute_thread, room=message['room'])
+        socketio.start_background_task(target=execute_thread, info=message['room'], single=True)
 
 
 @socketio.on('batch_executing', namespace='/execute')
 def batch_exec():
     """Func for batch deploy"""
-    room = 'batch_execute'
+    room = batch_socket_room
     join_room(room)
     emit('my_response', {'data': "Projects version detail refer to file: " + extra_args_file + ", which post in " + SystemConfig().get().repository_server,
                          'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=room)
     try:
         batch_list = get_branches(room)
     except Exception as Err:
-        emit('my_response', {'data': "Failed to get release list due to: " + str(Err), 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+        emit('my_response', {'data': "Failed to get release list due to: " + str(Err),
+                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=room)
         raise Exception("Get Deploy List Error")
     else:
-        emit('my_response', {'data': "Got release list: \n" + str(batch_list), 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"})
+        emit('my_response', {'data': "Got release list: \n" + str(batch_list),
+                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=room)
+        emit('my_response', {'data': "批量发布开始...", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=room)
+        for child in batch_list:
+            # call deploy thread
+            with thread_lock:
+                socketio.start_background_task(target=execute_thread, info=child, single=False)
 
 
 @socketio.on('disconnect_request', namespace='/execute')
@@ -74,13 +82,13 @@ def print_disconnect():
     print('Client disconnected', request.sid)
 
 
-def execute_thread(room):
+def execute_thread(info, single=True):
     """Execute process thread"""
     time_begin = time.localtime()
-    # string room should be "project@branch", pick out project and branch name from it.
-    room_split = str(room).split("@")
-    project = str(room_split[0])
-    branch = str(room_split[1])
+    # string info should be "project@branch", pick out project and branch name from it.
+    info_split = str(info).split("@")
+    project = str(info_split[0])
+    branch = str(info_split[1])
     working_path = project_work_path(project)
     # clean the working path
     clean_command = 'rm -rf ' + str(working_path)
@@ -88,11 +96,18 @@ def execute_thread(room):
     time.sleep(2)
     try:
         # get deploy package
-        my_pkg = get_package(project=project, version=branch, room=room)
+        my_pkg = get_package(project=project, version=branch, room=info)
         my_hosts = get_hosts(project)
         my_playbook = get_playbook(package_name=str(my_pkg[1]), local_package=str(my_pkg[0]))
     except Exception as Err:
         sys.exit(str(Err))
+
+    # define room name, which use for socket output info
+    if single:
+        room = info
+    else:
+        room = batch_socket_room
+
     # create ansible command
     ansible_bin = SystemConfig().get().ansible_path
     command = ansible_bin + "/ansible-playbook -i " + my_hosts + " " + my_playbook
@@ -109,15 +124,17 @@ def execute_thread(room):
         while running:
             socketio.sleep(2)
             output = str(logs.read())
-            # only print out when there's output
-            if output:
+            # only print out when there's output and single release, single should be false when batch deploy
+            if output and single:
                 socketio.emit('my_response', {'time_stamp': "", 'data': output}, namespace='/execute', room=room)
             # poll() func will get return code of subrocess.Popen(), None means running
             if proc.poll() != None:
                 running = False
                 time_end = time.localtime()
-                socketio.emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":", 'data': "脚本执行完毕!"}, namespace='/execute', room=room)
-    socketio.emit('my_response',{'data': "请检查进程是否正常！", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"}, namespace='/execute', room=room)
+                socketio.emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":",
+                                              'data': "工程脚本执行完毕!"}, namespace='/execute', room=room)
+    socketio.emit('my_response',{'data': "请检查进程是否正常！",
+                                 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"}, namespace='/execute', room=room)
     # write logs into record
     with open(logs_file) as logs:
         logs = logs.read()

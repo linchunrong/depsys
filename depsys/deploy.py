@@ -58,9 +58,16 @@ def batch_exec():
                              'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=room)
         emit('my_response', {'data': "批量发布开始...", 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=room)
         for child in batch_list:
-            # call deploy thread
-            with thread_lock:
-                socketio.start_background_task(target=execute_thread, info=child, single=False)
+            project = child.split('@')[0]
+            exist = ProjectConfig().get(project)
+            # only when project exist will go on
+            if exist:
+                # call deploy thread
+                with thread_lock:
+                    task = socketio.start_background_task(target=execute_thread, info=child, single=False)
+            else:
+                emit('my_response', {'data': "[ERROR] [" + project + "] 工程未配置/不存在，请检查！",
+                                     'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=room)
 
 
 @socketio.on('disconnect_request', namespace='/execute')
@@ -132,8 +139,8 @@ def execute_thread(info, single=True):
                 running = False
                 time_end = time.localtime()
                 socketio.emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":",
-                                              'data': "工程脚本执行完毕!"}, namespace='/execute', room=room)
-    socketio.emit('my_response',{'data': "请检查进程是否正常！",
+                                              'data': "[" + project + "] 发布脚本执行完毕!"}, namespace='/execute', room=room)
+    socketio.emit('my_response',{'data': "[" + project + "] 请检查进程是否正常！",
                                  'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"}, namespace='/execute', room=room)
     # write logs into record
     with open(logs_file) as logs:
@@ -175,7 +182,7 @@ def execute_thread(info, single=True):
                 try:
                     release_info = json.load(release_info)
                 except Exception as Err:
-                    socketio.emit('my_response', {'data': "Read " + extra_args_file + " failed due to: " + str(Err) + "\n",
+                    socketio.emit('my_response', {'data': "[" + project + "] Read " + extra_args_file + " failed due to: " + str(Err) + "\n",
                                          'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                     print("Error: ", str(Err))
                     DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer="N/A",
@@ -200,18 +207,18 @@ def execute_thread(info, single=True):
             try:
                 shutil.copyfile(str(srcfile),str(destfile))
             except Exception as Err:
-                return ("Failed to save deployed package due to: " + str(Err))
+                return ("[" + project + "] Failed to save deployed package due to: " + str(Err))
             # save extra args file if exist
             else:
                 if os.path.isfile(extra_file):
                     try:
                         shutil.copyfile(extra_file,str(destfile_path.joinpath(extra_args_file)))
                     except Exception as e:
-                        return ("Failed to save extra args file due to: " + str(e))
+                        return ("[" + project + "] Failed to save extra args file due to: " + str(e))
         else:
-            return ("Deployed package was saved before, this probably a rollback action.")
+            return ("[" + project + "] Deployed package was saved before, this probably a rollback action.")
     else:
-        return ("Not a success deployment, package save isn't need.")
+        return ("[" + project + "] Not a success deployment, package save isn't need.")
 
 
 def my_path():
@@ -334,7 +341,7 @@ def get_package(project, version, room):
     # check if local package exist
     deployed_package = my_path().joinpath(data_path, project, version, package_name)
     if os.path.isfile(deployed_package):
-        socketio.emit('my_response', {'data': "Found deployed local package, use it for this deployment." + "\n",
+        socketio.emit('my_response', {'data': "[" + project + "] Found deployed local package, use it for this deployment." + "\n",
                     'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
         extra_file = my_path().joinpath(data_path, project, version, extra_args_file)
         if not os.path.isfile(extra_file):
@@ -349,11 +356,11 @@ def get_package(project, version, room):
             # pull package via gitPython
             try:
                 my_remote = empty_repo.create_remote(project, repo_address)
-                socketio.emit('my_response', {'data': "Downloading package from gitlab..." + "\n",
+                socketio.emit('my_response', {'data': "[" + project + "] Downloading package from gitlab..." + "\n",
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 my_remote.pull(version)
             except Exception as Err:
-                socketio.emit('my_response', {'data': "[ERROR] Download package from repository failed, please check your setting! \n",
+                socketio.emit('my_response', {'data': "[ERROR] [" + project + "] Download package from repository failed, please check your setting! \n",
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 print("Error: ", str(Err))
                 raise Exception("Package Download Error")
@@ -373,11 +380,11 @@ def get_package(project, version, room):
             # pull specific path via gitPython
             try:
                 my_remote = empty_repo.create_remote(project, repo_address)
-                socketio.emit('my_response', {'data': "Downloading package from gitlab..." + "\n",
+                socketio.emit('my_response', {'data': "[" + project + "] Downloading package from gitlab..." + "\n",
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 my_remote.pull('master')
             except Exception as Err:
-                socketio.emit('my_response', {'data': "[ERROR] Download package from repository failed, please check your setting! \n",
+                socketio.emit('my_response', {'data': "[ERROR] [" + project + "] Download package from repository failed, please check your setting! \n",
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                 print("Error: ", str(Err))
                 raise Exception("Package Download Error")
@@ -386,7 +393,7 @@ def get_package(project, version, room):
                 if os.path.isfile(package):
                     extra_file = project_work_path(project).joinpath(extra_args_file)
                 else:
-                    socketio.emit('my_response', {'data': "[ERROR] Seems this version doesnt' include a package, please check!" + "\n",
+                    socketio.emit('my_response', {'data': "[ERROR] [" + project + "] Seems this version doesnt' include a package, please check!" + "\n",
                                 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
                     raise Exception("Version Empty Error")
             if not os.path.isfile(extra_file):
@@ -432,8 +439,9 @@ def get_branches(room):
         print("Error: ", str(Err))
         raise Exception("File Download Error")
     else:
-        socketio.emit('my_response', {'data': "Downloaded " + extra_args_file + " to " + str(working_path),
-                                      'time_stamp' : "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
+        socketio.emit('my_response', {'data': "Saved " + extra_args_file + " to " + str(working_path),
+                                      'time_stamp' : "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"},
+                      namespace='/execute', room=room)
         with open(extra_args_file, encoding='utf-8') as release_info:
             # release_info is a json format file
             try:

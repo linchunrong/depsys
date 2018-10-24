@@ -118,6 +118,13 @@ def deploy_exec(project):
     return render_template('execute.html', project=project, branch=branch, async_mode=deploy.socketio.async_mode)
 
 
+@app.route('/execute/batch')
+@login_required
+def deploy_batch():
+    from depsys import deploy
+    return render_template('execute.html', project='batch', async_mode=deploy.socketio.async_mode)
+
+
 @app.route('/config', methods=['GET', 'POST'])
 @login_required
 def config():

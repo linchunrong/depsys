@@ -20,14 +20,25 @@ $(document).ready(function() {
         $('#log').append('<br>' + $('<div/>').text(msg.time_stamp + msg.data).html());
     });
     $('button#exec_room').click(function () {
-        socket.emit('executing', {room: $('#exec_room').val()});
-        return false
+        if ($('#exec_room').val() === 'batch_execute') {
+            socket.emit('batch_executing');
+        }
+        else {
+            socket.emit('executing', {room: $('#exec_room').val()});
+        }
+        return false;
     });
     $('button#disconnect').click(function () {
         socket.emit('disconnect_request');
-        window.location.href = "{{ url_for('project_deploy', project=project) }}";
+        if ($('#exec_room').val() === 'batch_execute')
+        {
+            window.location.href = "{{ url_for('projects') }}";
+        }
+        else {
+            window.location.href = "{{ url_for('project_deploy', project=project) }}";
+        }
         return false;
-    })
+    });
 });
 </script>
 <!-- Main Content -->
@@ -35,6 +46,7 @@ $(document).ready(function() {
     <div class="side-body">
         <div class="page-title">
             <span class="title">发布</span>
+            <div class="description hidden">Async Mode: {{ async_mode }}</div>
         </div>
         <div class="row">
             <div class="col-xs-12">
@@ -42,13 +54,22 @@ $(document).ready(function() {
                     <div class="card-header">
                         <div class="card-title">
                             <div class="title">
+                                {% if branch %}
                                 <span class="text-primary">{{ project }}</span>
+                                {% else %}
+                                <span class="text-primary">批量发布</span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="form-group">
+                            {% if branch %}
                             <span class="text-success" style="font-size: medium">版本：{{ branch }}</span>
+                            {% else %}
+                                <span class="text-success" style="font-size: medium">简略日志</span>
+                                <em><small class="text-danger">(详细日志，请在发布完成后进入相关工程查看！)</small></em>
+                            {% endif %}
                             <button class="close" id="disconnect"><span aria-hidden="true">&times;</span></button>
                         </div>
                         <div class="form-group">
@@ -56,7 +77,11 @@ $(document).ready(function() {
                         </div>
                         <div class="form-inline">
                             <div class="form-group">
+                                {% if branch %}
                                 <button class="btn btn-info" value="{{ project }}@{{ branch }}" id="exec_room">开始</button>
+                                {% else %}
+                                <button class="btn btn-info" value="batch_execute" id="exec_room">开始</button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

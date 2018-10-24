@@ -64,7 +64,7 @@ def batch_exec():
             if exist:
                 # call deploy thread
                 with thread_lock:
-                    task = socketio.start_background_task(target=execute_thread, info=child, single=False)
+                    socketio.start_background_task(target=execute_thread, info=child, single=False)
             else:
                 emit('my_response', {'data': "[ERROR] [" + project + "] 工程未配置/不存在，请检查！",
                                      'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=room)
@@ -120,7 +120,8 @@ def execute_thread(info, single=True):
     command = ansible_bin + "/ansible-playbook -i " + my_hosts + " " + my_playbook
     # command = "ping www.baidu.com -c 5"
     os.chdir(str(working_path))
-    logs_file = "logs_" + random_string(16) + ".txt"
+    logs_name = "logs_" + random_string(16) + ".txt"
+    logs_file = str(working_path.joinpath(logs_name))
     # run ansible and write logs into temporary log files
     with open(logs_file, "w+") as file:
         proc = subprocess.Popen(command, shell=True, stdout=file)
@@ -140,8 +141,6 @@ def execute_thread(info, single=True):
                 time_end = time.localtime()
                 socketio.emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":",
                                               'data': "[" + project + "] 发布脚本执行完毕!"}, namespace='/execute', room=room)
-    socketio.emit('my_response',{'data': "[" + project + "] 请检查进程是否正常！",
-                                 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"}, namespace='/execute', room=room)
     # write logs into record
     with open(logs_file) as logs:
         logs = logs.read()
@@ -149,10 +148,19 @@ def execute_thread(info, single=True):
         returncode = proc.poll()
         if returncode == 0:
             status = 1
+            socketio.emit('my_response', {'data': "[" + project + "] 发布成功，请检查进程是否正常！",
+                                          'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
+                          namespace='/execute', room=room)
         elif returncode <0:
             status = -1
+            socketio.emit('my_response', {'data': "[" + project + "] 发布中断！！",
+                                          'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
+                          namespace='/execute', room=room)
         else:
             status = 0
+            socketio.emit('my_response', {'data': "[ERROR] [" + project + "] 发生错误，请检查日志！",
+                                          'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
+                      namespace='/execute', room=room)
         # grab package md5 from logs
         search_line = '''md5_value.stdout_lines": \[\n ([^>]+) ]'''
         result = re.compile(search_line).findall(logs)

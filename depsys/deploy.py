@@ -21,16 +21,17 @@ extra_args_file = setting.EXTRA_ARGS_FILE.strip()
 deploy_pkg_path = setting.DEPLOY_PKG_PATH.strip()
 pkg_owner = setting.PKG_OWNER.strip()
 batch_socket_room = "batch_execute"
+namespace = '/execute'
 workstation = "workstation"
 
 
-@socketio.on('my_event', namespace='/execute')
+@socketio.on('my_event', namespace=namespace)
 def message(message):
     emit('my_response',
          {'data': message['data'], 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
 
 
-@socketio.on('executing', namespace='/execute')
+@socketio.on('executing', namespace=namespace)
 def executing(message):
     # every thread own their room to get their logs
     with thread_lock:
@@ -40,7 +41,7 @@ def executing(message):
         socketio.start_background_task(target=execute_thread, info=message['room'], single=True)
 
 
-@socketio.on('batch_executing', namespace='/execute')
+@socketio.on('batch_executing', namespace=namespace)
 def batch_exec():
     """Func for batch deploy"""
     room = batch_socket_room
@@ -70,12 +71,12 @@ def batch_exec():
                                      'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=room)
 
 
-@socketio.on('disconnect_request', namespace='/execute')
+@socketio.on('disconnect_request', namespace=namespace)
 def disconnect_request():
     disconnect()
 
 
-@socketio.on('connect', namespace='/execute')
+@socketio.on('connect', namespace=namespace)
 def test_connect():
     #global thread
     #with thread_lock:
@@ -84,7 +85,7 @@ def test_connect():
     emit('my_response', {'data': '开始连接后台...', 'time_stamp': time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"})
 
 
-@socketio.on('disconnect', namespace='/execute')
+@socketio.on('disconnect', namespace=namespace)
 def print_disconnect():
     print('Client disconnected', request.sid)
 
@@ -134,13 +135,13 @@ def execute_thread(info, single=True):
             output = str(logs.read())
             # only print out when there's output and single release, single should be false when batch deploy
             if output and single:
-                socketio.emit('my_response', {'time_stamp': "", 'data': output}, namespace='/execute', room=room)
+                socketio.emit('my_response', {'time_stamp': "", 'data': output}, namespace=namespace, room=room)
             # poll() func will get return code of subrocess.Popen(), None means running
             if proc.poll() != None:
                 running = False
                 time_end = time.localtime()
                 socketio.emit('my_response', {'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":",
-                                              'data': "[" + project + "] 发布脚本执行完毕!"}, namespace='/execute', room=room)
+                                              'data': "[" + project + "] 发布脚本执行完毕!"}, namespace=namespace, room=room)
     # write logs into record
     with open(logs_file) as logs:
         logs = logs.read()
@@ -150,17 +151,17 @@ def execute_thread(info, single=True):
             status = 1
             socketio.emit('my_response', {'data': "[" + project + "] 发布成功，请检查进程是否正常！",
                                           'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
-                          namespace='/execute', room=room)
+                          namespace=namespace, room=room)
         elif returncode <0:
             status = -1
             socketio.emit('my_response', {'data': "[" + project + "] 发布中断！！",
                                           'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
-                          namespace='/execute', room=room)
+                          namespace=namespace, room=room)
         else:
             status = 0
             socketio.emit('my_response', {'data': "[ERROR] [" + project + "] 发生错误，请检查日志！",
                                           'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
-                      namespace='/execute', room=room)
+                      namespace=namespace, room=room)
         # grab package md5 from logs
         search_line = '''md5_value.stdout_lines": \[\n ([^>]+) ]'''
         result = re.compile(search_line).findall(logs)
@@ -191,7 +192,7 @@ def execute_thread(info, single=True):
                     release_info = json.load(release_info)
                 except Exception as Err:
                     socketio.emit('my_response', {'data': "[" + project + "] Read " + extra_args_file + " failed due to: " + str(Err) + "\n",
-                                         'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
+                                         'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace=namespace, room=room)
                     print("Error: ", str(Err))
                     DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer="N/A",
                                        time_begin=time_begin, time_end=time_end, pkg_md5=pkg_md5, logs=logs)
@@ -350,7 +351,7 @@ def get_package(project, version, room):
     deployed_package = my_path().joinpath(data_path, project, version, package_name)
     if os.path.isfile(deployed_package):
         socketio.emit('my_response', {'data': "[" + project + "] Found deployed local package, use it for this deployment." + "\n",
-                    'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
+                    'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace=namespace, room=room)
         extra_file = my_path().joinpath(data_path, project, version, extra_args_file)
         if not os.path.isfile(extra_file):
             extra_file = None
@@ -365,11 +366,11 @@ def get_package(project, version, room):
             try:
                 my_remote = empty_repo.create_remote(project, repo_address)
                 socketio.emit('my_response', {'data': "[" + project + "] Downloading package from gitlab..." + "\n",
-                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
+                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace=namespace, room=room)
                 my_remote.pull(version)
             except Exception as Err:
                 socketio.emit('my_response', {'data': "[ERROR] [" + project + "] Download package from repository failed, please check your setting! \n",
-                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
+                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace=namespace, room=room)
                 print("Error: ", str(Err))
                 raise Exception("Package Download Error")
             # write commit info into
@@ -389,11 +390,11 @@ def get_package(project, version, room):
             try:
                 my_remote = empty_repo.create_remote(project, repo_address)
                 socketio.emit('my_response', {'data': "[" + project + "] Downloading package from gitlab..." + "\n",
-                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
+                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace=namespace, room=room)
                 my_remote.pull('master')
             except Exception as Err:
                 socketio.emit('my_response', {'data': "[ERROR] [" + project + "] Download package from repository failed, please check your setting! \n",
-                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
+                            'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace=namespace, room=room)
                 print("Error: ", str(Err))
                 raise Exception("Package Download Error")
             else:
@@ -402,7 +403,7 @@ def get_package(project, version, room):
                     extra_file = project_work_path(project).joinpath(extra_args_file)
                 else:
                     socketio.emit('my_response', {'data': "[ERROR] [" + project + "] Seems this version doesnt' include a package, please check!" + "\n",
-                                'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace='/execute', room=room)
+                                'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace=namespace, room=room)
                     raise Exception("Version Empty Error")
             if not os.path.isfile(extra_file):
                 extra_file = None
@@ -438,18 +439,18 @@ def get_branches(room):
         my_remote = empty_repo.create_remote("batch", repo_address)
         socketio.emit('my_response', {'data': "Downloading " + extra_args_file + " from repository...",
                                       'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
-                      namespace='/execute', room=room)
+                      namespace=namespace, room=room)
         my_remote.pull('master')
     except Exception as Err:
         socketio.emit('my_response', {'data': "[ERROR] Download " + extra_args_file + " from repository failed, please check your setting!",
                                       'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
-                      namespace='/execute', room=room)
+                      namespace=namespace, room=room)
         print("Error: ", str(Err))
         raise Exception("File Download Error")
     else:
         socketio.emit('my_response', {'data': "Saved " + extra_args_file + " to " + str(working_path),
                                       'time_stamp' : "\n" + time.strftime("%Y-%m-%d:%H:%M:%S",time.localtime()) + ":"},
-                      namespace='/execute', room=room)
+                      namespace=namespace, room=room)
         with open(extra_args_file, encoding='utf-8') as release_info:
             # release_info is a json format file
             try:
@@ -457,7 +458,7 @@ def get_branches(room):
             except Exception as Err:
                 socketio.emit('my_response', {'data': "Read " + extra_args_file + " failed due to: " + str(Err),
                                               'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
-                              namespace='/execute', room=room)
+                              namespace=namespace, room=room)
                 print("Error: ", str(Err))
                 raise Exception("Read File Error")
             else:

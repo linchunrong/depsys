@@ -8,45 +8,16 @@
 {% endblock %}
 {% block content %}
 <script src="../static/lib/js/socket.io.js"></script>
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function() {
-    namespace = '/execute';
-    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-    socket.on('connect', function () {
-        socket.emit('my_event', {data: '后台已连接!'});
-        //socket.emit('executing', {room: $('#exec_room').val()});
-    });
-    socket.on('my_response', function (msg) {
-        $('#log').append('<br>' + $('<div/>').text(msg.time_stamp + msg.data).html());
-    });
-    $('button#exec_room').click(function () {
-        if ($('#exec_room').val() === 'batch_execute') {
-            socket.emit('batch_executing');
-        }
-        else {
-            socket.emit('executing', {room: $('#exec_room').val()});
-        }
-        return false;
-    });
-    $('button#disconnect').click(function () {
-        socket.emit('disconnect_request');
-        if ($('#exec_room').val() === 'batch_execute')
-        {
-            window.location.href = "{{ url_for('projects') }}";
-        }
-        else {
-            window.location.href = "{{ url_for('project_deploy', project=project) }}";
-        }
-        return false;
-    });
-});
-</script>
+<!-- custom web socket actions -->
+<script src="../static/js/socket.js" charset="utf-8"></script>
 <!-- Main Content -->
 <div class="container-fluid">
     <div class="side-body">
         <div class="page-title">
             <span class="title">发布</span>
             <div class="description hidden">Async Mode: {{ async_mode }}</div>
+            <!-- set project_name as var for socket.js -->
+            <div class="description hidden"><input id="project_name" value="{{ project }}"></div>
         </div>
         <div class="row">
             <div class="col-xs-12">

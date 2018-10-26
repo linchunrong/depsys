@@ -158,18 +158,23 @@ def project_config(project):
     if request.method == "POST":
         if form.validate_on_submit():
             p = ProjectConfig()
+            project_name = form.project_name.data.strip()
+            exist = p.get(project_name)
+            if exist:
+                flash("Error: " + project_name + " 已经存在！")
+                return redirect(url_for('project_config', project=project))
             if project == "add_new_project":
-                p.add(project_name=form.project_name.data.strip(), group=form.group.data.strip(), describe=form.describe.data.strip(),
+                p.add(project_name=project_name, group=form.group.data.strip(), describe=form.describe.data.strip(),
                       servers=form.servers.data.strip(), source_address=form.source_address.data.strip(),
                       project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
                 flash("添加工程 "+ form.project_name.data.strip() + " 成功！")
-                return redirect(url_for('project_config', project=form.project_name.data.strip()))
+                return redirect(url_for('project_config', project=project_name))
             else:
-                p.update(project_name_old=project, project_name=form.project_name.data.strip(), group=form.group.data.strip(), describe=form.describe.data.strip(),
-                         servers=form.servers.data.strip(),
-                         source_address=form.source_address.data.strip(), project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
+                p.update(project_name_old=project, project_name=project_name, group=form.group.data.strip(), describe=form.describe.data.strip(),
+                         servers=form.servers.data.strip(), source_address=form.source_address.data.strip(),
+                         project_type=form.project_type.data, post_script_type=form.post_script_type.data, post_script=form.post_script.data)
                 flash("工程 " + form.project_name.data.strip() + " 配置已更新！")
-                return redirect(url_for('project_config', project=form.project_name.data.strip()))
+                return redirect(url_for('project_config', project=project_name))
         else:
             for key in form.errors:
                 flash("Error: " + form.errors[key][0])

@@ -6,7 +6,7 @@ import datetime, pdfkit, os, pathlib
 import setting
 
 # create pdf report in temp_path here
-temp_path = setting.temp_path
+temp_path = setting.TEMP_PATH.strip()
 
 
 class Report:

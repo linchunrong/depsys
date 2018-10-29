@@ -14,9 +14,9 @@ from depsys.dashboard import DeployRecord
 # thread = None
 thread_lock = Lock()
 # define variables
-data_path = setting.data_path.strip()
-bin_path = setting.bin_path.strip()
-temp_path = setting.temp_path.strip()
+data_path = setting.DATA_PATH.strip()
+bin_path = setting.BIN_PATH.strip()
+temp_path = setting.TEMP_PATH.strip()
 extra_args_file = setting.EXTRA_ARGS_FILE.strip()
 deploy_pkg_path = setting.DEPLOY_PKG_PATH.strip()
 pkg_owner = setting.PKG_OWNER.strip()

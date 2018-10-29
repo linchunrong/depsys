@@ -42,7 +42,7 @@ def email(receiver, attachment=None, subject=None, content='FYI', subtype='plain
 def wechat(type, message=None, post_file=None):
     """Send message via WeChat"""
     # API doc refer to - https://work.weixin.qq.com/api/doc, get variables rom setting
-    access_token = get_token(corpid=corpid, corpsecret=corpsecret)
+    access_token = get_token(corpid=CORPID, corpsecret=CORPSECRET)
     # if there's error when call get_token, return Error
     if "Error" in access_token:
         return access_token
@@ -52,7 +52,7 @@ def wechat(type, message=None, post_file=None):
         "touser": "@all",
         "toparty": "@all",
         "msgtype": type,
-        "agentid": AgentId,
+        "agentid": AGENTID,
         "safe": 0
     }
     if type == 'file':

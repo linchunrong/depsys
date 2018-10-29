@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# !!! Only upper can be save into flask app.config object !!!  get value via app.config['key']
+
 # network setting
-Host = '0.0.0.0'
-Port = 5000
+HOST = '0.0.0.0'
+PORT = 5000
 
 # Set it True for Test env, False for Prod env
 DEBUG = True
@@ -14,8 +16,8 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://depsys:123456@127.0.0.1:3306/depsys'
 
 # default admin user/password
-admin_user = 'admin'
-admin_pass = '888888'
+ADMIN_USER = 'admin'
+ADMIN_PASS = '888888'
 
 # package path and owner
 DEPLOY_PKG_PATH = '/home/FaeWork/pkgs/'
@@ -25,14 +27,14 @@ PKG_OWNER = 'FaeWork'
 EXTRA_ARGS_FILE = "release_note.json"
 
 # date paths, which save project data, would be ./depsys/data_path
-data_path = 'data'
+DATA_PATH = 'data'
 # temporary path, would be ./depsys/temp_path
-temp_path = 'tmp'
+TEMP_PATH = 'tmp'
 # bin path, not in use, would be ./depsys/bin_path
-bin_path = 'bin'
+BIN_PATH = 'bin'
 
 # WeChat interface
 API_URL = 'https://qyapi.weixin.qq.com/cgi-bin/'
-corpid = '******'
-corpsecret = '******'
-AgentId = '******'
+CORPID = '******'
+CORPSECRET = '******'
+AGENTID = '******'

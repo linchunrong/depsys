@@ -6,4 +6,4 @@ from setting import *
 
 if __name__ == '__main__':
     #app.run(debug=True)
-    socketio.run(app, host=Host, port=Port, debug=DEBUG)
+    socketio.run(app, host=HOST, port=PORT, debug=DEBUG)

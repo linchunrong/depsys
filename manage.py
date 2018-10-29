@@ -24,13 +24,13 @@ if __name__ == '__main__':
         item = User.query.filter_by(username='admin').first()
         # switch admin password to default which set in setting.py
         if item:
-            item.password = setting.admin_pass
+            item.password = setting.ADMIN_PASS
             db.session.commit()
             db.session.close()
             print("Admin password has been updated to default!")
         # add admin user/password into db when it doesn't exist
         else:
-            item = User(username=setting.admin_user, password=setting.admin_pass, enable=1)
+            item = User(username=setting.ADMIN_USER, password=setting.ADMIN_PASS, enable=1)
             db.session.add(item)
             db.session.commit()
             db.session.close()

@@ -3,10 +3,6 @@
 
 # !!! Only upper can be save into flask app.config object !!!  get value via app.config['key']
 
-# network setting
-HOST = '0.0.0.0'
-PORT = 5000
-
 # Set it True for Test env, False for Prod env
 DEBUG = True
 
@@ -14,6 +10,10 @@ SECRET_KEY = '\x84\x96\x04\xe9\xc5\xe1\xb4\xc5\xa4M\xcd\x9a\xf4b"\xce\x88\xe36\x
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://depsys:123456@127.0.0.1:3306/depsys'
+
+# network setting
+HOST = '0.0.0.0'
+PORT = 5000
 
 # default admin user/password
 ADMIN_USER = 'admin'

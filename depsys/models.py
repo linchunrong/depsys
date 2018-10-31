@@ -5,6 +5,11 @@ from depsys import db, login_manager
 from flask_login import UserMixin
 
 
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -13,10 +18,6 @@ class User(db.Model, UserMixin):
     group = db.Column(db.String(36))
     enable = db.Column(db.Boolean, default=True, nullable=False)
     permission = db.Column(db.Integer)
-
-    @login_manager.user_loader
-    def load_user(id):
-        return User.query.get(int(id))
 
     def __repr__(self):
         return '<User %r>' % self.username

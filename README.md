@@ -12,21 +12,27 @@ $ python manage.py db upgrade
 ```shell
 $ python manage.py init
 ```
-- 启动命令为 python ./runserver.py
+- 启动命令
+ ```shell
+ # 直接启动
+$ python ./runserver.py
+# 利用 gunicorn Web 服务器启动
+$ gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 -b 127.0.0.1:5000 runserver:app
+ ```
 
 `注意：报表中利用 pdfkit 生成带中文的 PDF 文件时，需要Linux系统安装中文字体`
 
 ---
-#### Depends
-python==3.6.0  
-mysql==5.6  
-ansible==2.4.2  
-git==1.8.3.1  
-wkhtmltopdf==0.12.5
+#### Dependencies
+- python==3.6.0  
+- mysql==5.6  
+- ansible==2.4.2  
+- git==1.8.3.1  
+- wkhtmltopdf==0.12.5
 
-所引入的 python 类库见 requirement.txt, pip 安装：
+所引入的 python 类库见 requirements.txt, pip 安装：
 ```shell
-pip install -r requiremente.txt
+pip install -r requirements.txt
 ```
 
 `注：版本仅作参考用`

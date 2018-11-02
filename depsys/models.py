@@ -5,11 +5,6 @@ from depsys import db, login_manager
 from flask_login import UserMixin
 
 
-@login_manager.user_loader
-def load_user(id):
-    return User.query.get(int(id))
-
-
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -21,6 +16,11 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 
 class System(db.Model):

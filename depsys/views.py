@@ -8,6 +8,7 @@ from depsys import app, sendmsg, makemsg
 from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import *
 from depsys.forms import *
+from depsys.permissions import requires_roles
 
 
 # Index
@@ -109,6 +110,7 @@ def project_deploy(project):
 
 @app.route('/execute/<project>', methods=['POST'])
 @login_required
+@requires_roles('admin', 'editor')
 def deploy_exec(project):
     from depsys import deploy
     branch = request.form['branch']
@@ -120,6 +122,7 @@ def deploy_exec(project):
 
 @app.route('/execute/batch')
 @login_required
+@requires_roles('admin', 'editor')
 def deploy_batch():
     from depsys import deploy
     return render_template('execute.html', project='batch', async_mode=deploy.socketio.async_mode)
@@ -127,6 +130,7 @@ def deploy_batch():
 
 @app.route('/config', methods=['GET', 'POST'])
 @login_required
+@requires_roles('admin', 'editor')
 def config():
     form = SystemForm()
     conf = SystemConfig().get()
@@ -152,6 +156,7 @@ def config():
 
 @app.route('/config/<project>', methods=['GET', 'POST'])
 @login_required
+@requires_roles('admin', 'editor')
 def project_config(project):
     form = ProjectForm()
     conf = ProjectConfig().get(project)
@@ -184,6 +189,7 @@ def project_config(project):
 
 @app.route('/delete/<project>', methods=['GET', 'POST'])
 @login_required
+@requires_roles('admin')
 def project_delete(project):
     p = ProjectConfig()
     if request.method == "POST":

@@ -3,7 +3,7 @@
 
 import sys
 from depsys import db
-from depsys.models import Project, System, User
+from depsys.models import Project, System, User, Role
 
 
 class SystemConfig:
@@ -99,5 +99,28 @@ class UserConfig:
         else:
             print("Error: Either user_id or username as arguments!")
             sys.exit(1)
+
+        return item
+
+
+class RoleConfig:
+    """Config for role"""
+    def add(self, name, describe):
+        """Add role"""
+        item = Role(name=name, describe=describe)
+        db.session.add(item)
+        db.session.commit()
+        db.session.close()
+
+    def delete(self, name):
+        """Delete role"""
+        item = Role.query.filter_by(name=name).first()
+        db.session.delete(item)
+        db.session.commit()
+        db.session.close()
+
+    def get(self, role_id):
+        """Get role config"""
+        item = Role.query.filter_by(role_id=role_id).first()
 
         return item

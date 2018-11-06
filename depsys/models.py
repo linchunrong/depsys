@@ -11,8 +11,8 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(17), unique=True, nullable=False)
     password = db.Column(db.String(24), nullable=False)
     group = db.Column(db.String(36))
-    enable = db.Column(db.Boolean, default=True, nullable=False)
-    permission = db.Column(db.Integer)
+    enable = db.Column(db.Boolean, default=True)
+    role = db.Column(db.Integer, db.ForeignKey('roles.role_id'))
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -21,6 +21,14 @@ class User(db.Model, UserMixin):
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+
+class Role(db.Model):
+    __tablename__ = 'roles'
+    role_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(16), unique=True, nullable=False)
+    describe = db.Column(db.String(100))
+    user = db.relationship('User', backref='rol')
 
 
 class System(db.Model):

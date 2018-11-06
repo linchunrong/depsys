@@ -26,8 +26,9 @@ def role_init_admin():
         item = Role(name='admin', describe='administrator')
         db.session.add(item)
         db.session.commit()
-        role_id = item.role_id
         db.session.close()
+        new = Role.query.filter_by(name='admin').first()
+        role_id = new.role_id
         return role_id
 
 
@@ -38,6 +39,7 @@ if __name__ == '__main__':
     if action == 'init':
         item = User.query.filter_by(username='admin').first()
         role = role_init_admin()
+        print(role)
         # switch admin password to default which set in setting.py
         if item:
             item.password = setting.ADMIN_PASS

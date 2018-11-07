@@ -22,8 +22,8 @@ def get_current_user_role():
     return role
 
 
-def error_response():
-    return render_template('error.html')
+def deny_response():
+    return render_template('deny.html')
 
 
 # write a decorate for view page
@@ -32,7 +32,7 @@ def requires_roles(*roles):
         @wraps(f)
         def wrapped(*args, **kwargs):
             if get_current_user_role() not in roles:
-                return error_response()
+                return deny_response()
             return f(*args, **kwargs)
         return wrapped
     return wrapper

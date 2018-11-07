@@ -154,6 +154,15 @@ def config():
     return render_template('sysconfig.html', form=form, conf=conf)
 
 
+@app.route('/users', methods=['GET', 'POST'])
+@login_required
+@requires_roles('admin')
+def users():
+    user_list = UserConfig().get_all()
+    role_list = RoleConfig().get_all()
+    return render_template('users.html', user_list=user_list, role_list=role_list)
+
+
 @app.route('/config/<project>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('admin', 'editor')

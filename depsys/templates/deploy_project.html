@@ -80,31 +80,31 @@ function version_select() {
                             <tbody>
                                 {% for record in records %}
                                 <tr>
-                                    <td width="65px">
+                                    <td width="65px" style="vertical-align: middle">
                                         <div class="radio3 radio-check radio-inline radio-success">
                                             <input type="radio" id="{{ record.version }}" name="selected" value="{{ record.version }}" onclick="version_select()"/>
                                             <label for="{{ record.version }}">&nbsp;</label>
                                         </div>
                                     </td>
-                                    <td>{{ record.version }}</td>
-                                    <td width="150px">{{ record.time_begin }}</td>
+                                    <td style="vertical-align: middle">{{ record.version }}</td>
+                                    <td width="150px" style="vertical-align: middle">{{ record.time_begin }}</td>
                                     {% if record.status == 1 %}
-                                    <td width="80px">
+                                    <td width="80px" style="vertical-align: middle">
                                         <label class="label label-success">成功</label>
                                     </td>
                                     {% elif record.status == 0 %}
-                                    <td width="80px">
+                                    <td width="80px" style="vertical-align: middle">
                                         <label class="label label-danger">失败</label>
                                     </td>
                                     {% elif record.status == -1 %}
-                                    <td width="80px">
+                                    <td width="80px" style="vertical-align: middle">
                                         <label class="label label-warning">中断</label>
                                     </td>
                                     {% endif %}
-                                    <td>{{ record.deploy_reason }}</td>
-                                    <td width="100px">{{ record.requester }}</td>
+                                    <td style="vertical-align: middle">{{ record.deploy_reason }}</td>
+                                    <td width="100px" style="vertical-align: middle">{{ record.requester }}</td>
                                         <p style="display: none" id="{{ record.record_id }}">{{ record.logs }}</p>
-                                    <td width="100px">
+                                    <td width="100px" style="vertical-align: middle">
                                         <label class="label label-info">
                                             <a href="javascript:void(0)" style="color: ghostwhite" onclick="show_logs('{{ record.record_id }}')">点击查看</a>
                                         </label>

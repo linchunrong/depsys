@@ -90,16 +90,41 @@ class UserConfig:
         db.session.commit()
         db.session.close()
 
-    def get(self, user_id=None, username=None):
-        """Get user config"""
+    def add(self, username, password, role, group=None, enable=1):
+        """Add user info"""
+        item = User(username=username, password=password, group=group, enable=enable, role=role)
+        db.session.add(item)
+        db.session.commit()
+        db.session.close()
+
+    def delete(self, user_id=None, username=None):
+        """Delete user info"""
         if user_id:
             item = User.query.filter_by(id=user_id).first()
         elif username:
             item = User.query.filter_by(username=username).first()
         else:
             print("Error: Either user_id or username as arguments!")
-            sys.exit(1)
+            raise Exception("Delete User: Username/ID Error")
+        db.session.delete(item)
+        db.session.commit()
+        db.session.close()
 
+    def get(self, user_id=None, username=None):
+        """Get user info"""
+        if user_id:
+            item = User.query.filter_by(id=user_id).first()
+        elif username:
+            item = User.query.filter_by(username=username).first()
+        else:
+            print("Error: Either user_id or username as arguments!")
+            raise Exception("Get User: Username/ID Error")
+
+        return item
+
+    def get_all(self):
+        """Get all users info"""
+        item = User.query.all()
         return item
 
 
@@ -122,5 +147,9 @@ class RoleConfig:
     def get(self, role_id):
         """Get role config"""
         item = Role.query.filter_by(role_id=role_id).first()
+        return item
 
+    def get_all(self):
+        """Get all roles"""
+        item = Role.query.all()
         return item

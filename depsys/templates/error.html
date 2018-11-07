@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block navbar_title %}
+<ol class="breadcrumb navbar-breadcrumb">
+    <li class="active">Error</li>
+</ol>
+{% endblock %}
+{% block content %}
+<!-- Main Content -->
+    <div class="container-fluid">
+        <div class="side-body">
+            <div class="page-title">
+                <span class="title">Error</span>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="sub-title">Permission Deny!</div>
+                            <div>
+                                <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                                    <h4 id="oh-snap!-you-got-an-error!">Oh snap! You got an error!<a class="anchorjs-link" href="#oh-snap!-you-got-an-error!"><span class="anchorjs-icon"></span></a></h4>
+                                    <p>你没有访问这个页面的权限，如需访问，请联系管理员！</p>
+                                    <p>
+                                        <a class="btn btn-danger" href="javascript: history.back(-1)">返回</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

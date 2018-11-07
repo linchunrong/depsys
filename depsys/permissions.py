@@ -4,6 +4,7 @@
 from functools import wraps
 from depsys.sysconfig import UserConfig, RoleConfig
 from flask_login import current_user
+from flask import render_template
 
 
 def get_current_user_role_id():
@@ -22,9 +23,10 @@ def get_current_user_role():
 
 
 def error_response():
-    return "403 Permission Deny!"
+    return render_template('error.html')
 
 
+# write a decorate for view page
 def requires_roles(*roles):
     def wrapper(f):
         @wraps(f)

@@ -20,13 +20,13 @@
                                 <p>
                                     用户名：
                                     <label>{{ user.username }}</label><br>
-                                    所属组：
-                                    {% if user.group != None %}
-                                    <label>{{ user.group}}</label>
+                                    角色：
+                                    {% if role != None %}
+                                        <em>{{ role.name}}</em>
                                     {% else %}
                                     <label>无</label>
                                     {% endif %}
-                                </p>
+                                </p><br>
                                 <div class="form-inline">
                                     更改密码：{{ form.password(placeholder="******",class="form-control",style="height:80%") }}
                                 </div>

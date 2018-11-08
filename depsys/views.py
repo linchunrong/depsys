@@ -47,6 +47,7 @@ def profile():
     form = UserForm()
     user_id = session['user_id']
     user = UserConfig().get(user_id=user_id)
+    role = RoleConfig().get(user.role)
     if request.method == "POST":
         if form.validate_on_submit():
             if form.password.data:
@@ -60,13 +61,13 @@ def profile():
                 flash("Error: " + form.errors[key][0])
         return redirect(url_for('profile'))
 
-    return render_template('profile.html', form=form, user=user)
+    return render_template('profile.html', form=form, user=user, role=role)
 
 
 @app.route('/projects', methods=['GET', 'POST'])
 @login_required
 def projects():
-    project_list = DeployInfo().projects()
+    project_list = ProjectConfig().get_all()
     form = ReportForm()
     if request.method == "POST" and form.validate_on_submit():
         report = makemsg.Report()

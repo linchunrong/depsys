@@ -8,14 +8,6 @@ from depsys import db
 
 class DeployInfo:
     """Get Deploy information"""
-    def projects(self):
-        """Get all projects"""
-        project_list = []
-        project_info = Project.query.all()
-        for i in range(len(project_info)):
-            project_list.append(project_info[i].project_name)
-        return project_list
-
     def status(self):
         """Get deploy status"""
         amount = []

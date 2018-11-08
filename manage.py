@@ -39,7 +39,6 @@ if __name__ == '__main__':
     if action == 'init':
         item = User.query.filter_by(username='admin').first()
         role = role_init_admin()
-        print(role)
         # switch admin password to default which set in setting.py
         if item:
             item.password = setting.ADMIN_PASS

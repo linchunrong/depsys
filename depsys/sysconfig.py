@@ -79,6 +79,11 @@ class ProjectConfig:
         item = Project.query.filter_by(project_name=project_name).first()
         return item
 
+    def get_all(self):
+        """Get all projects"""
+        item = Project.query.all()
+        return item
+
 
 class UserConfig:
     """Config for user"""

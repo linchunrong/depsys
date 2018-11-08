@@ -30,27 +30,28 @@
                             <thead>
                                 <tr>
                                     <th>Project Name</th>
-                                    <th style="width: 180px">Action</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
                                     <th>Name</th>
-                                    <th style="width: 180px">Action</th>
+                                    <th>Action</th>
                                 </tr>
                             </tfoot>
                             <tbody>
                                 {% for project in project_list %}
                                 <tr>
-                                    <td>
+                                    <td style="vertical-align: middle">
                                         <div>
-                                            <a class="btn" href="{{ url_for('project_config',project=project) }}">{{ project }}</a>
+                                            <strong>{{ project.project_name }}</strong>
+                                            <small><em class="text-muted">&nbsp;&nbsp;( {{ project.describe }} )</em></small>
                                         </div>
                                     </td>
-                                    <td>
-                                        <a class="btn btn-default btn-sm" href="{{ url_for('project_deploy',project=project) }}" target="_blank">生产发布</a>
-                                        <a class="btn btn-default btn-sm" href="{{ url_for('project_config',project=project) }}">配置</a>
-                                        <a class="btn btn-default btn-sm" href="{{ url_for('project_delete',project=project) }}">删除</a>
+                                    <td style="vertical-align: middle">
+                                        <a class="btn btn-default btn-sm" href="{{ url_for('project_deploy',project=project.project_name) }}" target="_blank">生产发布</a>
+                                        <a class="btn btn-default btn-sm" href="{{ url_for('project_config',project=project.project_name) }}">配置</a>
+                                        <a class="btn btn-default btn-sm" href="{{ url_for('project_delete',project=project.project_name) }}">删除</a>
                                     </td>
                                 </tr>
                                 {% endfor %}

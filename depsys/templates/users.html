@@ -5,6 +5,8 @@
 </ol>
 {% endblock %}
 {% block content %}
+<script src="../static/layer/layer.js"></script>
+<script src="../static/js/users.js"></script>
 <!-- Main Content -->
     <div class="container-fluid">
         <div class="side-body">
@@ -54,8 +56,8 @@
                                                 {% endif %}
                                             {% endfor %}
                                             <td style="vertical-align: middle">
-                                                <a class="btn btn-default btn-sm" href="#">删除</a>
-                                                <a class="btn btn-default btn-sm" href="#">重置密码</a>
+                                                <a class="btn btn-default btn-sm" onclick="del_user('{{ user.id }}')">删除</a>
+                                                <a class="btn btn-default btn-sm" onclick="pwd_reset('{{ user.username }}')">重置密码</a>
                                             </td>
                                         </tr>
                                     {% endfor %}

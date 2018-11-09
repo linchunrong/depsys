@@ -161,6 +161,15 @@ def config():
 def users():
     user_list = UserConfig().get_all()
     role_list = RoleConfig().get_all()
+    # get variable from frontend
+    if request.method == 'POST':
+        action = request.form['action']
+        if action == 'del_user':
+            user_id = request.form['user_id']
+            UserConfig().delete(user_id)
+        if action == 'pwd_reset':
+            return "Post request! Action: " + action
+
     return render_template('users.html', user_list=user_list, role_list=role_list)
 
 

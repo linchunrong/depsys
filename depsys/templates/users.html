@@ -40,14 +40,14 @@
                                     </tfoot>
                                     <tbody>
                                     {% for user in user_list %}
-                                        <tr>
+                                        <tr id="{{ user.id }}">
                                             <td style="vertical-align: middle">{{ user.id }}</td>
                                             <td style="vertical-align: middle">{{ user.username }}</td>
                                             <td style="vertical-align: middle">
                                                 {% if user.enable %}
-                                                    <input type="checkbox" class="toggle-checkbox" checked>
+                                                    <input type="checkbox" value="{{ user.enable }}" class="toggle-checkbox" checked>
                                                 {% else %}
-                                                    <input type="checkbox" class="toggle-checkbox">
+                                                    <input type="checkbox" value="{{ user.enable }}" class="toggle-checkbox">
                                                 {% endif %}
                                             </td>
                                             {% for role in role_list %}
@@ -57,7 +57,7 @@
                                             {% endfor %}
                                             <td style="vertical-align: middle">
                                                 <a class="btn btn-default btn-sm" onclick="del_user('{{ user.id }}')">删除</a>
-                                                <a class="btn btn-default btn-sm" onclick="pwd_reset('{{ user.username }}')">重置密码</a>
+                                                <a class="btn btn-default btn-sm" onclick="pwd_reset('{{ user.id }}')">重置密码</a>
                                             </td>
                                         </tr>
                                     {% endfor %}

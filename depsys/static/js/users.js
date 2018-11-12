@@ -9,22 +9,33 @@ function del_user(msg){
                action: 'del_user',
                user_id: msg
            },
-           layer.msg('id: ' + msg + ' 已删除！', {icon: 1})
+           function () {
+               //window.location.reload();
+               // remove the relate tr element from html
+               $('#'+msg).remove();
+               layer.msg('id: ' + msg + ' 已删除！', {icon: 1});
+           }
        );
    }, function(){
        layer.msg('已取消', {
            time: 2000 //2s后自动关闭
        });
    });
-};
-// reset user password func
+}
+// reset user password
 function pwd_reset(msg) {
-    $.post('/users',
-        {
-            action: 'pwd_reset',
-			name: msg
-		},
-		function(data,status){
-			alert("数据: \n" + data + "\n状态: " + status);
-		});
-};
+    layer.prompt({title: '输入新密码，并确认', formType: 1}, function(pass, index){
+        layer.close(index);
+        // use ajax post data to backend
+        $.post('/users',
+            {
+                action: 'pwd_reset',
+                user_id: msg,
+                password: pass
+            },
+            function () {
+                layer.msg('id: ' + msg + ' 密码已更新！', {icon: 1});
+            }
+        );
+    });
+}

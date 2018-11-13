@@ -14,7 +14,17 @@ class LoginForm(FlaskForm):
 
 
 class UserForm(FlaskForm):
-    """User change password"""
+    """User Form"""
+    username = StringField('Username', validators=[validators.InputRequired(message="用户名必填！")])
+    password = PasswordField('Password', validators=[validators.EqualTo('confirm', message="密码不一致！")])
+    confirm = PasswordField('Repeat Password')
+    enable = BooleanField('Enable', default=True)
+    role = RadioField('Role', choices=[('admin', '管理员'), ('editor', '维护者'), ('user', '一般用户') ], default='user')
+    submit = SubmitField('保存')
+
+
+class ProfileForm(FlaskForm):
+    """Profile Form"""
     password = PasswordField('New Password', validators=[validators.EqualTo('confirm', message="密码不一致！")])
     confirm = PasswordField('Repeat Password')
     submit = SubmitField('更新')

@@ -15,7 +15,10 @@ function del_user(msg){
                $('#'+msg).remove();
                layer.msg('id: ' + msg + ' 已删除！', {icon: 1});
            }
-       );
+       )
+           .fail(function () {
+                layer.msg('发生错误！', {icon: 2});
+           });
    }, function(){
        layer.msg('已取消', {
            time: 2000 //2s后自动关闭
@@ -36,6 +39,9 @@ function pwd_reset(msg) {
             function () {
                 layer.msg('id: ' + msg + ' 密码已更新！', {icon: 1});
             }
-        );
+        )
+            .fail(function () {
+                layer.msg('发生错误！', {icon: 2});
+            });
     });
 }

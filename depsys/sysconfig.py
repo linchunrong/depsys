@@ -95,7 +95,7 @@ class UserConfig:
         db.session.commit()
         db.session.close()
 
-    def add(self, username, password, role, group=None, enable=1):
+    def add(self, username, password, role, group=None, enable=True):
         """Add user info"""
         item = User(username=username, password=password, group=group, enable=enable, role=role)
         db.session.add(item)
@@ -149,9 +149,16 @@ class RoleConfig:
         db.session.commit()
         db.session.close()
 
-    def get(self, role_id):
+    def get(self, role_id=None, name=None):
         """Get role config"""
-        item = Role.query.filter_by(role_id=role_id).first()
+        if role_id:
+            item = Role.query.filter_by(role_id=role_id).first()
+        elif name:
+            item = Role.query.filter_by(name=name).first()
+        else:
+            print("Error: Either id or name as arguments!")
+            raise Exception("Get Role: Name/ID Error")
+
         return item
 
     def get_all(self):

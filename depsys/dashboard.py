@@ -22,14 +22,13 @@ class DeployInfo:
 
     def status_detail(self):
         """Get deploy status info of every project"""
-        projects_list = self.projects()
+        projects_list = ProjectConfig().get_all()
         project_status_list = []
         for project in projects_list:
-            project_id = ProjectConfig().get(project).project_id
             amount = []
             for status in ('1', '0', '-1'):
-                amount.append(len(Record.query.filter_by(project_id=project_id, status=status).all()))
-            project_status_list.append([project, amount[0], amount[1], amount[2]])
+                amount.append(len(Record.query.filter_by(project_id=project.project_id, status=status).all()))
+            project_status_list.append([project.project_name, amount[0], amount[1], amount[2]])
 
         data = [['project','Success', 'Failed', 'Abort']]+ project_status_list
 
@@ -37,12 +36,12 @@ class DeployInfo:
 
     def top_deploy(self,top_num):
         """Top num deploy project info"""
-        project_list = self.projects()
+        project_list = ProjectConfig().get_all()
         deploy_num = []
         for project in project_list:
-            project_id = ProjectConfig().get(project).project_id
+            project_id = project.project_id
             number = len(Record.query.filter_by(project_id=project_id).all())
-            deploy_num.append((project, number))
+            deploy_num.append((project.project_name, number))
 
         deploy_num = sorted(deploy_num, key=lambda num: num[1], reverse=True)
         projects = []
@@ -52,8 +51,8 @@ class DeployInfo:
             amount.append(child[1])
 
         data = {
-            'projects': projects[:-(top_num+1):-1],
-            'amount': amount[:-(top_num+1):-1]
+            'projects': projects[:top_num][::-1],
+            'amount': amount[:top_num][::-1]
         }
 
         return data

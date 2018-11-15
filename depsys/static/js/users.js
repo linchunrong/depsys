@@ -15,7 +15,10 @@ function del_user(msg){
                $('#'+msg).remove();
                layer.msg('id: ' + msg + ' 已删除！', {icon: 1});
            }
-       );
+       )
+           .fail(function () {
+                layer.msg('发生错误！', {icon: 2});
+           });
    }, function(){
        layer.msg('已取消', {
            time: 2000 //2s后自动关闭
@@ -36,6 +39,38 @@ function pwd_reset(msg) {
             function () {
                 layer.msg('id: ' + msg + ' 密码已更新！', {icon: 1});
             }
-        );
+        )
+            .fail(function () {
+                layer.msg('发生错误！', {icon: 2});
+            });
     });
 }
+// user enable switch
+$(document).ready(function(){
+    $("input[type='checkbox']").change(function() {
+        // is(':checked') return true/false
+        var enable = $("#" + this.id).is(':checked');
+        var username = this.id;
+        var user_id = this.value;
+        // use ajax post data to backend
+        $.post('/users',
+            {
+                action: 'enable_change',
+                user_id: user_id,
+                enable: enable
+            },
+            function () {
+                if (enable){
+                    layer.msg('用户: ' + username + ' 已启用！', {icon: 1});
+                }
+                else {
+                    layer.msg('用户: ' + username + ' 已禁用！', {icon: 1});
+                }
+                return false;
+            }
+        )
+            .fail(function () {
+                layer.msg('发生错误！', {icon: 2});
+            });
+    });
+});

@@ -24,12 +24,14 @@ def login():
     form = LoginForm()
     if form.validate_on_submit() and request.method == 'POST':
         user = UserConfig().get(username=form.username.data)
-        if user:
+        if user and user.enable:
             if user.password != form.password.data:
                 flash("Invalid password")
             else:
                 login_user(user)
                 return redirect(url_for('index'))
+        else:
+            flash('Invalid Username')
         return redirect(url_for('login'))
     return render_template('login.html', form=form)
 
@@ -44,10 +46,10 @@ def logout():
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    form = UserForm()
+    form = ProfileForm()
     user_id = session['user_id']
     user = UserConfig().get(user_id=user_id)
-    role = RoleConfig().get(user.role)
+    role = RoleConfig().get(role_id=user.role)
     if request.method == "POST":
         if form.validate_on_submit():
             if form.password.data:
@@ -163,15 +165,46 @@ def users():
         # get variable from frontend
         action = request.form['action']
         user_id = request.form['user_id']
+        conf = UserConfig()
         if action == 'del_user':
-            UserConfig().delete(user_id=user_id)
+            conf.delete(user_id=user_id)
         if action == 'pwd_reset':
             password = request.form['password']
-            UserConfig().update(user_id=user_id, password=password)
+            conf.update(user_id=user_id, password=password)
+        if action == 'enable_change':
+            enable = request.form['enable']
+            # turn enable to bool type since the value of enable is string true/false
+            enable =  True if enable.lower() == 'true' else False
+            conf.update(user_id=user_id, enable=enable)
     # method is Get, return all users and roles to page
     user_list = UserConfig().get_all()
     role_list = RoleConfig().get_all()
     return render_template('users.html', user_list=user_list, role_list=role_list)
+
+
+@app.route('/users/add', methods=['GET', 'POST'])
+@login_required
+@requires_roles('admin')
+def add_user():
+    form = UserForm()
+    if request.method == "POST":
+        if form.validate_on_submit():
+            if form.password.data:
+                conf = UserConfig()
+                exist = conf.get(username=form.username.data.strip())
+                if exist:
+                    flash("Error: 用户已存在！")
+                else:
+                    role_id = RoleConfig().get(name=form.role.data).role_id
+                    conf.add(username=form.username.data.strip(), password=form.password.data.strip(), enable=form.enable.data, role=role_id)
+                    flash("用户已增加！")
+            else:
+                flash("Error: 密码不能为空！" )
+        else:
+            for key in form.errors:
+                flash("Error: " + form.errors[key][0])
+        return redirect(url_for('add_user'))
+    return render_template('add_user.html', form=form)
 
 
 @app.route('/config/<project>', methods=['GET', 'POST'])

@@ -17,8 +17,16 @@
             <div class="row">
                 <div class="col-xs-12">
                     <div class="card">
+                        <div class="card-header">
+                            <div class="card-title" style="float: none">
+                                <div class="title">
+                                    用户列表
+                                    <a class="btn btn-info" style="float: right; margin-top: 0px" href="{{ url_for('add_user') }}">添加用户</a>
+                                </div>
+                            </div>
+                        </div>
                         <div class="card-body">
-                            <div class="sub-title">用户列表</div>
+                            <!--<div class="sub-title">用户列表</div>-->
                                 <table class="datatable table table-striped" cellspacing="0" width="100%">
                                     <thead>
                                         <tr>
@@ -44,11 +52,18 @@
                                             <td style="vertical-align: middle">{{ user.id }}</td>
                                             <td style="vertical-align: middle">{{ user.username }}</td>
                                             <td style="vertical-align: middle">
-                                                {% if user.enable %}
-                                                    <input type="checkbox" value="{{ user.enable }}" class="toggle-checkbox" checked>
-                                                {% else %}
-                                                    <input type="checkbox" value="{{ user.enable }}" class="toggle-checkbox">
-                                                {% endif %}
+                                                <div class="checkbox3 checkbox-success checkbox-inline checkbox-check checkbox-round checkbox-light">
+                                                    {% if user.enable %}
+                                                        <!-- set value to get user_id via users.js -->
+                                                        <input type="checkbox" id="{{ user.username }}" value="{{ user.id }}" checked="">
+                                                        <label for="{{ user.username }}">
+                                                    {% else %}
+                                                        <input type="checkbox" id="{{ user.username }}" value="{{ user.id }}">
+                                                        <label for="{{ user.username }}">
+                                                    {% endif %}
+                                                            <strong>启用</strong>
+                                                        </label>
+                                                </div>
                                             </td>
                                             {% for role in role_list %}
                                                 {% if user.role == role.role_id %}

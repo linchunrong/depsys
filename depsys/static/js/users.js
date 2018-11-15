@@ -45,3 +45,32 @@ function pwd_reset(msg) {
             });
     });
 }
+// user enable switch
+$(document).ready(function(){
+    $("input[type='checkbox']").change(function() {
+        // is(':checked') return true/false
+        var enable = $("#" + this.id).is(':checked');
+        var username = this.id;
+        var user_id = this.value;
+        // use ajax post data to backend
+        $.post('/users',
+            {
+                action: 'enable_change',
+                user_id: user_id,
+                enable: enable
+            },
+            function () {
+                if (enable){
+                    layer.msg('用户: ' + username + ' 已启用！', {icon: 1});
+                }
+                else {
+                    layer.msg('用户: ' + username + ' 已禁用！', {icon: 1});
+                }
+                return false;
+            }
+        )
+            .fail(function () {
+                layer.msg('发生错误！', {icon: 2});
+            });
+    });
+});

@@ -24,12 +24,14 @@ def login():
     form = LoginForm()
     if form.validate_on_submit() and request.method == 'POST':
         user = UserConfig().get(username=form.username.data)
-        if user:
+        if user and user.enable:
             if user.password != form.password.data:
                 flash("Invalid password")
             else:
                 login_user(user)
                 return redirect(url_for('index'))
+        else:
+            flash('Invalid Username')
         return redirect(url_for('login'))
     return render_template('login.html', form=form)
 
@@ -169,13 +171,18 @@ def users():
         if action == 'pwd_reset':
             password = request.form['password']
             conf.update(user_id=user_id, password=password)
+        if action == 'enable_change':
+            enable = request.form['enable']
+            # turn enable to bool type since the value of enable is string true/false
+            enable =  True if enable.lower() == 'true' else False
+            conf.update(user_id=user_id, enable=enable)
     # method is Get, return all users and roles to page
     user_list = UserConfig().get_all()
     role_list = RoleConfig().get_all()
     return render_template('users.html', user_list=user_list, role_list=role_list)
 
 
-@app.route('/add_user', methods=['GET', 'POST'])
+@app.route('/users/add', methods=['GET', 'POST'])
 @login_required
 @requires_roles('admin')
 def add_user():

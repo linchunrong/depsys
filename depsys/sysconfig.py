@@ -87,11 +87,22 @@ class ProjectConfig:
 
 class UserConfig:
     """Config for user"""
-    def update(self, user_id, password):
+    def update(self, user_id, **kwargs):
         """Update user info"""
         # Add more arguments if need
         item = User.query.filter_by(id=user_id).first()
-        item.password = password
+        # update item, get value from kwargs
+        if 'username' in kwargs:
+            item.username = kwargs['username']
+        if 'password' in kwargs:
+            item.password = kwargs['password']
+        if 'group' in kwargs:
+            item.group = kwargs['group']
+        if 'enable' in kwargs:
+            item.enable = kwargs['enable']
+        if 'role' in kwargs:
+            item.role = kwargs['role']
+
         db.session.commit()
         db.session.close()
 

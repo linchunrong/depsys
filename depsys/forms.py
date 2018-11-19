@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, validators, SelectField, TextAreaField, RadioField, BooleanField
+from wtforms import StringField, SubmitField, PasswordField, validators, \
+    SelectField, TextAreaField, RadioField, BooleanField
 
 
 class LoginForm(FlaskForm):
@@ -19,7 +20,9 @@ class UserForm(FlaskForm):
     password = PasswordField('Password', validators=[validators.EqualTo('confirm', message="密码不一致！")])
     confirm = PasswordField('Repeat Password')
     enable = BooleanField('Enable', default=True)
-    role = RadioField('Role', choices=[('admin', '管理员'), ('editor', '维护者'), ('user', '一般用户') ], default='user')
+    role = RadioField('Role', choices=[('admin', '管理员 <em>(admin)</em>'),
+                                       ('editor', '维护者 <em>(editor)</em>'),
+                                       ('user', '一般用户 <em>(user)</em>')], default='user')
     submit = SubmitField('保存')
 
 
@@ -34,11 +37,17 @@ class ProjectForm(FlaskForm):
     """Project Form"""
     project_name = StringField('Project_name', validators=[validators.InputRequired(message="工程名必填!")])
     servers = StringField('IPs', validators=[validators.InputRequired(message="服务器地址必填!")])
-    group = RadioField('Group', choices=[('研发1部', '研发1部'), ('研发2部', '研发2部'), ('研发3部', '研发3部'), ('研发4部', '研发4部')], default='研发1部')
+    group = RadioField('Group', choices=[('研发1部', '研发1部'),
+                                         ('研发2部', '研发2部'),
+                                         ('研发3部', '研发3部'),
+                                         ('研发4部', '研发4部')], default='研发1部')
     source_address = StringField('Repository_address')
     describe = StringField('Describe', validators=[validators.InputRequired(message="项目描述必填！")])
-    project_type = RadioField('Project_type', choices=[('zip', 'zip'), ('war', 'war'), ('jar', 'jar')], default='zip')
-    post_script_type = SelectField('Post_script_type', choices=[('shell', 'shell script'), ('python', 'python script')], default='shell')
+    project_type = RadioField('Project_type', choices=[('zip', 'zip'),
+                                                       ('war', 'war'),
+                                                       ('jar', 'jar')], default='zip')
+    post_script_type = SelectField('Post_script_type', choices=[('shell', 'shell script'),
+                                                                ('python', 'python script')], default='shell')
     post_script = TextAreaField('Post_script')
     submit = SubmitField('保存')
 
@@ -63,6 +72,8 @@ class ReportForm(FlaskForm):
     """Report Form"""
     media_email = BooleanField('<strong>邮件 </strong><em>(请于下方选择收件人)</em>', default=True)
     media_wechat = BooleanField('<strong>微信 </strong><em>(版本发布公众号)</em>', default=True)
-    receiver = SelectField('Receiver', choices=[('operate@cmbfae.com', '系统运行部'), ('cmbfae-it@cmbfae.com', '信息技术部')], default='operate@cmbfae.com')
-    date_range = RadioField('Date_range', choices=[('7', '最近七天'), ('1', '今天')], default='7')
+    receiver = SelectField('Receiver', choices=[('operate@cmbfae.com', '系统运行部'),
+                                                ('cmbfae-it@cmbfae.com', '信息技术部')], default='operate@cmbfae.com')
+    date_range = RadioField('Date_range', choices=[('7', '最近七天'),
+                                                   ('1', '今天')], default='7')
     submit = SubmitField('发送')

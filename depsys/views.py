@@ -176,6 +176,9 @@ def users():
             # turn enable to bool type since the value of enable is string true/false
             enable =  True if enable.lower() == 'true' else False
             conf.update(user_id=user_id, enable=enable)
+        if action == 'role_change':
+            role = request.form['role']
+            conf.update(user_id=user_id, role=role)
     # method is Get, return all users and roles to page
     user_list = UserConfig().get_all()
     role_list = RoleConfig().get_all()

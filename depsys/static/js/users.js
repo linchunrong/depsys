@@ -74,3 +74,21 @@ $(document).ready(function(){
             });
     });
 });
+// user role change,
+function role_change(role_id,user_id) {
+    // use ajax post data to backend
+    $.post('/users',
+        {
+            action: 'role_change',
+            user_id: user_id,
+            role: role_id
+        },
+        function () {
+            layer.msg('用户角色已更改！', {icon: 1});
+            return false;
+        }
+    )
+        .fail(function () {
+            layer.msg('发生错误！', {icon: 2});
+        });
+}

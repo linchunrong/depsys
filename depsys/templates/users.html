@@ -57,19 +57,29 @@
                                                         <!-- set value to get user_id via users.js -->
                                                         <input type="checkbox" id="{{ user.username }}" value="{{ user.id }}" checked="">
                                                         <label for="{{ user.username }}">
+                                                            <strong>启用</strong>
+                                                        </label>
                                                     {% else %}
                                                         <input type="checkbox" id="{{ user.username }}" value="{{ user.id }}">
                                                         <label for="{{ user.username }}">
-                                                    {% endif %}
                                                             <strong>启用</strong>
                                                         </label>
+                                                    {% endif %}
                                                 </div>
                                             </td>
-                                            {% for role in role_list %}
-                                                {% if user.role == role.role_id %}
-                                                    <td style="vertical-align: middle">{{ role.name }}</td>
-                                                {% endif %}
-                                            {% endfor %}
+                                            <td style="vertical-align: middle">
+                                                <!-- call js role_change func with two vars, user's role id, and user's id -->
+                                                <select style="width: 80px"
+                                                        onchange="role_change(this.options[this.options.selectedIndex].value, this.options[this.options.selectedIndex].id)">
+                                                {% for role in role_list %}
+                                                    {% if user.role == role.role_id %}
+                                                        <option value="{{ role.role_id }}" id="{{ user.id }}" selected>{{ role.name }}</option>
+                                                    {% else %}
+                                                        <option value="{{ role.role_id }}" id="{{ user.id }}">{{ role.name }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                </select>
+                                            </td>
                                             <td style="vertical-align: middle">
                                                 <a class="btn btn-default btn-sm" onclick="del_user('{{ user.id }}')">删除</a>
                                                 <a class="btn btn-default btn-sm" onclick="pwd_reset('{{ user.id }}')">重置密码</a>

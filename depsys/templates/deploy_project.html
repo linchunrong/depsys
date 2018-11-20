@@ -44,9 +44,10 @@ td,th
                                     <th>选择</th>
                                     <th>版本</th>
                                     <th>日期</th>
-                                    <th>发布</th>
+                                    <th>状态</th>
+                                    <th>发布者</th>
                                     <th>发版说明</th>
-                                    <th>发起人</th>
+                                    <th>请求者</th>
                                     <th>日志</th>
                                 </tr>
                             </thead>
@@ -55,9 +56,10 @@ td,th
                                     <th>选择</th>
                                     <th>版本</th>
                                     <th>日期</th>
-                                    <th>发布</th>
+                                    <th>状态</th>
+                                    <th>发布者</th>
                                     <th>发版说明</th>
-                                    <th>发起人</th>
+                                    <th>请求者</th>
                                     <th>日志</th>
                                 </tr>
                             </tfoot>
@@ -85,6 +87,7 @@ td,th
                                         <label class="label label-warning">中断</label>
                                     </td>
                                     {% endif %}
+                                    <td style="vertical-align: middle">{{ record.deployer }}</td>
                                     <td style="vertical-align: middle">{{ record.deploy_reason }}</td>
                                     <td style="vertical-align: middle">{{ record.requester }}</td>
                                         <p style="display: none" id="{{ record.record_id }}">{{ record.logs }}</p>

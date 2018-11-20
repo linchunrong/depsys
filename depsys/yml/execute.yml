@@ -9,21 +9,45 @@
     when: send_file|success
   - name: show package md5 value
     debug: var=md5_value.stdout_lines verbosity=0
-  - name: run stop deploy script on target servers
-    shell: stop_script_file chdir=/home/FaeWork
-    register: stop_script
+  - name: get stop script
+    get_url:
+      url: stop_script_file
+      dest: target_stop_script
+      force: yes
+      mode: 0755
+    register: get_stop_script
     when: send_file|success
+  - name: run stop script on target servers
+    shell: run_stop_script
+    register: stop_script
+    when: get_stop_script|success
   - name: show stop script debug info
     debug: var=stop_script.stdout_lines verbosity=0
-  - name: run deploy script on target servers
-    shell: deploy_script_file chdir=/home/FaeWork
-    register: deploy_script
+  - name: get deploy script
+    get_url:
+      url: deploy_script_file
+      dest: target_deploy_script
+      force: yes
+      mode: 0755
+    register: get_deploy_script
     when: stop_script|success
+  - name: run deploy script on target servers
+    shell: run_deploy_script
+    register: deploy_script
+    when: get_deploy_script|success
   - name: show deploy script debug info
     debug: var=deploy_script.stdout_lines verbosity=0
-  - name: run start script on target servers
-    shell: start_script_file chdir=/home/FaeWork
-    register: start_script
+  - name: get start script
+    get_url:
+      url: start_script_file
+      dest: target_start_script
+      force: yes
+      mode: 0755
+    register: get_start_script
     when: deploy_script|success
+  - name: run start script on target servers
+    shell: run_start_script
+    register: start_script
+    when: get_start_script|success
   - name: show start script debug info
     debug: var=start_script.stdout_lines verbosity=0

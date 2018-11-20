@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import setting, urllib.request, urllib.parse, time, os, sys, random, string, pathlib, subprocess, shutil, json, re
-from flask import request
+from flask import request, session
 from threading import Lock
 from git import Repo
 from depsys import socketio
 from flask_socketio import disconnect, emit, join_room
-from depsys.sysconfig import SystemConfig, ProjectConfig
+from depsys.sysconfig import SystemConfig, ProjectConfig, UserConfig
 from depsys.dashboard import DeployRecord
 
 # deploy execute process
@@ -23,6 +23,9 @@ pkg_owner = setting.PKG_OWNER.strip()
 batch_socket_room = "batch_execute"
 namespace = '/execute'
 workstation = "workstation"
+# get user from session as deployer
+user_id = session['user_id']
+deployer = UserConfig().get(user_id=user_id).username
 
 
 @socketio.on('my_event', namespace=namespace)
@@ -194,17 +197,17 @@ def execute_thread(info, single=True):
                     socketio.emit('my_response', {'data': "[" + project + "] Read " + extra_args_file + " failed due to: " + str(Err) + "\n",
                                          'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace=namespace, room=room)
                     print("Error: ", str(Err))
-                    DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer="N/A",
+                    DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer=deployer,
                                        time_begin=time_begin, time_end=time_end, pkg_md5=pkg_md5, logs=logs)
                 else:
                     for info in release_info['发布列表']:
                         if info['发布版本'] == branch:
                             requester = info['发布人']
                             deploy_reason = info['发布原因']
-                            DeployRecord().add(project=project, status=status, version=branch, requester=requester, deploy_reason=deploy_reason, deployer="N/A",
+                            DeployRecord().add(project=project, status=status, version=branch, requester=requester, deploy_reason=deploy_reason, deployer=deployer,
                                    time_begin=time_begin, time_end=time_end, pkg_md5=pkg_md5, logs=logs)
         else:
-            DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer="N/A",
+            DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer=deployer,
                                time_begin=time_begin, time_end=time_end, pkg_md5=pkg_md5, logs=logs)
     # save deployed package, str(my_pkg[1]) stand for package name
     if status == 1:
@@ -299,17 +302,33 @@ def get_script(script_type):
 def get_playbook(package_name, local_package):
     """Create ansible playbook"""
     project = package_name.split('.')[0]
-    os.chdir(str(project_work_path(str(project))))
     src_file = my_path()/"yml/execute.yml"
-    dest_file = "playbook_" + random_string(16) + ".yml"
     # read playbook template =
     with open(src_file) as src:
         playbook_template = src.read()
+    # grab some variables
+    start_script_file = get_script("start_script").strip()
+    start_script_name = start_script_file.split('/')[-1]
+    target_start_script = '/tmp/'+ start_script_name
+    deploy_script_file = get_script("deploy_script").strip()
+    deploy_script_name = deploy_script_file.split('/')[-1]
+    target_deploy_script = '/tmp/' + deploy_script_name
+    stop_script_file = get_script("stop_script").strip()
+    stop_script_name = stop_script_file.split('/')[-1]
+    target_stop_script = '/tmp/' + stop_script_name
     # cd to temporary folder and write a temporary playbook
+    os.chdir(str(project_work_path(str(project))))
+    dest_file = "playbook_" + random_string(16) + ".yml"
     with open(dest_file, 'w+') as dest:
-        content = playbook_template.replace("start_script_file", "curl -s " + get_script("start_script") + " | sh -s " + str(project))
-        content = content.replace("deploy_script_file","curl -s " + get_script("deploy_script") + " | sh -s " + str(project))
-        content = content.replace("stop_script_file", "curl -s " + get_script("stop_script") + " | sh -s " + str(project))
+        content = playbook_template.replace("start_script_file", start_script_file)
+        content = content.replace("target_start_script", target_start_script)
+        content = content.replace("run_start_script", target_start_script + " " + str(project))
+        content = content.replace("deploy_script_file", deploy_script_file)
+        content = content.replace("target_deploy_script", target_deploy_script)
+        content = content.replace("run_deploy_script", target_deploy_script + " " + str(project))
+        content = content.replace("stop_script_file", stop_script_file)
+        content = content.replace("target_stop_script", target_stop_script)
+        content = content.replace("run_stop_script", target_stop_script + " " + str(project))
         content = content.replace("local_pkg_file", local_package)
         content = content.replace("dest_pkg_file", deploy_pkg_path + package_name)
         content = content.replace("pkg_owner", pkg_owner)

@@ -9,6 +9,7 @@ from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import *
 from depsys.forms import *
 from depsys.permissions import requires_roles
+from depsys.verify import Verify
 
 
 # Index
@@ -216,7 +217,13 @@ def add_user():
 def project_config(project):
     form = ProjectForm()
     conf = ProjectConfig().get(project)
+    # if project exist, get post_script data from conf and show them on frontend
+    if conf:
+        form.post_script_type.data = conf.post_script_type
+        form.post_script.data = conf.post_script
     if request.method == "POST":
+        # recall ProjectForm to get update data from post method
+        form = ProjectForm()
         if form.validate_on_submit():
             p = ProjectConfig()
             project_name = form.project_name.data.strip()
@@ -266,6 +273,29 @@ def charts():
     return render_template('charts.html')
 
 
+@app.route('/license')
+@login_required
+def license():
+    return render_template('license.html')
+
+
+@app.route('/verify', methods=['POST'])
+@login_required
+@requires_roles('admin', 'editor')
+def verify():
+    v = Verify()
+    action = request.form['action']
+    if action == 'verify_ansible':
+        path = request.form['path'].strip()
+        return v.ansible(path=path)
+    if action == 'verify_project_name':
+        name = request.form['name']
+        return v.project_name(project_name=name)
+    if action == 'verify_username':
+        name = request.form['name']
+        return v.username(username=name)
+
+
 # json data pages
 @app.route('/deploy_num')
 @login_required
@@ -297,8 +327,3 @@ def requester_top():
     info = DeployInfo()
     data = info.top_requester(10)
     return jsonify(data)
-
-
-@app.route('/license')
-def license():
-    return render_template('license.html')

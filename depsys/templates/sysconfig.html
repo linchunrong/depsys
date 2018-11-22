@@ -5,6 +5,7 @@
 </ol>
 {% endblock %}
 {% block content %}
+<script src="../static/js/verify.js"></script>
     <!-- Main Content -->
     <div class="container-fluid">
         <div class="side-body">
@@ -27,7 +28,12 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">Ansible path</label>
                                     <div class="col-sm-9">
-                                        {{ form.ansible_path(class="form-control",placeholder="e.g. /usr/bin",value=conf.ansible_path) }}
+                                        {{ form.ansible_path(id="ansible_path",class="form-control",placeholder="e.g. /usr/bin",value=conf.ansible_path) }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-9">
+                                        <a class="btn btn-default" onclick="verify_ansible()">验证</a>
                                     </div>
                                 </div>
                             </div>

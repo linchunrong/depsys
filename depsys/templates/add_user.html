@@ -6,6 +6,7 @@
 </ol>
 {% endblock %}
 {% block content %}
+<script src="../static/js/verify.js"></script>
 <!-- Main Content -->
     <div class="container-fluid">
         <div class="side-body">
@@ -20,7 +21,12 @@
                         <div class="card-body">
                             <div class="sub-title">用户名</div>
                                 <div class="form-inline">
-                                    {{ form.username(class="form-control",placeholder="请输入用户名...") }}
+                                    <div class="form-group">
+                                        {{ form.username(id="username",class="form-control",placeholder="请输入用户名...") }}
+                                    </div>
+                                    <div class="form-group">
+                                        <a class="btn btn-default" onclick="verify_username()">验证</a>
+                                    </div>
                                 </div>
                             <div class="sub-title">密码</div>
                                 <div class="form-inline">

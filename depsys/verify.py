@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import subprocess
+from depsys.sysconfig import ProjectConfig, UserConfig
 
 
 class Verify:
@@ -26,5 +27,24 @@ class Verify:
     def email(self):
         pass
 
-    def project(self):
-        pass
+    def project_name(self, project_name):
+        """Project name valid verify"""
+        if project_name.strip() == "":
+            return "Error: Project name is empty!"
+        conf = ProjectConfig()
+        exist = conf.get(project_name=project_name)
+        if exist:
+            return "Error: Project name already exist!"
+        else:
+            return "This name is valid!"
+
+    def username(self, username):
+        """Username valid verify"""
+        if username.strip() == "":
+            return "Error: Username is empty!"
+        conf = UserConfig()
+        exist = conf.get(username=username)
+        if exist:
+            return "Error: Username already exist!"
+        else:
+            return "This name is valid!"

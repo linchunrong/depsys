@@ -288,6 +288,14 @@ def verify():
     if action == 'verify_ansible':
         path = request.form['path'].strip()
         return v.ansible(path=path)
+    if action == 'verify_repository':
+        address = request.form['repo_address']
+        name = request.form['repo_user']
+        pwd = request.form['repo_pwd']
+        return  v.repository(username=name, password=pwd, address=address)
+    if action == 'verify_email':
+        receiver = request.form['receiver']
+        return v.email(receiver=receiver)
     if action == 'verify_project_name':
         name = request.form['name']
         return v.project_name(project_name=name)

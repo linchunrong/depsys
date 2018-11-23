@@ -87,19 +87,24 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">Repository Server</label>
                                     <div class="col-sm-9">
-                                        {{ form.repository_server(placeholder="请输入源码库地址(http格式)...",value=conf.repository_server,class='form-control') }}
+                                        {{ form.repository_server(id="repo_address",placeholder="请输入源码库地址(http格式)...",value=conf.repository_server,class='form-control') }}
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">Username</label>
                                     <div class="col-sm-9">
-                                        {{ form.repository_user(placeholder="请输入用户名...",value=conf.repository_user,class='form-control') }}
+                                        {{ form.repository_user(id="repo_user",placeholder="请输入用户名...",value=conf.repository_user,class='form-control') }}
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">Password</label>
                                     <div class="col-sm-9">
-                                        {{ form.repository_password(placeholder="请输入密码...",class='form-control') }}
+                                        {{ form.repository_password(id="repo_pwd",placeholder="请输入密码...",class='form-control') }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-9">
+                                        <a class="btn btn-default" onclick="verify_repository()">验证连接</a>
                                     </div>
                                 </div>
                             </div>
@@ -139,6 +144,11 @@
                                     <label class="col-sm-2 control-label">Password</label>
                                     <div class="col-sm-9">
                                         {{ form.smtp_password(placeholder="SMTP密码...",value=conf.smtp_pwd,class='form-control') }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-9">
+                                        <a class="btn btn-default" onclick="verify_email()">发送测试邮件</a>
                                     </div>
                                 </div>
                             </div>

@@ -5,7 +5,7 @@ import setting, urllib.request, urllib.parse, time, os, sys, random, string, pat
 from flask import request, session
 from threading import Lock
 from git import Repo
-from depsys import socketio
+from depsys import socketio, app
 from flask_socketio import disconnect, emit, join_room
 from depsys.sysconfig import SystemConfig, ProjectConfig, UserConfig
 from depsys.dashboard import DeployRecord
@@ -56,6 +56,7 @@ def batch_exec():
     except Exception as Err:
         emit('my_response', {'data': "Failed to get release list due to: " + str(Err),
                              'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=room)
+        app.logger.error(str(Err))
         raise Exception("Get Deploy List Error")
     else:
         emit('my_response', {'data': "Got release list: \n" + str(batch_list),
@@ -72,6 +73,7 @@ def batch_exec():
             else:
                 emit('my_response', {'data': "[ERROR] [" + project + "] 工程未配置/不存在，请检查！",
                                      'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, room=room)
+                app.logger.error('Project does not exist')
 
 
 @socketio.on('disconnect_request', namespace=namespace)
@@ -111,6 +113,7 @@ def execute_thread(info, single=True):
         my_hosts = get_hosts(project)
         my_playbook = get_playbook(package_name=str(my_pkg[1]), local_package=str(my_pkg[0]))
     except Exception as Err:
+        app.logger.error(str(Err))
         sys.exit(str(Err))
 
     # define room name, which use for socket output info
@@ -155,16 +158,19 @@ def execute_thread(info, single=True):
             socketio.emit('my_response', {'data': "[" + project + "] 发布成功，请检查进程是否正常！",
                                           'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
                           namespace=namespace, room=room)
+            app.logger.info('Project %s %s deploy success' % (project, branch))
         elif returncode <0:
             status = -1
             socketio.emit('my_response', {'data': "[" + project + "] 发布中断！！",
                                           'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
                           namespace=namespace, room=room)
+            app.logger.info('Project %s %s deploy abort' % (project, branch))
         else:
             status = 0
             socketio.emit('my_response', {'data': "[ERROR] [" + project + "] 发生错误，请检查日志！",
                                           'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
                       namespace=namespace, room=room)
+            app.logger.info('Project %s %s deploy error' % (project, branch))
         # grab package md5 from logs
         search_line = '''md5_value.stdout_lines": \[\n ([^>]+) ]'''
         result = re.compile(search_line).findall(logs)
@@ -196,7 +202,7 @@ def execute_thread(info, single=True):
                 except Exception as Err:
                     socketio.emit('my_response', {'data': "[" + project + "] Read " + extra_args_file + " failed due to: " + str(Err) + "\n",
                                          'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace=namespace, room=room)
-                    print("Error: ", str(Err))
+                    app.logger.error(str(Err))
                     DeployRecord().add(project=project, status=status, version=branch, requester="N/A", deploy_reason="N/A", deployer=deployer,
                                        time_begin=time_begin, time_end=time_end, pkg_md5=pkg_md5, logs=logs)
                 else:
@@ -219,6 +225,7 @@ def execute_thread(info, single=True):
             try:
                 shutil.copyfile(str(srcfile),str(destfile))
             except Exception as Err:
+                app.logger.error(str(Err))
                 return ("[" + project + "] Failed to save deployed package due to: " + str(Err))
             # save extra args file if exist
             else:
@@ -226,6 +233,7 @@ def execute_thread(info, single=True):
                     try:
                         shutil.copyfile(extra_file,str(destfile_path.joinpath(extra_args_file)))
                     except Exception as e:
+                        app.logger.error(str(e))
                         return ("[" + project + "] Failed to save extra args file due to: " + str(e))
         else:
             return ("[" + project + "] Deployed package was saved before, this probably a rollback action.")
@@ -251,11 +259,11 @@ def mkdir(path):
     os.chdir(str(my_path()))
     exists = os.path.exists(path)
     if exists:
-        # print (path +  "目录已存在！")
+        app.logger.info('Path %s already exist' % path)
         return False
     else:
         os.makedirs(path)
-        # print (path + "创建成功！")
+        app.logger.info('Path %s created' % path)
         return True
 
 
@@ -276,7 +284,7 @@ def get_script(script_type):
     elif script_type == "stop_script":
         remote_script = conf.get().stop_script
     else:
-        print ("Get script failed! Only support start_script/deploy_script/stop_script.")
+        app.logger.info('Get script failed! Only support start_script/deploy_script/stop_script')
         raise Exception("Wrong Script Name Error")
     '''
     # fetch script name
@@ -390,7 +398,7 @@ def get_package(project, version, room):
             except Exception as Err:
                 socketio.emit('my_response', {'data': "[ERROR] [" + project + "] Download package from repository failed, please check your setting! \n",
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace=namespace, room=room)
-                print("Error: ", str(Err))
+                app.logger.error(str(Err))
                 raise Exception("Package Download Error")
             # write commit info into
             else:
@@ -414,7 +422,7 @@ def get_package(project, version, room):
             except Exception as Err:
                 socketio.emit('my_response', {'data': "[ERROR] [" + project + "] Download package from repository failed, please check your setting! \n",
                             'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace=namespace, room=room)
-                print("Error: ", str(Err))
+                app.logger.error(str(Err))
                 raise Exception("Package Download Error")
             else:
                 # we maybe check out empty package folder via sparse checkout
@@ -423,6 +431,7 @@ def get_package(project, version, room):
                 else:
                     socketio.emit('my_response', {'data': "[ERROR] [" + project + "] Seems this version doesnt' include a package, please check!" + "\n",
                                 'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"}, namespace=namespace, room=room)
+                    app.logger.error('Version is empty')
                     raise Exception("Version Empty Error")
             if not os.path.isfile(extra_file):
                 extra_file = None
@@ -464,7 +473,7 @@ def get_branches(room):
         socketio.emit('my_response', {'data': "[ERROR] Download " + extra_args_file + " from repository failed, please check your setting!",
                                       'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
                       namespace=namespace, room=room)
-        print("Error: ", str(Err))
+        app.logger.error(str(Err))
         raise Exception("File Download Error")
     else:
         socketio.emit('my_response', {'data': "Saved " + extra_args_file + " to " + str(working_path),
@@ -478,7 +487,7 @@ def get_branches(room):
                 socketio.emit('my_response', {'data': "Read " + extra_args_file + " failed due to: " + str(Err),
                                               'time_stamp': "\n" + time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime()) + ":"},
                               namespace=namespace, room=room)
-                print("Error: ", str(Err))
+                app.logger.error(str(Err))
                 raise Exception("Read File Error")
             else:
                 batch_list = []

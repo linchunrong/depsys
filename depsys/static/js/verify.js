@@ -8,9 +8,14 @@ function verify_ansible() {
             path: path
         },
         function (result) {
-            layer.msg('结果： ' + result, {icon: 1});
-            return false;
-        }
+                if (result.startsWith('Error')){
+                    layer.msg(result, {time: 3000, icon: 2});
+                }
+                else {
+                    layer.msg('结果： ', {icon: 1});
+                }
+                return false;
+            }
     )
         .fail(function () {
             layer.msg('发生错误！', {icon: 2});
@@ -54,14 +59,14 @@ function verify_email() {
                 receiver: receiver
             },
             function (result) {
-            if (result.startsWith('Error')){
-                layer.msg(result, {time: 3000, icon: 2});
+                if (result.startsWith('Error')){
+                    layer.msg(result, {time: 3000, icon: 2});
+                }
+                else {
+                    layer.msg('发送成功！', {icon: 1});
+                }
+                return false;
             }
-            else {
-                layer.msg('发送成功！', {icon: 1});
-            }
-            return false;
-        }
         )
             .fail(function () {
                 layer.msg('发生错误！', {icon: 2});

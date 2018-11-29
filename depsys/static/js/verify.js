@@ -12,7 +12,7 @@ function verify_ansible() {
                     layer.msg(result, {time: 3000, icon: 2});
                 }
                 else {
-                    layer.msg('结果： ', {icon: 1});
+                    layer.msg('结果：' + result, {icon: 1});
                 }
                 return false;
             }

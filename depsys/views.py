@@ -275,6 +275,8 @@ def users():
         if action == 'role_change':
             role = request.form['role']
             conf.update(user_id=user_id, role=role)
+        else:
+            app.logger.error('Users - action [%s] in request invalid' % action)
     # method is Get, return all users and roles to page
     user_list = UserConfig().get_all()
     role_list = RoleConfig().get_all()
@@ -332,8 +334,7 @@ def verify():
     action = request.form['action']
     if action == 'verify_ansible':
         path = request.form['path'].strip()
-        result = v.ansible(path=path)
-        return result
+        return v.ansible(path=path)
     if action == 'verify_repository':
         address = request.form['repo_address']
         name = request.form['repo_user']

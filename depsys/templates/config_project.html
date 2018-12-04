@@ -6,6 +6,7 @@
 </ol>
 {% endblock %}
 {% block content %}
+<script src="../static/js/verify.js"></script>
 <!-- Main Content -->
 <div class="container-fluid">
     <div class="side-body">
@@ -33,10 +34,10 @@
                                 <div class="form-group">
                                     {% if project == "add_new_project" %}
                                         命名
-                                    {{ form.project_name(class="form-control",placeholder="请输入新工程名(必填)") }}
+                                    {{ form.project_name(id="project_name",class="form-control",placeholder="请输入新工程名(必填)") }}
                                     {% else %}
                                         重命名
-                                    {{ form.project_name(class="form-control",value=conf.project_name) }}
+                                    {{ form.project_name(id="project_name",class="form-control",value=conf.project_name) }}
                                     {% endif %}
                                 </div>
                                 <div class="form-group">
@@ -50,6 +51,9 @@
                                         <td>{{ type.label }}</td>
                                     </div>
                                     {% endfor %}
+                                </div>
+                                <div class="form-group">
+                                    <a class="btn btn-default" onclick="verify_project_name()">验证</a>
                                 </div>
                             </div><br>
                             <div class="sub-title">责任团队<span class="description">(单选)</span></div>
@@ -88,7 +92,7 @@
                                 </div>
                             </div>
                             <div>
-                                {{ form.post_script(class="form-control",rows="3",placeholder="请在此框输入完整脚本！") }}
+                                {{ form.post_script(class="form-control",rows="5",placeholder="请在此框输入完整脚本！",style="resize: vertical;") }}
                             </div><br>
                             <div>
                                 {{ form.submit(class="btn btn-default") }}

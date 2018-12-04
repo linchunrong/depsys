@@ -39,7 +39,7 @@ def email(receiver, attachment=None, subject=None, content='FYI', subtype='plain
         return True
 
 
-def wechat(type, message=None, post_file=None):
+def wechat(msgtype, message=None, post_file=None):
     """Send message via WeChat"""
     # API doc refer to - https://work.weixin.qq.com/api/doc, get variables rom setting
     access_token = get_token(corpid=CORPID, corpsecret=CORPSECRET)
@@ -51,18 +51,18 @@ def wechat(type, message=None, post_file=None):
     send_data = {
         "touser": "@all",
         "toparty": "@all",
-        "msgtype": type,
+        "msgtype": msgtype,
         "agentid": AGENTID,
         "safe": 0
     }
-    if type == 'file':
-        media_id = get_media_id(type, access_token, target_file=post_file)
+    if msgtype == 'file':
+        media_id = get_media_id(msgtype, access_token, target_file=post_file)
         # if there's error when call get_media, return Error
         if "Error" in media_id:
             return media_id
-        send_data[type] = {"media_id": media_id}
-    if type == 'text':
-        send_data[type] = {"content": message}
+        send_data[msgtype] = {"media_id": media_id}
+    if msgtype == 'text':
+        send_data[msgtype] = {"content": message}
 
     send_data = bytes(json.dumps(send_data, ensure_ascii=False), encoding='utf-8')
     # send message
@@ -98,9 +98,9 @@ def get_token(corpid, corpsecret):
             return "Error: " + str(page['errmsg'])
 
 
-def get_media_id(type, access_token, target_file):
+def get_media_id(msgtype, access_token, target_file):
     """Get wechat media_id"""
-    get_media_id_url = API_URL + "media/upload?access_token=" +  access_token + "&type=" + type
+    get_media_id_url = API_URL + "media/upload?access_token=" + access_token + "&type=" + msgtype
 
     with open(target_file, 'rb') as f:
         files = {'file': f}

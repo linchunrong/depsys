@@ -64,7 +64,7 @@ $(document).ready(function(){
                     layer.msg('用户: ' + username + ' 已启用！', {icon: 1});
                 }
                 else {
-                    layer.msg('用户: ' + username + ' 已禁用！', {icon: 1});
+                    layer.msg('用户: ' + username + ' 已禁用！', {icon: 2});
                 }
                 return false;
             }

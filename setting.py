@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from datetime import timedelta
 
 # !!! Only upper can be save into flask app.config object !!!  get value via app.config['key']
 
@@ -7,6 +8,8 @@
 DEBUG = True
 
 SECRET_KEY = '\x84\x96\x04\xe9\xc5\xe1\xb4\xc5\xa4M\xcd\x9a\xf4b"\xce\x88\xe36\x88c\x13\xe5\t'
+# session timeout value, could be hours=num or minutes=num
+PERMANENT_SESSION_LIFETIME = timedelta(hours=2)
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://depsys:123456@127.0.0.1:3306/depsys'

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from depsys.models import Record, Project
+from depsys.models import Record
 from depsys.sysconfig import ProjectConfig
 from depsys import db
 
@@ -30,11 +30,11 @@ class DeployInfo:
                 amount.append(len(Record.query.filter_by(project_id=project.project_id, status=status).all()))
             project_status_list.append([project.project_name, amount[0], amount[1], amount[2]])
 
-        data = [['project','Success', 'Failed', 'Abort']]+ project_status_list
+        data = [['project', 'Success', 'Failed', 'Abort']] + project_status_list
 
         return data
 
-    def top_deploy(self,top_num):
+    def top_deploy(self, top_num):
         """Top num deploy project info"""
         project_list = ProjectConfig().get_all()
         deploy_num = []
@@ -57,26 +57,26 @@ class DeployInfo:
 
         return data
 
-    def top_requester(self,top_num):
+    def top_requester(self, top_num):
         """Top num requester info"""
-        requesters =[]
+        requesters = []
         records = Record.query.all()
         for record in records:
             requesters.append(record.requester)
         # use set to uniq requester
         requester_num = []
         for requester in set(requesters):
-            requester_num.append((requester,requesters.count(requester)))
+            requester_num.append((requester, requesters.count(requester)))
 
         requester_num = sorted(requester_num, key=lambda num: num[1], reverse=True)
-        #requesters_new = []
+        # requesters_new = []
         amount = []
         for child in requester_num:
-            #requesters_new.append(child[0])
-            amount.append({'value':child[1], 'name': child[0]})
+            # requesters_new.append(child[0])
+            amount.append({'value': child[1], 'name': child[0]})
 
         data = {
-            #'requesters': requesters_new[:-(top_num+1):-1],
+            # 'requesters': requesters_new[:-(top_num+1):-1],
             'amount': amount[:-(top_num+1):-1]
         }
 
@@ -100,15 +100,20 @@ class DeployRecord:
             record_exist.pkg_md5 = pkg_md5
             record_exist.logs = logs
         else:
-            record_new = Record(project_id=project_id, status=status, version=version, requester=requester if requester else "N/A", deployer=deployer if deployer else "N/A",
-                          deploy_reason=deploy_reason if deploy_reason else "N/A", time_begin=time_begin, time_end=time_end, pkg_md5=pkg_md5, logs=logs)
+            record_new = Record(project_id=project_id, status=status, version=version,
+                                requester=requester if requester else "N/A", deployer=deployer if deployer else "N/A",
+                                deploy_reason=deploy_reason if deploy_reason else "N/A",
+                                time_begin=time_begin, time_end=time_end, pkg_md5=pkg_md5, logs=logs)
             db.session.add(record_new)
         db.session.commit()
         db.session.close()
 
-    def delete(self, project):
+    def delete(self, project_id, version):
         """Delete deployed record"""
-        pass
+        item = Record.query.filter_by(project_id=project_id, version=version).first()
+        db.session.delete(item)
+        db.session.commit()
+        db.session.close()
 
     def get(self, project):
         """Get deployed records"""

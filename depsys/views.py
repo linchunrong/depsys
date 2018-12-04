@@ -264,15 +264,15 @@ def users():
         conf = UserConfig()
         if action == 'del_user':
             conf.delete(user_id=user_id)
-        if action == 'pwd_reset':
+        elif action == 'pwd_reset':
             password = request.form['password']
             conf.update(user_id=user_id, password=password)
-        if action == 'enable_change':
+        elif action == 'enable_change':
             enable = request.form['enable']
             # turn enable to bool type since the value of enable is string true/false
             enable = True if enable.lower() == 'true' else False
             conf.update(user_id=user_id, enable=enable)
-        if action == 'role_change':
+        elif action == 'role_change':
             role = request.form['role']
             conf.update(user_id=user_id, role=role)
         else:
@@ -335,18 +335,18 @@ def verify():
     if action == 'verify_ansible':
         path = request.form['path'].strip()
         return v.ansible(path=path)
-    if action == 'verify_repository':
+    elif action == 'verify_repository':
         address = request.form['repo_address']
         name = request.form['repo_user']
         pwd = request.form['repo_pwd']
         return v.repository(username=name, password=pwd, address=address)
-    if action == 'verify_email':
+    elif action == 'verify_email':
         receiver = request.form['receiver']
         return v.email(receiver=receiver)
-    if action == 'verify_project_name':
+    elif action == 'verify_project_name':
         name = request.form['name']
         return v.project_name(project_name=name)
-    if action == 'verify_username':
+    elif action == 'verify_username':
         name = request.form['name']
         return v.username(username=name)
     else:

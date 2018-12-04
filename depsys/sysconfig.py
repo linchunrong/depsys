@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
 from depsys import db
 from depsys.models import Project, System, User, Role
 
@@ -9,7 +8,8 @@ from depsys.models import Project, System, User, Role
 class SystemConfig:
     """System config, include get and update method"""
     def update(self, ansible_path, deploy_script, start_script, stop_script,
-               repository_server, repository_user, repository_password, smtp_server, mail_address, smtp_user, smtp_password):
+               repository_server, repository_user, repository_password,
+               smtp_server, mail_address, smtp_user, smtp_password):
         """Update system config"""
         # Should be only one record in DB
         item = System.query.first()
@@ -27,12 +27,15 @@ class SystemConfig:
         db.session.commit()
         db.session.close()
 
-    def add(self,ansible_path, deploy_script, start_script, stop_script,
-            repository_server, repository_user, repository_password, smtp_server, mail_address, smtp_user, smtp_password):
+    def add(self, ansible_path, deploy_script, start_script, stop_script,
+            repository_server, repository_user, repository_password,
+            smtp_server, mail_address, smtp_user, smtp_password):
         """Add system config"""
-        item = System(ansible_path=ansible_path, deploy_script=deploy_script, start_script=start_script, stop_script=stop_script,
-                      repository_server=repository_server, repository_user=repository_user, repository_pwd=repository_password,
-                      smtp_server=smtp_server, mail_address=mail_address, smtp_user=smtp_user, smtp_pwd=smtp_password)
+        item = System(ansible_path=ansible_path, deploy_script=deploy_script, start_script=start_script,
+                      stop_script=stop_script, repository_server=repository_server,
+                      repository_user=repository_user, repository_pwd=repository_password,
+                      smtp_server=smtp_server, mail_address=mail_address,
+                      smtp_user=smtp_user, smtp_pwd=smtp_password)
         db.session.add(item)
         db.session.commit()
         db.session.close()
@@ -45,7 +48,8 @@ class SystemConfig:
 
 class ProjectConfig:
     """Action for project"""
-    def update(self,project_name_old, project_name, group, describe, servers, source_address, project_type, post_script_type, post_script):
+    def update(self, project_name_old, project_name, group, describe,
+               servers, source_address, project_type, post_script_type, post_script):
         """Update project config"""
         item = Project.query.filter_by(project_name=project_name_old).first()
         item.project_name = project_name
@@ -59,9 +63,11 @@ class ProjectConfig:
         db.session.commit()
         db.session.close()
 
-    def add(self, project_name, group, describe, servers, source_address, project_type, post_script_type, post_script):
+    def add(self, project_name, group, describe, servers,
+            source_address, project_type, post_script_type, post_script):
         """Add project"""
-        item = Project(project_name=project_name, group=group, describe=describe, servers=servers, source_address=source_address,
+        item = Project(project_name=project_name, group=group, describe=describe,
+                       servers=servers, source_address=source_address,
                        type=project_type, post_script_type=post_script_type, post_script=post_script)
         db.session.add(item)
         db.session.commit()

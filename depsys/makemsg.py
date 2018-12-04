@@ -103,6 +103,6 @@ class Report:
         try:
             pdfkit.from_string(html, pdf_file)
         except Exception as Err:
-            return ("Failed to convert pdf file duo to: ", str(Err))
+            return "Failed to convert pdf file duo to: %s" % str(Err)
         else:
             return pdf_file

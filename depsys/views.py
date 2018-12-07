@@ -2,14 +2,34 @@
 # -*- coding: utf-8 -*-
 
 import time
+from datetime import timedelta
 from flask import render_template, redirect, url_for, request, jsonify, session, flash
 from flask_login import login_user, login_required, logout_user, current_user
-from depsys import app, sendmsg, makemsg
+from depsys import app, sendmsg, makemsg, timer
 from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import *
 from depsys.forms import *
 from depsys.permissions import requires_roles
 from depsys.verify import Verify
+
+
+# session timeout setting
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    # session timeout value, could be hours=num or minutes=num
+    app.permanent_session_lifetime = timedelta(minutes=30)
+
+
+@app.teardown_request
+def teardown_request(exception=None):
+    if exception:
+        app.logger.info("Request Error: %s" % exception)
+    elif current_user.is_active:
+        timer.write_time(session.get('user_id'))
+    else:
+        # app.logger.info("Anonymous run this request")
+        pass
 
 
 # Index
@@ -52,7 +72,7 @@ def logout():
 @login_required
 def profile():
     form = ProfileForm()
-    user_id = session['user_id']
+    user_id = session.get('user_id')
     # grab user and role info from db
     user = UserConfig().get(user_id=user_id)
     role = RoleConfig().get(role_id=user.role)

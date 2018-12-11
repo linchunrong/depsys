@@ -1,14 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#import threading
-#from depsys import app
+import time
+from depsys import prepares
 
 
-def write_time(user_id):
-    # app.logger.info('User %s is active' % user_id)
-    print('User %s is active' % user_id)
-    pass
+def write_time(**kwargs):
+    current_time = time.localtime()
+    current_time = time.strftime("%Y-%m-%d %H:%M:%S", current_time)
+    time_file = prepares.temp_path.joinpath('user_time_%s' % str(kwargs.get('user_id')))
+    with open(time_file, 'w') as info:
+        info.write("%s %s %s" % (current_time, kwargs.get('user_add'), kwargs.get('browser_version')))
+
+
+def pick_time(user_id):
+    return user_id
 
 
 #def fun_timer():

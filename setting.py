@@ -32,6 +32,8 @@ DATA_PATH = 'data'
 TEMP_PATH = 'tmp'
 # bin path, not in use, would be ./depsys/bin_path
 BIN_PATH = 'bin'
+# logs file name
+LOGS_NAME = 'app.log'
 
 # WeChat interface
 API_URL = 'https://qyapi.weixin.qq.com/cgi-bin/'

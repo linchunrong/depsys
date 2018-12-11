@@ -26,7 +26,10 @@ def teardown_request(exception=None):
     if exception:
         app.logger.info("Request Error: %s" % exception)
     elif current_user.is_active:
-        timer.write_time(session.get('user_id'))
+        user_id = session.get('user_id')
+        browser_version = '%s %s' % (request.user_agent.browser, request.user_agent.version)
+        user_add = request.remote_addr
+        timer.write_time(user_id=user_id, browser_version=browser_version, user_add=user_add)
     else:
         # app.logger.info("Anonymous run this request")
         pass

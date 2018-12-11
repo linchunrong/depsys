@@ -6,7 +6,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_socketio import SocketIO
-import logging, os, pathlib
+import logging
+from depsys import prepares
 
 # call monkey.patch_all to ignore gevent(take care of socketio thread) warning
 monkey.patch_all()
@@ -27,16 +28,15 @@ login_manager.session_protection = 'strong'
 login_manager.login_view = 'login'
 login_manager.init_app(app)
 
-# define logfile under app path
-parent_path = os.path.dirname(os.path.dirname(__file__))
-parent_path = pathlib.Path(parent_path)
-logfile = str(parent_path.joinpath('app.log'))
-# logs output to app.log via logging module
-handler = logging.FileHandler(logfile, encoding='UTF-8')
+# logs output to logfile via logging module
+handler = logging.FileHandler(prepares.logfile, encoding='UTF-8')
 logging_format = logging.Formatter(
     '%(asctime)s [%(levelname)s] %(filename)s %(funcName)s(%(lineno)s): %(message)s')
 handler.setFormatter(logging_format)
 app.logger.addHandler(handler)
+
+# run prepares
+prepares.run()
 
 from depsys import views
 

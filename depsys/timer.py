@@ -9,20 +9,33 @@ def write_time(**kwargs):
     current_time = time.localtime()
     current_time = time.strftime("%Y-%m-%d %H:%M:%S", current_time)
     time_file = prepares.temp_path.joinpath('user_time_%s' % str(kwargs.get('user_id')))
+    data = {
+        "Time": current_time,
+        "User_Add": kwargs.get('user_add'),
+        "Browser": kwargs.get('browser_version')
+    }
     with open(time_file, 'w') as info:
-        info.write("%s %s %s" % (current_time, kwargs.get('user_add'), kwargs.get('browser_version')))
+        info.write(str(data))
 
 
-def pick_time(user_id):
-    return user_id
+def pick_time():
+    pass
+    # print("Schedule output")
 
 
-#def fun_timer():
-#    app.logger.info('Hello timer!')
-#    global timer
-#    timer = threading.Timer(5.5, fun_timer)
-#    timer.start()
+'''
+import threading
+
+def pick_stop(signum, frame):
+    global pick
+    pick.cancel()
 
 
-#timer = threading.Timer(1, fun_timer)
-#timer.start()
+def pick_time():
+    global pick
+    pick = threading.Timer(5, pick_time)
+    pick.start()
+
+signal.signal(signal.SIGINT, pick_stop)
+pick_time()
+'''

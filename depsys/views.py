@@ -5,12 +5,13 @@ import time
 from datetime import timedelta
 from flask import render_template, redirect, url_for, request, jsonify, session, flash
 from flask_login import login_user, login_required, logout_user, current_user
-from depsys import app, sendmsg, makemsg, timer
+from depsys import app, sendmsg, makemsg
 from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import *
 from depsys.forms import *
 from depsys.permissions import requires_roles
 from depsys.verify import Verify
+from depsys.timer import write_time
 
 
 # session timeout setting
@@ -29,7 +30,7 @@ def teardown_request(exception=None):
         user_id = session.get('user_id')
         browser_version = '%s %s' % (request.user_agent.browser, request.user_agent.version)
         user_add = request.remote_addr
-        timer.write_time(user_id=user_id, browser_version=browser_version, user_add=user_add)
+        write_time(user_id=user_id, browser_version=browser_version, user_add=user_add)
     else:
         # app.logger.info("Anonymous run this request")
         pass

@@ -11,6 +11,9 @@ SECRET_KEY = '\x84\x96\x04\xe9\xc5\xe1\xb4\xc5\xa4M\xcd\x9a\xf4b"\xce\x88\xe36\x
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://depsys:123456@127.0.0.1:3306/depsys'
 
+# enable scheduler api
+SCHEDULER_API_ENABLED = True
+
 # network setting
 HOST = '0.0.0.0'
 PORT = 5000

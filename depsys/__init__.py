@@ -8,6 +8,7 @@ from flask_login import LoginManager
 from flask_socketio import SocketIO
 import logging
 from depsys import prepares
+from flask_apscheduler import APScheduler
 
 # call monkey.patch_all to ignore gevent(take care of socketio thread) warning
 monkey.patch_all()
@@ -19,6 +20,22 @@ async_mode = None
 
 app = Flask(__name__)
 app.config.from_object('setting')
+
+# setup scheduler jobs
+app.config['JOBS'] = [
+    {
+        'id': 'job1',
+        'func': 'depsys.timer:pick_time',
+        'trigger': 'interval',
+        'seconds': 5
+    }
+]
+scheduler = APScheduler()
+# it is also possible to enable the API directly
+# scheduler.api_enabled = True
+scheduler.init_app(app)
+scheduler.start()
+
 # app.config.from_envvar('FLASKR_SETTINGS')
 socketio = SocketIO(app, async_mode=async_mode)
 

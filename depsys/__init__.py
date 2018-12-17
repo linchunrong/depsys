@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_socketio import SocketIO
 import logging
-from depsys import prepares
+from depsys import bases
 from flask_apscheduler import APScheduler
 
 # call monkey.patch_all to ignore gevent(take care of socketio thread) warning
@@ -27,7 +27,7 @@ app.config['JOBS'] = [
         'id': 'job1',
         'func': 'depsys.timer:pick_time',
         'trigger': 'interval',
-        'seconds': 5
+        'seconds': 10
     }
 ]
 scheduler = APScheduler()
@@ -46,14 +46,14 @@ login_manager.login_view = 'login'
 login_manager.init_app(app)
 
 # logs output to logfile via logging module
-handler = logging.FileHandler(prepares.logfile, encoding='UTF-8')
+handler = logging.FileHandler(bases.logfile, encoding='UTF-8')
 logging_format = logging.Formatter(
     '%(asctime)s [%(levelname)s] %(filename)s %(funcName)s(%(lineno)s): %(message)s')
 handler.setFormatter(logging_format)
 app.logger.addHandler(handler)
 
-# run prepares
-prepares.run()
+# run bases
+bases.run()
 
 from depsys import views
 

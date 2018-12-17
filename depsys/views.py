@@ -5,13 +5,12 @@ import time
 from datetime import timedelta
 from flask import render_template, redirect, url_for, request, jsonify, session, flash
 from flask_login import login_user, login_required, logout_user, current_user
-from depsys import app, sendmsg, makemsg
+from depsys import app, sendmsg, makemsg, timer
 from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import *
 from depsys.forms import *
 from depsys.permissions import requires_roles
 from depsys.verify import Verify
-from depsys.timer import write_time
 
 
 # session timeout setting
@@ -28,9 +27,10 @@ def teardown_request(exception=None):
         app.logger.info("Request Error: %s" % exception)
     elif current_user.is_active:
         user_id = session.get('user_id')
+        username = session.get('username')
         browser_version = '%s %s' % (request.user_agent.browser, request.user_agent.version)
         user_add = request.remote_addr
-        write_time(user_id=user_id, browser_version=browser_version, user_add=user_add)
+        timer.write_time(user_id=user_id, username=username, browser_version=browser_version, user_add=user_add)
     else:
         # app.logger.info("Anonymous run this request")
         pass
@@ -48,15 +48,18 @@ def index():
 def login():
     form = LoginForm()
     if form.validate_on_submit() and request.method == 'POST':
+        username = form.username.data.strip()
         # grab user from db
-        user = UserConfig().get(username=form.username.data)
+        user = UserConfig().get(username=username)
         # if user exist and valid
         if user and user.enable:
             if user.password != form.password.data:
                 flash("Invalid password")
             else:
                 login_user(user)
-                app.logger.info('User %s Login' % user.username)
+                # write username into session
+                session['username'] = username
+                app.logger.info('User %s Login' % username)
                 return redirect(url_for('index'))
         else:
             flash('Invalid Username')
@@ -66,9 +69,13 @@ def login():
 
 @app.route('/logout')
 def logout():
-    app.logger.info('User %s Logout' % current_user.username)
+    user_id = current_user.id
+    app.logger.info('User %s logout at %s' % (current_user.username, time.asctime()))
+    # logout user
     logout_user()
     flash("You have logout!")
+    # write logout action to db
+    timer.write_logout(user_id=user_id)
     return redirect(url_for('login'))
 
 

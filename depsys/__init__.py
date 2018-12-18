@@ -21,21 +21,6 @@ async_mode = None
 app = Flask(__name__)
 app.config.from_object('setting')
 
-# setup scheduler jobs
-app.config['JOBS'] = [
-    {
-        'id': 'job1',
-        'func': 'depsys.timer:pick_time',
-        'trigger': 'interval',
-        'seconds': 10
-    }
-]
-scheduler = APScheduler()
-# it is also possible to enable the API directly
-# scheduler.api_enabled = True
-scheduler.init_app(app)
-scheduler.start()
-
 # app.config.from_envvar('FLASKR_SETTINGS')
 socketio = SocketIO(app, async_mode=async_mode)
 
@@ -54,6 +39,21 @@ app.logger.addHandler(handler)
 
 # run bases
 bases.run()
+
+# setup scheduler jobs
+app.config['JOBS'] = [
+    {
+        'id': 'job1',
+        'func': 'depsys.timer:pick_time',
+        'trigger': 'interval',
+        'seconds': 1800
+    }
+]
+scheduler = APScheduler()
+# it is also possible to enable the API directly
+# scheduler.api_enabled = True
+scheduler.init_app(app)
+scheduler.start()
 
 from depsys import views
 

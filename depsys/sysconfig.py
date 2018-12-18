@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from depsys import db
-from depsys.models import Project, System, User, Role
+from depsys.models import Project, System, User, Role, Audit
 
 
 class SystemConfig:
@@ -182,3 +182,35 @@ class RoleConfig:
         """Get all roles"""
         item = Role.query.all()
         return item
+
+
+class AuditConfig:
+    """Config for audit"""
+    def update(self):
+        """Update audit info"""
+        pass
+
+    def add(self, user_id, username, time_stamp, user_addr, browser, action):
+        """Add audit info"""
+        item = Audit(user_id=user_id, username=username, time_stamp=time_stamp,
+                     user_addr=user_addr, browser=browser, action=action)
+        db.session.add(item)
+        db.session.commit()
+        db.session.close()
+
+    def delete(self, audit_id):
+        """Delete audit"""
+        item = Audit.query.filter_by(audit_id=audit_id).first()
+        db.session.delete(item)
+        db.session.commit()
+        db.session.close()
+
+    def get(self, audit_id):
+        """Get audit info"""
+        item = Audit.query.filter_by(audit_id=audit_id).first()
+        return item
+
+    def get_all(self):
+        """Get all audits info"""
+        item = Audit.query.all()
+        return  item

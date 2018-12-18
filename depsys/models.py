@@ -13,6 +13,7 @@ class User(db.Model, UserMixin):
     group = db.Column(db.String(36))
     enable = db.Column(db.Boolean, default=True)
     role = db.Column(db.Integer, db.ForeignKey('roles.role_id'))
+    audit = db.relationship('Audit', backref='aud')
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -29,6 +30,18 @@ class Role(db.Model):
     name = db.Column(db.String(16), unique=True, nullable=False)
     describe = db.Column(db.String(100))
     user = db.relationship('User', backref='rol')
+
+
+class Audit(db.Model):
+    __tablename__ = 'audit'
+    audit_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    username = db.Column(db.String(17))
+    time_stamp = db.Column(db.DateTime)
+    user_addr = db.Column(db.String(32))
+    browser = db.Column(db.String(64))
+    # user request action, e.g. login/logout
+    action = db.Column(db.String(64))
 
 
 class System(db.Model):

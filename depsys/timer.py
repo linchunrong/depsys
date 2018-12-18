@@ -3,6 +3,7 @@
 
 import time, os
 from depsys import app, bases
+from depsys.sysconfig import AuditConfig
 
 
 def write_time(**kwargs):
@@ -14,7 +15,7 @@ def write_time(**kwargs):
         "User_id": kwargs.get('user_id'),
         "Username": kwargs.get('username'),
         "Time": current_time,
-        "User_add": kwargs.get('user_add'),
+        "User_addr": kwargs.get('user_addr'),
         "Browser": kwargs.get('browser_version')
     }
     with open(time_file, 'w') as info:
@@ -37,24 +38,38 @@ def pick_time():
             # session timeout in 30min
             if time_pass > 1800:
                 print("User %s logout at %s" % (result.get('Username'), result.get('Time')))
-                write_logout(result.get('User_id'))
+                data = {
+                    "Username": result.get('Username'),
+                    "Time": time.strptime(result.get('Time')),
+                    "User_addr": result.get('User_addr'),
+                    "Browser": result.get('Browser'),
+                    "Action": "Logout"
+                }
+                write_audit(user_id=result.get('User_id'), data=data)
             # print(result.get('User_id'), result.get('Time'), time_pass)
     # print("Schedule output")
 
 
-def write_logout(user_id):
-    """Write user logout time info into db"""
-    ######
-    # write db func
-    ######
-    # remove user request time file, in case logout time duplication
+def write_audit(user_id, data):
+    """Write user audit info into db"""
+    audit = AuditConfig()
     try:
-        os.remove(bases.temp_path.joinpath('%s%s' % (bases.time_file_pre, user_id)))
+        # data is a dict args
+        audit.add(user_id=user_id, username=data.get('Username'), time_stamp=data.get('Time'),
+                  user_addr=data.get('User_addr'), browser=data.get('Browser'), action=data.get('Action'))
     except Exception as Err:
-        app.logger.error("Failed to remove user time file %s%s due to %s." % (bases.time_file_pre, user_id, str(Err)))
-    else:
-        app.logger.info("Removed user time file %s%s" % (bases.time_file_pre, user_id))
+        app.logger.error("Failed to write audit info to db due to: %s" % str(Err))
+        raise Exception("Audit data write DB Error")
 
+    if data.get('Action') == 'Logout':
+        # remove user request time file, in case logout time duplication
+        try:
+            os.remove(bases.temp_path.joinpath('%s%s' % (bases.time_file_pre, user_id)))
+        except Exception as Err:
+            app.logger.error("Failed to remove user time file %s%s due to %s."
+                             % (bases.time_file_pre, user_id, str(Err)))
+        else:
+            app.logger.info("Removed user time file %s%s" % (bases.time_file_pre, user_id))
 
 
 '''

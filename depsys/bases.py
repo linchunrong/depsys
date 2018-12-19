@@ -12,7 +12,7 @@ temp_path = my_path.joinpath(TEMP_PATH.strip())
 # define logfile
 logfile = str(parent_path.joinpath(LOGS_NAME.strip()))
 # define user request time file prefix
-time_file_pre = 'user_time_'
+time_file_pre = 'user_time'
 
 
 # create folder func

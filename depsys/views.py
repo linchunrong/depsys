@@ -18,7 +18,7 @@ from depsys.verify import Verify
 def make_session_permanent():
     session.permanent = True
     # session timeout value, could be hours=num or minutes=num
-    app.permanent_session_lifetime = timedelta(minutes=60)
+    app.permanent_session_lifetime = timedelta(minutes=30)
 
 
 @app.teardown_request
@@ -30,6 +30,7 @@ def teardown_request(exception=None):
         username = session.get('username')
         browser_version = '%s %s' % (request.user_agent.browser, request.user_agent.version)
         user_addr = request.remote_addr
+        # call write_time fun write the newest request info
         timer.write_time(user_id=user_id, username=username, browser_version=browser_version, user_addr=user_addr)
     else:
         # app.logger.info("Anonymous run this request")
@@ -61,6 +62,7 @@ def login():
                 session['username'] = username
                 # grab info when login
                 data = {
+                    'User_id': user.id,
                     'Username': username,
                     'Time': time.localtime(),
                     'User_addr': request.remote_addr,
@@ -69,7 +71,7 @@ def login():
                 }
                 app.logger.info('User %s login at %s' % (username, time.asctime(data.get('Time'))))
                 # write login action to db
-                timer.write_audit(user_id=user.id, data=data)
+                timer.write_audit(data=data)
                 return redirect(url_for('index'))
         else:
             flash('Invalid Username')
@@ -81,19 +83,19 @@ def login():
 def logout():
     # grab info when logout
     data = {
+        'User_id': current_user.id,
         'Username': current_user.username,
         'Time': time.localtime(),
         'User_addr': request.remote_addr,
         'Browser': '%s %s' % (request.user_agent.browser, request.user_agent.version),
         'Action': 'Logout'
     }
-    user_id = current_user.id
     app.logger.info('User %s logout at %s' % (current_user.username, time.asctime(data.get('Time'))))
     # logout user
     logout_user()
     flash("You have logout!")
     # write logout action to db
-    timer.write_audit(user_id=user_id, data=data)
+    timer.write_audit(data=data)
     return redirect(url_for('login'))
 
 

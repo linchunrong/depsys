@@ -46,6 +46,7 @@ app.config['JOBS'] = [
         'id': 'job1',
         'func': 'depsys.timer:pick_time',
         'trigger': 'interval',
+        # depend on session timeout setting
         'seconds': 1800
     }
 ]

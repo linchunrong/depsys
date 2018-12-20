@@ -370,6 +370,14 @@ def charts():
     return render_template('charts.html')
 
 
+@app.route('/audit')
+@login_required
+@requires_roles('admin')
+def audit():
+    audit_list = AuditConfig().get_all()
+    return render_template('audit.html', audit_list = audit_list)
+
+
 @app.route('/licence')
 @login_required
 def licence():

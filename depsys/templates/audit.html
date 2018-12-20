@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block navbar_title %}
+<ol class="breadcrumb navbar-breadcrumb">
+    <li class="active">Audit</li>
+</ol>
+{% endblock %}
+{% block content %}
+<script src="../static/js/users.js"></script>
+<!-- Main Content -->
+    <div class="container-fluid">
+        <div class="side-body">
+            <div class="page-title">
+                <span class="title">审计</span>
+                <div class="description">用户操作记录</div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title" style="float: none">
+                                <div class="title">
+                                    记录列表
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!--<div class="sub-title">用户列表</div>-->
+                                <table class="datatable table table-striped" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Username</th>
+                                            <th>Address</th>
+                                            <th>Terminal</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Username</th>
+                                        <th>Address</th>
+                                        <th>Terminal</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </tfoot>
+                                    <tbody>
+                                    {% for audit in audit_list %}
+                                        <tr>
+                                            <td>{{ audit.time_stamp }}</td>
+                                            <td>{{ audit.username }}</td>
+                                            <td>{{ audit.user_addr }}</td>
+                                            <td>{{ audit.browser }}</td>
+                                            <td>{{ audit.action }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

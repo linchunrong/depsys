@@ -2,14 +2,43 @@
 # -*- coding: utf-8 -*-
 
 import time
+from datetime import timedelta
 from flask import render_template, redirect, url_for, request, jsonify, session, flash
 from flask_login import login_user, login_required, logout_user, current_user
-from depsys import app, sendmsg, makemsg
+from depsys import app, sendmsg, makemsg, timer
 from depsys.dashboard import DeployInfo, DeployRecord
 from depsys.sysconfig import *
 from depsys.forms import *
 from depsys.permissions import requires_roles
 from depsys.verify import Verify
+
+
+# session timeout setting
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    # session timeout value, could be hours=num or minutes=num
+    app.permanent_session_lifetime = timedelta(minutes=30)
+
+
+@app.teardown_request
+def teardown_request(exception=None):
+    if exception:
+        app.logger.info("Request Error: %s" % exception)
+    elif current_user.is_active:
+        user_id = session.get('user_id')
+        username = session.get('username')
+        browser_version = '%s %s' % (request.user_agent.browser, request.user_agent.version)
+        # when nginx setup real ip headers
+        if request.headers.get('X-Real-Ip'):
+            user_addr = request.headers.get('X-Real-Ip')
+        else:
+            user_addr = request.remote_addr
+        # call write_time fun write the newest request info
+        timer.write_time(user_id=user_id, username=username, browser_version=browser_version, user_addr=user_addr)
+    else:
+        # app.logger.info("Anonymous run this request")
+        pass
 
 
 # Index
@@ -24,15 +53,34 @@ def index():
 def login():
     form = LoginForm()
     if form.validate_on_submit() and request.method == 'POST':
+        username = form.username.data.strip()
         # grab user from db
-        user = UserConfig().get(username=form.username.data)
+        user = UserConfig().get(username=username)
         # if user exist and valid
         if user and user.enable:
             if user.password != form.password.data:
                 flash("Invalid password")
             else:
                 login_user(user)
-                app.logger.info('User %s Login' % user.username)
+                # write username into session
+                session['username'] = username
+                # grab user address
+                if request.headers.get('X-Real-Ip'):
+                    user_addr = request.headers.get('X-Real-Ip')
+                else:
+                    user_addr = request.remote_addr
+                # grab info when login
+                data = {
+                    'User_id': user.id,
+                    'Username': username,
+                    'Time': time.localtime(),
+                    'User_addr': user_addr,
+                    'Browser': '%s %s' % (request.user_agent.browser, request.user_agent.version),
+                    'Action': 'Login'
+                }
+                app.logger.info('User %s login at %s' % (username, time.asctime(data.get('Time'))))
+                # write login action to db
+                timer.write_audit(data=data)
                 return redirect(url_for('index'))
         else:
             flash('Invalid Username')
@@ -42,9 +90,25 @@ def login():
 
 @app.route('/logout')
 def logout():
-    app.logger.info('User %s Logout' % current_user.username)
+    # grab info when logout
+    if request.headers.get('X-Real-Ip'):
+        user_addr = request.headers.get('X-Real-Ip')
+    else:
+        user_addr = request.remote_addr
+    data = {
+        'User_id': current_user.id,
+        'Username': current_user.username,
+        'Time': time.localtime(),
+        'User_addr': user_addr,
+        'Browser': '%s %s' % (request.user_agent.browser, request.user_agent.version),
+        'Action': 'Logout'
+    }
+    app.logger.info('User %s logout at %s' % (current_user.username, time.asctime(data.get('Time'))))
+    # logout user
     logout_user()
     flash("You have logout!")
+    # write logout action to db
+    timer.write_audit(data=data)
     return redirect(url_for('login'))
 
 
@@ -52,7 +116,7 @@ def logout():
 @login_required
 def profile():
     form = ProfileForm()
-    user_id = session['user_id']
+    user_id = session.get('user_id')
     # grab user and role info from db
     user = UserConfig().get(user_id=user_id)
     role = RoleConfig().get(role_id=user.role)
@@ -317,6 +381,14 @@ def add_user():
 @login_required
 def charts():
     return render_template('charts.html')
+
+
+@app.route('/audit')
+@login_required
+@requires_roles('admin')
+def audit():
+    audit_list = AuditConfig().get_all()
+    return render_template('audit.html', audit_list=audit_list)
 
 
 @app.route('/licence')

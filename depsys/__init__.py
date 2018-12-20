@@ -6,7 +6,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_socketio import SocketIO
-import logging, os, pathlib
+import logging
+from depsys import bases
+from flask_apscheduler import APScheduler
 
 # call monkey.patch_all to ignore gevent(take care of socketio thread) warning
 monkey.patch_all()
@@ -18,6 +20,7 @@ async_mode = None
 
 app = Flask(__name__)
 app.config.from_object('setting')
+
 # app.config.from_envvar('FLASKR_SETTINGS')
 socketio = SocketIO(app, async_mode=async_mode)
 
@@ -27,16 +30,31 @@ login_manager.session_protection = 'strong'
 login_manager.login_view = 'login'
 login_manager.init_app(app)
 
-# define logfile under app path
-parent_path = os.path.dirname(os.path.dirname(__file__))
-parent_path = pathlib.Path(parent_path)
-logfile = str(parent_path.joinpath('app.log'))
-# logs output to app.log via logging module
-handler = logging.FileHandler(logfile, encoding='UTF-8')
+# logs output to logfile via logging module
+handler = logging.FileHandler(bases.logfile, encoding='UTF-8')
 logging_format = logging.Formatter(
     '%(asctime)s [%(levelname)s] %(filename)s %(funcName)s(%(lineno)s): %(message)s')
 handler.setFormatter(logging_format)
 app.logger.addHandler(handler)
+
+# run bases
+bases.run()
+
+# setup scheduler jobs
+app.config['JOBS'] = [
+    {
+        'id': 'job1',
+        'func': 'depsys.timer:pick_time',
+        'trigger': 'interval',
+        # depend on session timeout setting
+        'seconds': 1800
+    }
+]
+scheduler = APScheduler()
+# it is also possible to enable the API directly
+# scheduler.api_enabled = True
+scheduler.init_app(app)
+scheduler.start()
 
 from depsys import views
 

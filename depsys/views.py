@@ -29,7 +29,11 @@ def teardown_request(exception=None):
         user_id = session.get('user_id')
         username = session.get('username')
         browser_version = '%s %s' % (request.user_agent.browser, request.user_agent.version)
-        user_addr = request.remote_addr
+        # when nginx setup real ip headers
+        if request.headers.get('X-Real-Ip'):
+            user_addr = request.headers.get('X-Real-Ip')
+        else:
+            user_addr = request.remote_addr
         # call write_time fun write the newest request info
         timer.write_time(user_id=user_id, username=username, browser_version=browser_version, user_addr=user_addr)
     else:
@@ -60,12 +64,17 @@ def login():
                 login_user(user)
                 # write username into session
                 session['username'] = username
+                # grab user address
+                if request.headers.get('X-Real-Ip'):
+                    user_addr = request.headers.get('X-Real-Ip')
+                else:
+                    user_addr = request.remote_addr
                 # grab info when login
                 data = {
                     'User_id': user.id,
                     'Username': username,
                     'Time': time.localtime(),
-                    'User_addr': request.remote_addr,
+                    'User_addr': user_addr,
                     'Browser': '%s %s' % (request.user_agent.browser, request.user_agent.version),
                     'Action': 'Login'
                 }
@@ -82,11 +91,15 @@ def login():
 @app.route('/logout')
 def logout():
     # grab info when logout
+    if request.headers.get('X-Real-Ip'):
+        user_addr = request.headers.get('X-Real-Ip')
+    else:
+        user_addr = request.remote_addr
     data = {
         'User_id': current_user.id,
         'Username': current_user.username,
         'Time': time.localtime(),
-        'User_addr': request.remote_addr,
+        'User_addr': user_addr,
         'Browser': '%s %s' % (request.user_agent.browser, request.user_agent.version),
         'Action': 'Logout'
     }
@@ -375,7 +388,7 @@ def charts():
 @requires_roles('admin')
 def audit():
     audit_list = AuditConfig().get_all()
-    return render_template('audit.html', audit_list = audit_list)
+    return render_template('audit.html', audit_list=audit_list)
 
 
 @app.route('/licence')

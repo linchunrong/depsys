@@ -21,6 +21,7 @@
     <link rel="stylesheet" type="text/css" href="../static/lib/css/select2.min.css">
     <!-- CSS App -->
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/profile.css">
     <link rel="stylesheet" type="text/css" href="../static/css/themes/flat-blue.css">
 </head>
     <!-- Javascript Libs -->
@@ -51,7 +52,11 @@
                     </div>
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown profile">
-                            <a href="{{ url_for('logout') }}" class="dropdown-toggle" role="button" aria-expanded="false">Logout</a>
+                            <a class="dropdown-toggle" role="button" aria-expanded="false">Profile</a>
+                              <div class="dropdown-content">
+                                  <a href="{{ url_for('profile') }}" class="icon fa fa-edit"></a>
+                                  <a href="{{ url_for('logout') }}" class="icon fa fa-power-off"></a>
+                              </div>
                         </li>
                     </ul>
                 </div>
@@ -98,11 +103,6 @@
                             <li>
                                 <a href="{{ url_for('audit') }}">
                                     <span class="icon fa fa-eye"></span><span class="title">Audit</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('profile') }}">
-                                    <span class="icon fa fa-book"></span><span class="title">Profile</span>
                                 </a>
                             </li>
                             <li>
